@@ -8,7 +8,13 @@ Learning Rust by implementing solutions for [Advent of Code](https://adventofcod
 Simply execute:
 
 ```bash
-cargo run y2020/ex01/
+cargo run <exercise_path> <input_file> [part]
+```
+
+For instance:
+
+```bash
+cargo run y2020/ex01/ y2020/ex01/input.txt part2
 ```
 
 
