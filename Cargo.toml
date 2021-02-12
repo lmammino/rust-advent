@@ -1,4 +1,5 @@
 [workspace]
 members = [
-  "y2020/ex01"
+  "y2020/ex01",
+  "y2020/ex02"
 ]
