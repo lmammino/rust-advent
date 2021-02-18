@@ -17,6 +17,12 @@ For instance:
 cargo run y2020/ex01/ y2020/ex01/input.txt part2
 ```
 
+Alternatively, if that does not work, we can run it using the `--bin` command line argument
+
+```bash
+cargo run --bin <exercise_name> <exercise_path> <input_file> [part]
+```
+
 
 ## Create a new exercise
 
