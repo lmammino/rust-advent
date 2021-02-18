@@ -47,6 +47,13 @@ fn validate_line(line: &Line) -> bool {
     occurences >= line.min && occurences <= line.max
 }
 
+fn validate_line2(line: &Line) -> bool {
+    let start_index = (line.min - 1) as usize;
+    let end_index = (line.max - 1) as usize;
+    line.password.chars().nth(start_index).unwrap() == line.char
+        && line.password.chars().nth(end_index).unwrap() != line.char
+}
+
 fn part1(lines: Vec<String>) -> u32 {
     lines.iter().map(parse_line).filter(validate_line).count() as u32
 
@@ -70,6 +77,5 @@ fn part1(lines: Vec<String>) -> u32 {
 }
 
 fn part2(lines: Vec<String>) -> u32 {
-    parse_line(lines.get(0).unwrap());
-    0
+    lines.iter().map(parse_line).filter(validate_line2).count() as u32
 }
