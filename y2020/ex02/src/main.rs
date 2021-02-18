@@ -58,6 +58,15 @@ fn part1(lines: Vec<String>) -> u32 {
     //     }
     // }
     // valid_count
+
+    // let mut valid_count = 0;
+    // for line in &lines {
+    //     match validate_line(&parse_line(line)) {
+    //         true => valid_count += 1,
+    //         false => (),
+    //     }
+    // }
+    // valid_count
 }
 
 fn part2(lines: Vec<String>) -> u32 {
