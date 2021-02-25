@@ -14,8 +14,8 @@ fn main() -> io::Result<()> {
         .collect();
 
     match part.as_str() {
-        "part1" => assert_eq!(part1(values), 560),
-        "part2" => assert_eq!(part2(values), 303),
+        "part1" => assert_eq!(part1(values), 454),
+        "part2" => assert_eq!(part2(values), 649),
         _ => panic!("Invalid part"),
     };
 
@@ -50,8 +50,8 @@ fn validate_line(line: &Line) -> bool {
 fn validate_line2(line: &Line) -> bool {
     let start_index = (line.min - 1) as usize;
     let end_index = (line.max - 1) as usize;
-    line.password.chars().nth(start_index).unwrap() == line.char
-        && line.password.chars().nth(end_index).unwrap() != line.char
+    (line.password.chars().nth(start_index).unwrap() == line.char)
+        ^ (line.password.chars().nth(end_index).unwrap() == line.char)
 }
 
 fn part1(lines: Vec<String>) -> u32 {
