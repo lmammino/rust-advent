@@ -1,26 +1,4 @@
 use regex::Regex;
-use std::io::{self, BufRead};
-use std::{env, fs::File};
-
-fn main() -> io::Result<()> {
-    let args = env::args().collect::<Vec<String>>();
-    let input_file_path = args.get(2).expect("Missing input file path argument");
-    let part = args.get(3).unwrap_or(&String::from("part1")).clone();
-
-    let input_file = File::open(input_file_path).expect("Cannot open input file");
-    let lines = io::BufReader::new(input_file).lines();
-    let values: Vec<String> = lines
-        .map(|l| l.expect("Cannot read line from file"))
-        .collect();
-
-    match part.as_str() {
-        "part1" => assert_eq!(part1(values), 454),
-        "part2" => assert_eq!(part2(values), 649),
-        _ => panic!("Invalid part"),
-    };
-
-    Ok(())
-}
 
 struct Line {
     min: u32,
@@ -29,7 +7,7 @@ struct Line {
     password: String,
 }
 
-fn parse_line(line: &String) -> Line {
+fn parse_line(line: &str) -> Line {
     let re = Regex::new(r"^(\d+)-(\d+)\s([a-zA-Z]):\s([a-zA-Z]+)$").unwrap();
     let capture = re.captures(line).unwrap();
 
@@ -54,8 +32,8 @@ fn validate_line2(line: &Line) -> bool {
         ^ (line.password.chars().nth(end_index).unwrap() == line.char)
 }
 
-fn part1(lines: Vec<String>) -> u32 {
-    lines.iter().map(parse_line).filter(validate_line).count() as u32
+pub fn part1(input: &str) -> u32 {
+    input.lines().map(parse_line).filter(validate_line).count() as u32
 
     // let mut valid_count = 0;
     // for line in &lines {
@@ -76,6 +54,22 @@ fn part1(lines: Vec<String>) -> u32 {
     // valid_count
 }
 
-fn part2(lines: Vec<String>) -> u32 {
-    lines.iter().map(parse_line).filter(validate_line2).count() as u32
+pub fn part2(input: &str) -> u32 {
+    input.lines().map(parse_line).filter(validate_line2).count() as u32
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn part_1() {
+        let input = include_str!("../input.txt");
+        assert_eq!(part1(input), 454);
+    }
+
+    #[test]
+    fn part_2() {
+        let input = include_str!("../input.txt");
+        assert_eq!(part2(input), 649);
+    }
 }

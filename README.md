@@ -3,24 +3,19 @@
 
 Learning Rust by implementing solutions for [Advent of Code](https://adventofcode.com/) problems.
 
-## How to run an exercise
+
+## How to run tests for all exercises
 
 Simply execute:
 
 ```bash
-cargo run <exercise_path> <input_file> [part]
+cargo test
 ```
 
-For instance:
+If you want to run only one test for a given part of an exercise you can run something like this:
 
 ```bash
-cargo run y2020/ex01/ y2020/ex01/input.txt part2
-```
-
-Alternatively, if that does not work, we can run it using the `--bin` command line argument
-
-```bash
-cargo run --bin <exercise_name> <exercise_path> <input_file> [part]
+cargo test --package ex01 --lib --all-features -- tests::part_2
 ```
 
 
@@ -29,14 +24,14 @@ cargo run --bin <exercise_name> <exercise_path> <input_file> [part]
 Cd into the specific **year folder** (e.g. `y2020`) and run:
 
 ```bash
-cargo new exNN
+cargo new --lib exNN
 ```
 
 Replace `NN` with the number of exercise for the given year. For instance:
 
 
 ```bash
-cargo new ex01
+cargo new --lib ex01
 ```
 
 Finally add the new subproject in the workspace by editing the main [`Cargo.toml`](/Cargo.toml). For instance, assuming you just created `y2020/ex10`:
