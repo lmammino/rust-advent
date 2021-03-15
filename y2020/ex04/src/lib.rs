@@ -97,9 +97,7 @@ pub fn part2(lines: Vec<&str>) -> u32 {
 
         let is_valid = validators.iter().all(|(field, validator)| {
             if let Some(field_value) = passport.get(*field) {
-                if validator.validate(field_value) {
-                    return true;
-                }
+                return validator.validate(field_value);
             }
             false
         });
