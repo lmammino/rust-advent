@@ -1,5 +1,6 @@
 # Rust advent 🦀 🐚
 
+[![Rust](https://github.com/lmammino/rust-advent/actions/workflows/rust.yml/badge.svg)](https://github.com/lmammino/rust-advent/actions/workflows/rust.yml)
 
 Learning Rust by implementing solutions for [Advent of Code](https://adventofcode.com/) problems.
 
