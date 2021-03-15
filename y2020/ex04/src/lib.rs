@@ -52,13 +52,13 @@ pub fn part1(lines: Vec<&str>) -> u32 {
 
 pub fn part2(lines: Vec<&str>) -> u32 {
     let mut validators: HashMap<&str, Box<dyn validators::Validator>> = HashMap::new();
-    validators.insert("byr", Box::from(validators::create_byr_validator()));
-    validators.insert("iyr", Box::from(validators::create_iyr_validator()));
-    validators.insert("eyr", Box::from(validators::create_eyr_validator()));
-    validators.insert("hgt", Box::from(validators::create_hgt_validator()));
-    validators.insert("hcl", Box::from(validators::create_hcl_validator()));
-    validators.insert("ecl", Box::from(validators::create_ecl_validator()));
-    validators.insert("pid", Box::from(validators::create_pid_validator()));
+    validators.insert("byr", Box::new(validators::create_byr_validator()));
+    validators.insert("iyr", Box::new(validators::create_iyr_validator()));
+    validators.insert("eyr", Box::new(validators::create_eyr_validator()));
+    validators.insert("hgt", Box::new(validators::create_hgt_validator()));
+    validators.insert("hcl", Box::new(validators::create_hcl_validator()));
+    validators.insert("ecl", Box::new(validators::create_ecl_validator()));
+    validators.insert("pid", Box::new(validators::create_pid_validator()));
     // cid (Country ID) - ignored, missing or not.
     // This one is optional so we are not writing a validator for it
 
