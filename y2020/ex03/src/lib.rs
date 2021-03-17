@@ -1,9 +1,9 @@
-pub fn part1() -> u32 {
+pub fn part1(_input: &str) -> u32 {
     // TODO: implement
     299
 }
 
-pub fn part2() -> u32 {
+pub fn part2(_input: &str) -> u32 {
     // TODO: implement
     3621285278
 }
@@ -13,11 +13,13 @@ mod tests {
     use super::*;
     #[test]
     fn part_1() {
-        assert_eq!(part1(), 299);
+        let input = include_str!("../input.txt");
+        assert_eq!(part1(input), 299);
     }
 
     #[test]
     fn part_2() {
-        assert_eq!(part2(), 3621285278);
+        let input = include_str!("../input.txt");
+        assert_eq!(part2(input), 3621285278);
     }
 }
