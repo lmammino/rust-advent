@@ -3,10 +3,8 @@ pub fn part1(_input: &str) -> u32 {
             .lines()
             .map(|s| {
                 s.chars().collect::<Vec<char>>()
-                // s.iter().map(|b| *b as char).collect::<Vec<char>>();
             })
             .collect();
-    // println!("{:?}", lines.get(0).unwrap().get(0).unwrap());
     let mut x = 0;
     let mut cnt = 0;
     for row in lines {
@@ -24,10 +22,8 @@ pub fn part2(_input: &str) -> u32 {
             .lines()
             .map(|s| {
                 s.chars().collect::<Vec<char>>()
-                // s.iter().map(|b| *b as char).collect::<Vec<char>>();
             })
             .collect();
-    // println!("{:?}", lines.get(0).unwrap().get(0).unwrap());
     let mut xs = vec![0;5];
     let ixs = vec![1,3,5,7,1];
     let mut cnt = vec![0;5];
