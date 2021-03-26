@@ -21,6 +21,11 @@ pub fn part1(input: &str) -> u16 {
 
 pub fn part2(input: &str) -> u16 {
     let mut sorted_seat_ids = input.lines().map(seatid_to_int).collect::<Vec<u16>>();
+    // NOTE: sort is not ideal!
+    // There might be another approach that we can do in linear time,
+    // but we were in a rush and went for the quick solution!
+    // For instance, we could keep the data in an hashset O(n) and then scan the hashset O(n).
+    // For every number n we check if n + 1 is in the set, if not n + 1 is the solution!
     sorted_seat_ids.sort_unstable();
 
     for (i, seat_id) in sorted_seat_ids.iter().enumerate() {
