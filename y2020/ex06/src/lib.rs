@@ -10,6 +10,8 @@ mod tests {
     #[test]
     fn part_1() {
         let input = include_str!("../input.txt");
-        assert_eq!(part1(input), 0)
+        assert_eq!(part1(input), 6726)
     }
+
+    // part 2 3316
 }
