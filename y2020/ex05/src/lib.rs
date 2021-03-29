@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 fn seatid_to_int(input: &str) -> u16 {
     let bin_str = input
         .chars()
@@ -20,19 +22,16 @@ pub fn part1(input: &str) -> u16 {
 }
 
 pub fn part2(input: &str) -> u16 {
-    let mut sorted_seat_ids = input.lines().map(seatid_to_int).collect::<Vec<u16>>();
-    // NOTE: sort is not ideal!
-    // There might be another approach that we can do in linear time,
-    // but we were in a rush and went for the quick solution!
-    // For instance, we could keep the data in an hashset O(n) and then scan the hashset O(n).
-    // For every number n we check if n + 1 is in the set, if not n + 1 is the solution!
-    sorted_seat_ids.sort_unstable();
+    let seat_ids = input.lines().map(seatid_to_int).collect::<HashSet<u16>>();
 
-    for (i, seat_id) in sorted_seat_ids.iter().enumerate() {
-        if sorted_seat_ids.get(i + 1).unwrap() - seat_id > 1 {
-            return seat_id + 1;
+    for current_seat in &seat_ids {
+        let next_seat = current_seat + 1;
+        let next_next_seat = &next_seat + 1;
+        if !seat_ids.contains(&next_seat) && seat_ids.contains(&next_next_seat)  {
+            return next_seat
         }
     }
+
     panic!("Couldn't find our seat!")
 }
 
