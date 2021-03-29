@@ -21,6 +21,7 @@ pub fn part1(input: &str) -> usize {
 
 pub fn part2(input: &str) -> usize {
     let mut answers  = 0;
+    // this is true only for the first line of a block of answers
     let mut is_first = true;
 
     let mut question_answers_set = HashSet::new();
@@ -47,7 +48,6 @@ pub fn part2(input: &str) -> usize {
     }
 
     answers += question_answers_set.len();
-    
     answers
 }
 
