@@ -9,6 +9,7 @@ struct Line {
 }
 
 type Parents = HashMap<String, Vec<String>>;
+type Children = HashMap<String, Vec<(usize, String)>>;
 lazy_static! {
     static ref LINE_REGEX: Regex = Regex::new(r"^(\w+\s\w+) bags contain ((?:(?:\d+) (?:\w+\s\w+) bags?(?:[,.]\s?))+|no other bags.)$").unwrap();
     static ref BAGS_REGEX: Regex = Regex::new(r"(\d+) (\w+\s\w+) bags?").unwrap();
@@ -78,8 +79,24 @@ pub fn part1(input: &str) -> usize {
     visited.len() - 1
 }
 
+paths = ['1type/2type/3other/5type', '1type/2type/3type', '1type/7type/3other/9type']
+
+
 pub fn part2(input: &str) -> usize {
-    println!("{}", input);
+    let bags:Vec<Line> = input.lines().map(parse_line).collect();
+
+    let mut children : Children = HashMap::new();
+
+    for bag in bags.iter() {
+        for (count, child) in &bag.children {
+            children.entry(String::from(&(bag.name))).or_default().push(
+                (*count, String::from(child))
+            );
+        }
+    }
+
+    println!("{:?}", &children);
+
     30055
 }
 
