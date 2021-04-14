@@ -1,58 +1,29 @@
+#[macro_use]
+extern crate lazy_static;
 use regex::Regex;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 struct Line {
     name: String,
     children: Vec<(usize, String)>,
 }
 
 type Parents = HashMap<String, Vec<String>>;
-
-struct Visitor {
-    counter: usize,
-    visited: HashSet<String>,
-    parents_index: Parents,
-}
-
-impl Visitor {
-    fn new(parents_index: Parents) -> Self {
-        Visitor {
-            counter: 0,
-            visited: HashSet::new(),
-            parents_index,
-        }
-    }
-
-    fn visit(&mut self, node: String) -> usize {
-        let parents = self.parents_index.get(&node);
-        if let Some(parents) = parents {
-            for bag in parents {
-                if !self.visited.contains(bag) {
-                    self.counter += 1;
-                    self.visited.insert(String::from(bag));
-                    self.visit(String::from(bag));
-                }
-            }
-        }
-
-// TODO: implement. For every parent visit it. If it is not visited, counter + 1 and go on
-
-        self.counter
-    }
+lazy_static! {
+    static ref LINE_REGEX: Regex = Regex::new(r"^(\w+\s\w+) bags contain ((?:(?:\d+) (?:\w+\s\w+) bags?(?:[,.]\s?))+|no other bags.)$").unwrap();
+    static ref BAGS_REGEX: Regex = Regex::new(r"(\d+) (\w+\s\w+) bags?").unwrap();
 }
 
 fn parse_line(line: &str) -> Line {
-    let re = Regex::new(r"^(\w+\s\w+) bags contain ((?:(?:\d+) (?:\w+\s\w+) bags?(?:[,.]\s?))+|no other bags.)$").unwrap();
-    let rebags = Regex::new(r"(\d+) (\w+\s\w+) bags?").unwrap();
 
-    let capture = re.captures(line).unwrap();
+    let capture = LINE_REGEX.captures(line).unwrap();
     // println!("{:?}", capture);
 
     let name = String::from(&capture[1]);
     let bags = String::from(&capture[2]);
 
     let mut children: Vec<(usize, String)> = vec!();
-    for captured_bags in rebags.captures_iter(&bags) {
+    for captured_bags in BAGS_REGEX.captures_iter(&bags) {
         // println!("{:?}", captured_bags);
         children.push((captured_bags[1].parse().unwrap(), String::from(&captured_bags[2])));
     }
@@ -64,13 +35,6 @@ fn parse_line(line: &str) -> Line {
 
 
 pub fn part1(input: &str) -> usize {
-    // let mut parents_index: HashMap<&str, Vec<&str>> = HashMap::new();
-    // // ...
-
-    // let mut counter = 0;
-    // let mut visited: HashSet<&str> = HashSet::new();
-
-    // IDEA creates an instance of visitor and use the visit method on it
     let bags:Vec<Line> = input.lines().map(parse_line).collect();
 
     let mut parents : Parents = HashMap::new();
@@ -83,16 +47,35 @@ pub fn part1(input: &str) -> usize {
         }
     }
 
+    let start_color = String::from("shiny gold");
+    let mut visited = HashSet::new();
+    let mut check_queue = VecDeque::new();
+
+    check_queue.push_back(&start_color);
+
+    while !check_queue.is_empty() {
+        let current_colour = check_queue.pop_front().unwrap();
+        visited.insert(current_colour);
+        if let Some(current_parents) = parents.get(current_colour) {
+            for colour in current_parents {
+                if !visited.contains(colour) {
+                    visited.insert(colour); // should already be in the set at this stage
+                    check_queue.push_back(colour);
+                }
+            }
+        }
+    };  
+
     // parents
-    // {"bright white": ["light red", "dark orange"], "vibrant plum": ["shiny gold"],
+    // {"bright white": ["light red", "dark orange"], 
+    // "vibrant plum": ["shiny gold"],
     // "muted yellow": ["light red", "dark orange"],
     // "dotted black": ["dark olive", "vibrant plum"],
     // "faded blue": ["muted yellow", "dark olive", "vibrant plum"],
-    // "shiny gold": ["bright white", "muted yellow"], "dark olive": ["shiny gold"]}
+    // "shiny gold": ["bright white", "muted yellow"], 
+    // "dark olive": ["shiny gold"]}
 
-    let mut visitor = Visitor::new(parents);
-
-    visitor.visit(String::from("shiny gold"))
+    visited.len() - 1
 }
 
 pub fn part2(input: &str) -> usize {
