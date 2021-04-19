@@ -20,14 +20,12 @@ lazy_static! {
 
 fn parse_line(line: &str) -> Line {
     let capture = LINE_REGEX.captures(line).unwrap();
-    // println!("{:?}", capture);
 
     let name = String::from(&capture[1]);
     let bags = String::from(&capture[2]);
 
     let mut children: Vec<(usize, String)> = vec![];
     for captured_bags in BAGS_REGEX.captures_iter(&bags) {
-        // println!("{:?}", captured_bags);
         children.push((
             captured_bags[1].parse().unwrap(),
             String::from(&captured_bags[2]),
@@ -105,7 +103,7 @@ pub fn part2(input: &str) -> usize {
         }
     }
 
-    part2_recursive("shiny gold", &children) - 1  // the starting bag is counted, we need to remove it
+    part2_recursive("shiny gold", &children) - 1 // the starting bag is counted, we need to remove it
 }
 
 #[cfg(test)]
