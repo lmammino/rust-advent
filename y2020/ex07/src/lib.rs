@@ -81,6 +81,16 @@ pub fn part1(input: &str) -> usize {
     visited.len() - 1
 }
 
+fn part2_recursive(bag_name: &str, children: &Children) -> usize {
+    let mut ret = 1;
+    if let Some(chs) = children.get(bag_name) {
+        for (cnt, child) in chs {
+            ret += cnt * part2_recursive(child, children);
+        }
+    }
+    ret
+}
+
 pub fn part2(input: &str) -> usize {
     let bags: Vec<Line> = input.lines().map(parse_line).collect();
 
@@ -95,11 +105,7 @@ pub fn part2(input: &str) -> usize {
         }
     }
 
-    println!("{:?}", &children);
-
-    // TODO: continue from here and implement algorithm from part2.png
-
-    30055
+    part2_recursive("shiny gold", &children) - 1  // the starting bag is counted, we need to remove it
 }
 
 #[cfg(test)]
