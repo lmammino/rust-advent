@@ -1,6 +1,7 @@
+use std::borrow::Cow;
 use std::collections::HashSet;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Instr {
     Nop(i32),
     Jmp(i32),
@@ -8,11 +9,11 @@ enum Instr {
 }
 
 impl Instr {
-    fn flip(&self) -> Self {
+    fn change(&self) -> (Self, Self) {
         match self {
-            Instr::Nop(x) => Instr::Jmp(*x),
-            Instr::Jmp(x) => Instr::Nop(*x),
-            _ => panic!("Only Nop and Jmp can be flipped"),
+            Instr::Nop(x) => (Instr::Jmp(*x), self.to_owned()),
+            Instr::Jmp(x) => (Instr::Nop(*x), self.to_owned()),
+            Instr::Acc(x) => (Instr::Acc(*x), self.to_owned()),
         }
     }
 }
@@ -34,7 +35,7 @@ fn parse_line(line: &str) -> Instr {
     }
 }
 
-fn execute_code(code: &[Instr], overwrite: Option<(usize, &Instr)>) -> (i32, usize) {
+fn execute_code(code: &[Instr]) -> (i32, bool) {
     let mut acc: i32 = 0;
     let mut i: usize = 0;
     let mut visited = HashSet::new();
@@ -44,22 +45,9 @@ fn execute_code(code: &[Instr], overwrite: Option<(usize, &Instr)>) -> (i32, usi
             break;
         }
 
-        // original_instr is the natural next istr.
-        // It might get overwritten if `overwrite` is set and the current line matches the overwrite line
-        let original_instr = code
+        let instr = code
             .get(i)
             .expect(&*format!("Cannot find instruction at index {}", i));
-
-        let instr = match overwrite {
-            Some((pos, new_instr)) => {
-                if pos == i {
-                    new_instr
-                } else {
-                    original_instr
-                }
-            }
-            _ => original_instr,
-        };
 
         visited.insert(i);
 
@@ -79,30 +67,37 @@ fn execute_code(code: &[Instr], overwrite: Option<(usize, &Instr)>) -> (i32, usi
         }
     }
 
-    (acc, i)
+    (acc, i >= code.len())
 }
 
 pub fn part1(input: &str) -> i32 {
     let code: Vec<Instr> = input.lines().map(parse_line).collect();
-    let (acc, _) = execute_code(&code, None);
+    let (acc, _) = execute_code(&code);
     acc
 }
 
 pub fn part2(input: &str) -> i32 {
     let code: Vec<Instr> = input.lines().map(parse_line).collect();
-    for i in 0..code.len() {
-        let curr_instr = code.get(i).unwrap();
+    let mut code_variations = Cow::from(code);
 
-        if let Instr::Acc(_) = curr_instr {
-            continue; // does not run simulation if the current line is an Acc instr (no mutation)
+    for i in 0..code_variations.len() {
+        // changes the current instruction
+        let (new_instr, orig_instr) = code_variations.get(i).unwrap().change();
+
+        if let Instr::Acc(_) = new_instr {
+            continue; // does not run simulation if the current line is an Acc instr (no change)
         }
 
-        let (acc, last_line) = execute_code(&code, Some((i, &curr_instr.flip())));
+        code_variations.to_mut()[i] = new_instr;
 
-        if last_line >= code.len() {
-            // the code completed
+        let (acc, completed) = execute_code(&code_variations);
+
+        if completed {
             return acc;
         }
+
+        // restores latest change (there will be only one change at the time)
+        code_variations.to_mut()[i] = orig_instr;
     }
 
     panic!("Could not find the instruction to swap");
