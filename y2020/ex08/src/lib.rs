@@ -25,7 +25,7 @@ fn parse_line(line: &str) -> Instr {
         .next()
         .expect("Value not found")
         .parse()
-        .expect("Cannot convert value to i16");
+        .expect("Cannot convert value to i32");
 
     match instr {
         "nop" => Instr::Nop(val),
