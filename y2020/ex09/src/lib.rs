@@ -45,7 +45,24 @@ pub fn part1(input: &str) -> u64 {
 }
 
 pub fn part2(input: &str) -> u64 {
-    dbg!(input);
+    let to_find = part1(input);
+    let values: Vec<u64> = input
+            .lines()
+            .map(|l| {
+                l.parse::<u64>()
+                    .unwrap_or_else(|_| panic!("Cannot convert line '{:?}' to u64", l))
+            }).collect();
+    for window in 2..values.len() {
+        for start in 0..(values.len()-window) {
+            let segment = &values[start..start+window];
+            let sum: u64 = segment.iter().sum();
+            if to_find==sum {
+                let min = segment.iter().min().unwrap();
+                let max = segment.iter().max().unwrap();
+                return min+max;
+            }
+        }
+    }
     0
 }
 
