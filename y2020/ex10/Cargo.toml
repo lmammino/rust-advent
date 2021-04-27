@@ -1,0 +1,9 @@
+[package]
+name = "ex10"
+version = "0.1.0"
+authors = ["Luciano <lucianomammino@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
