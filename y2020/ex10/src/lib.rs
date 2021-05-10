@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 pub fn part1_sort(input: &str) -> u32 {
     let mut numbers = input
@@ -57,13 +57,51 @@ pub fn part1(input: &str) -> u32 {
     ones * threes
 }
 
-fn tribonacci(n: u32) -> u32 {
-    match n {
+#[derive(Debug)]
+struct Cache {
+    hit: usize,
+    miss: usize,
+    cache: HashMap<u32, u32>,
+}
+
+impl Cache {
+    fn new() -> Self {
+        Cache {
+            hit: 0,
+            miss: 0,
+            cache: HashMap::new(),
+        }
+    }
+
+    fn get(&mut self, key: u32) -> Option<&u32> {
+        let val = self.cache.get(&key);
+        match val {
+            Some(_) => self.hit += 1,
+            None => self.miss += 1,
+        }
+        val
+    }
+
+    fn set(&mut self, key: u32, val: u32) {
+        self.cache.insert(key, val);
+    }
+}
+
+fn tribonacci(n: u32, cache: &mut Cache) -> u32 {
+    if let Some(x) = cache.get(n) {
+        return *x;
+    }
+
+    let res = match n {
         0 => 1,
         1 => 1,
         2 => 2,
-        _ => tribonacci(n - 1) + tribonacci(n - 2) + tribonacci(n - 3),
-    }
+        _ => tribonacci(n - 1, cache) + tribonacci(n - 2, cache) + tribonacci(n - 3, cache),
+    };
+
+    cache.set(n, res);
+
+    res
 }
 
 pub fn part2(input: &str) -> u64 {
@@ -80,9 +118,11 @@ pub fn part2(input: &str) -> u64 {
     let mut prev_num = 0; // first num is zero (impl)
     let mut elements_in_chunk: usize = 0;
 
+    let cache: &mut Cache = &mut Cache::new();
+
     for num in numbers {
         if num - prev_num > 2 {
-            combinations_by_chunk.push(tribonacci(elements_in_chunk as u32));
+            combinations_by_chunk.push(tribonacci(elements_in_chunk as u32, cache));
             elements_in_chunk = 0;
         } else {
             elements_in_chunk += 1;
@@ -90,11 +130,13 @@ pub fn part2(input: &str) -> u64 {
         prev_num = num;
     }
     // deals last implicit value (+3 implied at the end)
-    combinations_by_chunk.push(tribonacci(elements_in_chunk as u32));
+    combinations_by_chunk.push(tribonacci(elements_in_chunk as u32, cache));
 
     let result: u64 = combinations_by_chunk
         .iter()
         .fold(1, |acc: u64, val| acc * (*val as u64));
+
+    println!("{:?}", cache);
 
     result
 }
