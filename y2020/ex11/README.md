@@ -160,6 +160,9 @@ L.LLLLL.LL
 LLLLLLLLLL
 L.LLLLLL.L
 L.LLLLL.LL
+```
+
+```text
 #.##.##.##
 #######.##
 #.#.#..#..
@@ -170,6 +173,9 @@ L.LLLLL.LL
 ##########
 #.######.#
 #.#####.##
+```
+
+```text
 #.LL.LL.L#
 #LLLLLL.LL
 L.L.L..L..
@@ -180,6 +186,9 @@ L.LLLLL.LL
 LLLLLLLLL#
 #.LLLLLL.L
 #.LLLLL.L#
+```
+
+```text
 #.L#.##.L#
 #L#####.LL
 L.#.#..#..
@@ -190,6 +199,9 @@ L.#.#..#..
 LLL####LL#
 #.L#####.L
 #.L####.L#
+```
+
+```text
 #.L#.L#.L#
 #LLLLLL.LL
 L.L.L..#..
@@ -200,6 +212,9 @@ L.LL.LL.L#
 LLLLLLLLL#
 #.LLLLL#.L
 #.L#LL#.L#
+```
+
+```text
 #.L#.L#.L#
 #LLLLLL.LL
 L.L.L..#..
@@ -210,6 +225,9 @@ L.L#.#L.L#
 LLL###LLL#
 #.LLLLL#.L
 #.L#LL#.L#
+```
+
+```text
 #.L#.L#.L#
 #LLLLLL.LL
 L.L.L..#..
