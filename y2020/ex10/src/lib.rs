@@ -9,7 +9,7 @@ pub fn part1_sort(input: &str) -> u32 {
         })
         .collect::<Vec<u32>>();
 
-    numbers.sort();
+    numbers.sort_unstable();
 
     let mut ones = 0;
     let mut threes = 1; // initiating this at 1 because there is a jump of 3 at the end according to the exercise
@@ -132,11 +132,9 @@ pub fn part2(input: &str) -> u64 {
     // deals last implicit value (+3 implied at the end)
     combinations_by_chunk.push(tribonacci(elements_in_chunk as u32, cache));
 
-    let result: u64 = combinations_by_chunk
-        .iter()
-        .fold(1, |acc: u64, val| acc * (*val as u64));
+    let result: u64 = combinations_by_chunk.iter().map(|x| *x as u64).product();
 
-    println!("{:?}", cache);
+    // println!("{:?}", cache);
 
     result
 }
