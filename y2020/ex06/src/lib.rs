@@ -32,15 +32,8 @@ pub fn part2(input: &str) -> usize {
             is_first = true;
         } else if is_first {
             question_answers_set = line.chars().collect();
-            // for c in line.chars() {
-            //     question_answers_set.insert(c);
-            // }
             is_first = false;
         } else {
-            // let mut current_answers_set = HashSet::new();
-            // for c in line.chars() {
-            //     current_answers_set.insert(c);
-            // }
             question_answers_set = question_answers_set
                 .intersection(&line.chars().collect())
                 .copied()
