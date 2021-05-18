@@ -47,43 +47,35 @@ impl Board {
 
     fn cell_neighbors(&self, x: usize, y: usize) -> u8 {
         let mut ret = 0;
-        if y > 0 {
-            if let Some(row) = self.0.get(y - 1) {
-                if x > 0 {
-                    if let Some(Cell::OccupiedSeat) = row.get(x - 1) {
-                        ret += 1;
-                    }
-                }
-                if let Some(Cell::OccupiedSeat) = row.get(x) {
-                    ret += 1;
-                }
-                if let Some(Cell::OccupiedSeat) = row.get(x + 1) {
-                    ret += 1;
-                }
+        let offsets = [
+            (-1, -1),
+            (-1, 0),
+            (-1, 1),
+            (0, -1),
+            (0, 1),
+            (1, -1),
+            (1, 0),
+            (1, 1),
+        ];
+        for (dy, dx) in offsets.iter() {
+            let new_y = (y as i32) + dy;
+            let new_x = (x as i32) + dx;
+            if new_x < 0 || new_y < 0 {
+                continue;
             }
-        }
-        if let Some(row) = self.0.get(y + 1) {
-            if x > 0 {
-                if let Some(Cell::OccupiedSeat) = row.get(x - 1) {
-                    ret += 1;
-                }
-            }
-            if let Some(Cell::OccupiedSeat) = row.get(x) {
-                ret += 1;
-            }
-            if let Some(Cell::OccupiedSeat) = row.get(x + 1) {
-                ret += 1;
-            }
-        }
-        if let Some(row) = self.0.get(y) {
-            if x > 0 {
-                if let Some(Cell::OccupiedSeat) = row.get(x - 1) {
+            if let Some(row) = self.0.get(new_y as usize) {
+                if let Some(Cell::OccupiedSeat) = row.get(new_x as usize) {
                     ret += 1;
                 }
             }
-            if let Some(Cell::OccupiedSeat) = row.get(x + 1) {
-                ret += 1;
-            }
+            // if let Some(Cell::OccupiedSeat) = self
+            //     .0
+            //     .get(new_y as usize)
+            //     .map(|row| row.get(new_x as usize))
+            //     .flatten()
+            // {
+            //     ret += 1;
+            // }
         }
         ret
     }
