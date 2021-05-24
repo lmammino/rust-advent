@@ -1,6 +1,17 @@
 use std::usize;
 
-#[derive(Debug)]
+static OFFSETS: [(i32, i32);8] = [
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, -1),
+    (0, 1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+];
+
+#[derive(Debug, Clone)]
 enum Cell {
     Floor,
     EmptySeat,
@@ -27,7 +38,7 @@ impl ToString for Cell {
         }
     }
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Board(Vec<Vec<Cell>>);
 
 impl Board {
@@ -46,18 +57,8 @@ impl Board {
     }
 
     fn ray_cast_neighbours(&self, x: usize, y: usize) -> u8 {
-        let offsets = [
-            (-1, -1),
-            (-1, 0),
-            (-1, 1),
-            (0, -1),
-            (0, 1),
-            (1, -1),
-            (1, 0),
-            (1, 1),
-        ];
         let mut neighbours_found = 0;
-        for (dy, dx) in offsets.iter() {
+        for (dy, dx) in OFFSETS.iter() {
             let mut multiplier = 1;
             loop {
                 let new_y = (y as i32) + dy * multiplier;
@@ -93,17 +94,7 @@ impl Board {
 
     fn cell_neighbors(&self, x: usize, y: usize) -> u8 {
         let mut ret = 0;
-        let offsets = [
-            (-1, -1),
-            (-1, 0),
-            (-1, 1),
-            (0, -1),
-            (0, 1),
-            (1, -1),
-            (1, 0),
-            (1, 1),
-        ];
-        for (dy, dx) in offsets.iter() {
+        for (dy, dx) in OFFSETS.iter() {
             let new_y = (y as i32) + dy;
             let new_x = (x as i32) + dx;
             if new_x < 0 || new_y < 0 {
@@ -126,14 +117,14 @@ impl Board {
         ret
     }
 
-    fn next(&self, neighbours_limit: u8, use_ray_cast: Option<bool>) -> (Board, bool) {
+    fn next(&self, neighbours_limit: u8, use_ray_cast: bool) -> (Board, bool) {
         let mut ret = vec![];
         let mut changes = false;
         for (y, row) in self.0.iter().enumerate() {
             let mut new_row: Vec<Cell> = vec![];
             for (x, cell) in row.iter().enumerate() {
                 let neighbors;
-                if use_ray_cast.unwrap_or(false) {
+                if use_ray_cast {
                     neighbors = self.ray_cast_neighbours(x,y);
                 } else {
                     neighbors = self.cell_neighbors(x, y);
@@ -193,34 +184,43 @@ impl ToString for Board {
     }
 }
 
-pub fn part1(input: &str) -> u32 {
-    let mut board = Board::from_str(input);
+struct BoardIterator { board: Board, neighbours_limit: usize, use_ray_cast: bool }
 
-    // println!("{}", board.to_string());
-    let mut still_going = true;
-    while still_going {
-        let tmp = board.next(4, None);
-        board = tmp.0;
-        still_going = tmp.1;
+impl Iterator for BoardIterator {
+    type Item = Board;
+
+    fn next(&mut self) -> Option<Board> {
+        let (board, is_changed) = self.board.next(self.neighbours_limit as u8, self.use_ray_cast);
+        if !is_changed {
+            return None;
+        } else {
+            
+            self.board = board.clone();
+            return Some(board);
+        }
     }
+}
 
-    board.count()
+pub fn part1(input: &str) -> u32 {
+    let board = Board::from_str(input);
+    let iterator = BoardIterator{
+        board, 
+        neighbours_limit:4,
+        use_ray_cast: false
+    };
+
+    iterator.last().unwrap().count()
 }
 
 pub fn part2(input: &str) -> u32 {
-    println!("{}", input);
+    let board = Board::from_str(input);
+    let iterator = BoardIterator{
+        board, 
+        neighbours_limit:5,
+        use_ray_cast: true
+    };
 
-    let mut board = Board::from_str(input);
-
-    // println!("{}", board.to_string());
-    let mut still_going = true;
-    while still_going {
-        let tmp = board.next(5, Some(true));
-        board = tmp.0;
-        still_going = tmp.1;
-    }
-
-    board.count()
+    iterator.last().unwrap().count()
 }
 
 #[cfg(test)]
