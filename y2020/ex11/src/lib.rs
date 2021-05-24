@@ -1,4 +1,5 @@
 use std::usize;
+use std::fmt;
 
 static OFFSETS: [(i32, i32);8] = [
     (-1, -1),
@@ -29,15 +30,16 @@ impl Cell {
     }
 }
 
-impl ToString for Cell {
-    fn to_string(&self) -> String {
-        match &self {
-            Cell::Floor => String::from("."),
-            Cell::EmptySeat => String::from("L"),
-            Cell::OccupiedSeat => String::from("#"),
-        }
+impl fmt::Display for Cell {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match &self {
+            Cell::Floor => '.',
+            Cell::EmptySeat => 'L',
+            Cell::OccupiedSeat => '#',
+        })
     }
 }
+
 #[derive(Debug, Clone)]
 struct Board(Vec<Vec<Cell>>);
 
@@ -171,8 +173,8 @@ impl Board {
     }
 }
 
-impl ToString for Board {
-    fn to_string(&self) -> String {
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut board: Vec<String> = vec![];
 
         for line in &self.0 {
@@ -180,7 +182,7 @@ impl ToString for Board {
             board.push(this_line);
         }
 
-        board.join("\n")
+        write!(f,"{}",board.join("\n"))
     }
 }
 
