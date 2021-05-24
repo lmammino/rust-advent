@@ -45,6 +45,52 @@ impl Board {
         Board(ret)
     }
 
+    fn ray_cast_neighbours(&self, x: usize, y: usize) -> u8 {
+        let offsets = [
+            (-1, -1),
+            (-1, 0),
+            (-1, 1),
+            (0, -1),
+            (0, 1),
+            (1, -1),
+            (1, 0),
+            (1, 1),
+        ];
+        let mut neighbours_found = 0;
+        for (dy, dx) in offsets.iter() {
+            let mut multiplier = 1;
+            loop {
+                let new_y = (y as i32) + dy * multiplier;
+                let new_x = (x as i32) + dx * multiplier;
+                multiplier += 1;
+                if new_x < 0 || new_y < 0 {
+                    break;
+                }
+                if let Some(row) = self.0.get(new_y as usize) {
+                    match row.get(new_x as usize) {
+                        Some(Cell::Floor) => {
+                            continue;
+                        }
+                        Some(Cell::EmptySeat) => {
+                            break;
+                        }
+                        Some(Cell::OccupiedSeat) => {
+                            neighbours_found += 1;
+                            break;
+                        }
+                        None => {
+                            break;
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+
+        neighbours_found
+    }
+
     fn cell_neighbors(&self, x: usize, y: usize) -> u8 {
         let mut ret = 0;
         let offsets = [
@@ -80,13 +126,19 @@ impl Board {
         ret
     }
 
-    fn next(&self) -> (Board, bool) {
+    fn next(&self, neighbours_limit: u8, use_ray_cast: Option<bool>) -> (Board, bool) {
         let mut ret = vec![];
         let mut changes = false;
         for (y, row) in self.0.iter().enumerate() {
             let mut new_row: Vec<Cell> = vec![];
             for (x, cell) in row.iter().enumerate() {
-                let neighbors = self.cell_neighbors(x, y);
+                let neighbors;
+                if use_ray_cast.unwrap_or(false) {
+                    neighbors = self.ray_cast_neighbours(x,y);
+                } else {
+                    neighbors = self.cell_neighbors(x, y);
+                }
+                
                 match cell {
                     Cell::Floor => {
                         new_row.push(Cell::Floor);
@@ -100,7 +152,7 @@ impl Board {
                         }
                     }
                     Cell::OccupiedSeat => {
-                        if neighbors >= 4 {
+                        if neighbors >= neighbours_limit {
                             new_row.push(Cell::EmptySeat);
                             changes = true;
                         } else {
@@ -147,7 +199,7 @@ pub fn part1(input: &str) -> u32 {
     // println!("{}", board.to_string());
     let mut still_going = true;
     while still_going {
-        let tmp = board.next();
+        let tmp = board.next(4, None);
         board = tmp.0;
         still_going = tmp.1;
     }
@@ -157,7 +209,18 @@ pub fn part1(input: &str) -> u32 {
 
 pub fn part2(input: &str) -> u32 {
     println!("{}", input);
-    2039
+
+    let mut board = Board::from_str(input);
+
+    // println!("{}", board.to_string());
+    let mut still_going = true;
+    while still_going {
+        let tmp = board.next(5, Some(true));
+        board = tmp.0;
+        still_going = tmp.1;
+    }
+
+    board.count()
 }
 
 #[cfg(test)]
