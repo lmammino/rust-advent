@@ -1,3 +1,4 @@
+use std::str::FromStr;
 #[derive(Debug)]
 enum Action {
     North,
@@ -33,6 +34,23 @@ struct Instruction {
 
 impl Instruction {
     fn new(action: Action, value: u32) -> Self { Self { action, value } }
+}
+
+// "some".into() -> will return the returning value of `from` fn
+impl From<&str> for Instruction {
+    fn from(_: &str) -> Self {
+        todo!()
+    }
+}
+
+impl FromStr for Instruction {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let action = &s[0..1];
+        let value = &s[1..].parse::<u32>().expect("invalid input");
+        Ok(Instruction::new( action.into(), *value))
+    }
 }
 
 
@@ -97,9 +115,7 @@ impl Ship {
 pub fn part1(input: &str) -> u32 {
     let mut ship = Ship::new();
     input.lines().for_each( |l| {
-        let action = &l[0..1];
-        let value = &l[1..].parse::<u32>().expect("invalid input");
-        ship.go(Instruction::new( action.into(), *value))
+        ship.go(l.parse().unwrap())
     } );
 
     ship.get_manhattan_distance()
