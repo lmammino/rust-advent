@@ -54,16 +54,7 @@ struct Ship {
     y: i32,
 }
 
-// TODO: imlp Default for Ship
 impl Ship {
-    fn new() -> Self {
-        Self {
-            direction: 0,
-            x: 0,
-            y: 0,
-        }
-    }
-
     fn go(&mut self, instruction: Instruction) {
         use Action::*;
         match instruction.action {
@@ -100,20 +91,23 @@ impl Ship {
     }
 
     // for part 2
-    fn apply_waypoint(&mut self, instruction: &Instruction, waypoint: &Waypoint) {
-        match instruction.action {
-            Action::Forward => {
-                self.x += waypoint.x * instruction.value as i32;
-                self.y += waypoint.y * instruction.value as i32;
-            }
-            _ => {
-                // Nothing to do if not Forward
-            }
-        }
+    fn apply_waypoint(&mut self, multiplier: u32, waypoint: &Waypoint) {
+        self.x += waypoint.x * multiplier as i32;
+        self.y += waypoint.y * multiplier as i32;
     }
 
     fn get_manhattan_distance(&self) -> u32 {
         self.x.abs() as u32 + self.y.abs() as u32
+    }
+}
+
+impl Default for Ship {
+    fn default() -> Self {
+        Self {
+            direction: 0,
+            x: 0,
+            y: 0,
+        }
     }
 }
 
@@ -147,7 +141,7 @@ impl Waypoint {
         }
     }
 
-    fn transform(&mut self, instruction: &Instruction) {
+    fn transform(&mut self, instruction: Instruction) {
         use Action::*;
         match instruction.action {
             North => {
@@ -168,27 +162,30 @@ impl Waypoint {
             Left => {
                 self.rotate(((360 - instruction.value) % 360) as i32);
             }
-            Forward => {
-                // this doesn't change the Waypoint (but moves the ship)
+            _ => {
+                unreachable!()
             }
         }
     }
 }
 
 pub fn part1(input: &str) -> u32 {
-    let mut ship = Ship::new();
+    let mut ship:Ship = Default::default();
     input.lines().for_each(|l| ship.go(l.parse().unwrap()));
 
     ship.get_manhattan_distance()
 }
 
 pub fn part2(input: &str) -> u32 {
-    let mut ship = Ship::new();
+    let mut ship:Ship = Default::default();
     let mut waypoint = Waypoint::new();
     input.lines().for_each(|l| {
-        let instruction = l.parse().unwrap();
-        waypoint.transform(&instruction);
-        ship.apply_waypoint(&instruction, &waypoint);
+        let instruction:Instruction = l.parse().unwrap();
+        if let Action::Forward = instruction.action {
+            ship.apply_waypoint(instruction.value, &waypoint);
+        } else {
+            waypoint.transform(instruction);    
+        }
     });
 
     ship.get_manhattan_distance()
