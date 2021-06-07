@@ -68,16 +68,16 @@ impl Ship {
         use Action::*;
         match instruction.action {
             North => {
-                self.x += instruction.value as i32;
-            }
-            South => {
-                self.x -= instruction.value as i32;
-            }
-            East => {
                 self.y += instruction.value as i32;
             }
-            West => {
+            South => {
                 self.y -= instruction.value as i32;
+            }
+            East => {
+                self.x += instruction.value as i32;
+            }
+            West => {
+                self.x -= instruction.value as i32;
             }
             Rigth => {
                 self.direction = (self.direction + instruction.value + 360) % 360;
@@ -151,16 +151,16 @@ impl Waypoint {
         use Action::*;
         match instruction.action {
             North => {
-                self.x += instruction.value as i32;
-            }
-            South => {
-                self.x -= instruction.value as i32;
-            }
-            East => {
                 self.y += instruction.value as i32;
             }
-            West => {
+            South => {
                 self.y -= instruction.value as i32;
+            }
+            East => {
+                self.x += instruction.value as i32;
+            }
+            West => {
+                self.x -= instruction.value as i32;
             }
             Rigth => {
                 self.rotate(instruction.value as i32);
