@@ -1,7 +1,7 @@
-use std::usize;
 use std::fmt;
+use std::usize;
 
-static OFFSETS: [(i32, i32);8] = [
+static OFFSETS: [(i32, i32); 8] = [
     (-1, -1),
     (-1, 0),
     (-1, 1),
@@ -32,11 +32,15 @@ impl Cell {
 
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match &self {
-            Cell::Floor => '.',
-            Cell::EmptySeat => 'L',
-            Cell::OccupiedSeat => '#',
-        })
+        write!(
+            f,
+            "{}",
+            match &self {
+                Cell::Floor => '.',
+                Cell::EmptySeat => 'L',
+                Cell::OccupiedSeat => '#',
+            }
+        )
     }
 }
 
@@ -127,11 +131,11 @@ impl Board {
             for (x, cell) in row.iter().enumerate() {
                 let neighbors;
                 if use_ray_cast {
-                    neighbors = self.ray_cast_neighbours(x,y);
+                    neighbors = self.ray_cast_neighbours(x, y);
                 } else {
                     neighbors = self.cell_neighbors(x, y);
                 }
-                
+
                 match cell {
                     Cell::Floor => {
                         new_row.push(Cell::Floor);
@@ -182,33 +186,38 @@ impl fmt::Display for Board {
             board.push(this_line);
         }
 
-        write!(f,"{}",board.join("\n"))
+        write!(f, "{}", board.join("\n"))
     }
 }
 
-struct BoardIterator { board: Board, neighbours_limit: usize, use_ray_cast: bool }
+struct BoardIterator {
+    board: Board,
+    neighbours_limit: usize,
+    use_ray_cast: bool,
+}
 
 impl Iterator for BoardIterator {
     type Item = Board;
 
     fn next(&mut self) -> Option<Board> {
-        let (board, is_changed) = self.board.next(self.neighbours_limit as u8, self.use_ray_cast);
+        let (board, is_changed) = self
+            .board
+            .next(self.neighbours_limit as u8, self.use_ray_cast);
         if !is_changed {
-            return None;
+            None
         } else {
-            
             self.board = board.clone();
-            return Some(board);
+            Some(board)
         }
     }
 }
 
 pub fn part1(input: &str) -> u32 {
     let board = Board::from_str(input);
-    let iterator = BoardIterator{
-        board, 
-        neighbours_limit:4,
-        use_ray_cast: false
+    let iterator = BoardIterator {
+        board,
+        neighbours_limit: 4,
+        use_ray_cast: false,
     };
 
     iterator.last().unwrap().count()
@@ -216,10 +225,10 @@ pub fn part1(input: &str) -> u32 {
 
 pub fn part2(input: &str) -> u32 {
     let board = Board::from_str(input);
-    let iterator = BoardIterator{
-        board, 
-        neighbours_limit:5,
-        use_ray_cast: true
+    let iterator = BoardIterator {
+        board,
+        neighbours_limit: 5,
+        use_ray_cast: true,
     };
 
     iterator.last().unwrap().count()
