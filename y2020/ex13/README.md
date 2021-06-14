@@ -67,7 +67,7 @@ Bus ID `31` departs six minutes after timestamp t.
 Bus ID `19` departs seven minutes after timestamp t.
 The only bus departures that matter are the listed bus IDs at their specific offsets from t. Those bus IDs can depart at other times, and other bus IDs can depart at those times. For example, in the list above, because bus ID `19` must depart seven minutes after the timestamp at which bus ID `7` departs, bus ID `7` will always also be departing with bus ID `19` at seven minutes after timestamp t.
 
-In this example, the earliest timestamp at which this occurs is 1068781:
+In this example, the earliest timestamp at which this occurs is `1068781`:
 ```plain
 time     bus 7   bus 13  bus 59  bus 31  bus 19
 1068773    .       .       .       .       .
