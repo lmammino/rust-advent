@@ -5,6 +5,16 @@
 Learning Rust by implementing solutions for [Advent of Code](https://adventofcode.com/) problems.
 
 
+🎥 **HEY, we are live-streaming our attempts to solve the exercises in this repo!** Check us out on:
+
+  - [Twitch](https://twitch.tv/loige) for the live streams
+  - [YouTube](https://www.youtube.com/channel/UCL0w2IAjTBx3NNka-l7InPw) for the recordings
+
+[![Eugen, Roberto and Luciano trying to solve Advent of Code in Rust](https://i.imgur.com/wVIPDnt.png)](https://twitch.tv/loige)
+
+And remember to follow and subscribe! 😎 😋
+
+
 ## How to run tests for all exercises
 
 Simply execute:

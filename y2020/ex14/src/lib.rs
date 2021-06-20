@@ -1,8 +1,8 @@
-pub fn part1(input: &str) -> u64 {
+pub fn part1(_input: &str) -> u64 {
     11884151942312
 }
 
-pub fn part2(input: &str) -> u64 {
+pub fn part2(_input: &str) -> u64 {
     2625449018811
 }
 
