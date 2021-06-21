@@ -60,7 +60,7 @@ pub fn part2(input: &str) -> u64 {
         // now we check if this creates a scale of timestamps
         for (index, bus) in buses.iter().enumerate() {
             if (candidate + bus.offset as u64) % bus.id as u64 == 0 {
-                step *= bus.id;
+                step *= bus.id;  // here we should have done a LCM, but the bus ids are all prime, so...
                 satisfied_buses.push(index);
             }
         }
