@@ -1,7 +1,7 @@
-i = '13,x,x,x,x,x,x,37,x,x,x,x,x,401,x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,x,x,x,19,x,x,x,23,x,x,x,x,x,29,x,613,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41'
-j = '7,13,x,x,59,x,31,19'
+# i = '13,x,x,x,x,x,x,37,x,x,x,x,x,401,x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,x,x,x,19,x,x,x,23,x,x,x,x,x,29,x,613,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41'
+i = '7,13,x,x,59,x,31,19'
 
-buses = dict(x[::-1] for x in enumerate(j.split(',')))
+buses = dict(x[::-1] for x in enumerate(i.split(',')))
 
 if 'x' in buses:
     del buses['x']
@@ -31,7 +31,7 @@ print(candidate)
 
 """
 We take the biggest bus id (this is not mandatory, we could take any bus, but taking the biggest one speed up a little bit)
-Wa can compute the first timestamp to satisfy this bus by:
+We can compute the first timestamp to satisfy this bus by:
 
 ```
 candidate =  id-offset
