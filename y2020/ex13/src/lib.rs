@@ -55,19 +55,15 @@ pub fn part2(input: &str) -> u64 {
     let mut candidate = max_bus.id - max_bus.offset - step;
 
     while !buses.is_empty() {
-        let mut satisfied_buses= vec![];
         candidate += step;
-        // now we check if this creates a scale of timestamps
-        for (index, bus) in buses.iter().enumerate() {
-            if (candidate + bus.offset as u64) % bus.id as u64 == 0 {
-                step *= bus.id;  // here we should have done a LCM, but the bus ids are all prime, so...
-                satisfied_buses.push(index);
-            }
-        }
 
-        for index in satisfied_buses.into_iter().rev() {
-            buses.remove(index);
-        }
+        // now we check if this creates a scale of timestamps
+        let (satisfied_buses, unsatified) : (Vec<Bus>, Vec<Bus>) = buses.into_iter()
+            .partition(|bus| (candidate + bus.offset as u64) % bus.id as u64 == 0);
+
+        step = satisfied_buses.iter().fold(step, |step, bus| step * bus.id);
+
+        buses = unsatified;
     }
 
     candidate
