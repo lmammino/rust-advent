@@ -31,26 +31,26 @@ pub fn part1(input: &str) -> u64 {
 
     let mut mem: HashMap<u64,u64> = HashMap::new();
 
-    let mut current_mask= String::from("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    let mut and_mask:u64 = 2_u64.pow(36) - 1;
+    let mut or_mask:u64=  0;
     for instruction in instr {
         match instruction {
-            Instr::Mask(mask) => current_mask = mask.clone(),
-            Instr::Mem(key, val) => {
-                let mut value = val;
-                let mut mask: u64= 1;
-                current_mask.chars().rev().for_each(|c| {
-                    match c {
-                        '0' => {
-                            if value & mask != 0 {
-                                value ^= mask; 
-                            }
-                        },
-                        '1' => value |= mask,
-                        _ => {}
+            Instr::Mask(mask) => {
+                and_mask = 0;
+                or_mask = 0;
+                mask.chars().for_each(|c| {
+                    and_mask <<= 1;
+                    or_mask <<= 1;
+                    if c == '1' {
+                        or_mask |= 1;
                     }
-                    mask *= 2;
-                });
-                mem.insert(key, value);
+                    if c != '0' {
+                        and_mask |= 1;
+                    } 
+                })
+            }
+            Instr::Mem(key, val) => {
+                mem.insert(key, val & and_mask | or_mask);
             }
         }
     }
