@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 #[derive(Debug)]
 enum Instr {
@@ -29,9 +29,33 @@ pub fn part1(input: &str) -> u64 {
         |x| x.unwrap()
     ).collect();
 
-    println!("{:?}", instr);
+    let mut mem: HashMap<u64,u64> = HashMap::new();
 
-    11884151942312
+    let mut current_mask= String::from("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    for instruction in instr {
+        match instruction {
+            Instr::Mask(mask) => current_mask = mask.clone(),
+            Instr::Mem(key, val) => {
+                let mut value = val;
+                let mut mask: u64= 1;
+                current_mask.chars().rev().for_each(|c| {
+                    match c {
+                        '0' => {
+                            if value & mask != 0 {
+                                value ^= mask; 
+                            }
+                        },
+                        '1' => value |= mask,
+                        _ => {}
+                    }
+                    mask *= 2;
+                });
+                mem.insert(key, value);
+            }
+        }
+    }
+
+    mem.values().sum()
 }
 
 pub fn part2(_input: &str) -> u64 {
