@@ -12,5 +12,5 @@ edition = "2018"
 criterion = "0.3"
 
 [[bench]]
-name = "my_benchmark"
+name = "bench_ex14"
 harness = false
