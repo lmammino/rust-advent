@@ -15,3 +15,6 @@ members = [
   "y2020/ex13",
   "y2020/ex14"
 ]
+
+[profile.bench]
+debug = true
