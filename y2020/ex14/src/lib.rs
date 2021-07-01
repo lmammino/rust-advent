@@ -1,38 +1,33 @@
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
 #[derive(Debug)]
-enum Instr {
-    Mask(String),
+enum Instr<'a> {
+    Mask(&'a str),
     Mem(u64, u64),
 }
 
-impl FromStr for Instr {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+impl<'a> From<&'a str> for Instr<'a> {
+    fn from(s: &'a str) -> Self {
         if s.starts_with("mask") {
-            Ok(Instr::Mask(String::from(&s[7..])))
+            Instr::Mask(&s[7..])
         } else if s.starts_with("mem") {
             let addr_value = &mut s[4..].split("] = ");
             let addr: u64 = addr_value.next().unwrap().parse().unwrap();
             let value: u64 = addr_value.next().unwrap().parse().unwrap();
-            Ok(Instr::Mem(addr, value))
+            Instr::Mem(addr, value)
         } else {
-            Err(())
+            panic!("Invalid line found: {}", s)
         }
     }
 }
 
-
 pub fn part1(input: &str) -> u64 {
-    let instr: Vec<Instr> = input.lines().map(str::parse).map(
-        |x| x.unwrap()
-    ).collect();
+    let instr = input.lines().map(|x| x.into());
 
-    let mut mem: HashMap<u64,u64> = HashMap::new();
+    let mut mem: HashMap<u64, u64> = HashMap::new();
 
-    let mut and_mask:u64 = 2_u64.pow(36) - 1;
-    let mut or_mask:u64=  0;
+    let mut and_mask: u64 = 2_u64.pow(36) - 1;
+    let mut or_mask: u64 = 0;
     for instruction in instr {
         match instruction {
             Instr::Mask(mask) => {
@@ -46,7 +41,7 @@ pub fn part1(input: &str) -> u64 {
                     }
                     if c != '0' {
                         and_mask |= 1;
-                    } 
+                    }
                 })
             }
             Instr::Mem(key, val) => {
