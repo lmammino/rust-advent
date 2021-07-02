@@ -61,6 +61,6 @@ jobs:
             [
               {
                 "message_file": "./output.txt",
-                "title": "Valgrind Execution",
+                "title": "Valgrind Execution"
               }
             ]
