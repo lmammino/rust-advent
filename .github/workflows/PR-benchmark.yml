@@ -27,6 +27,18 @@ jobs:
         with:
           toolchain: stable
 
-      - uses: actions-rs/cargo@v1
+      - name: cargo bench
+        run: |
+          cargo bench | tee output.txt
+          
+      - name: "Post to PR"
+        uses: EliLillyCo/github-actions-post-to-pr@main
         with:
-          command: bench
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          post_to_pr_definition: |
+            [
+              {
+                "message_file": "./output.txt",
+                "title": "Cargo Bench Execution"
+              }
+            ]
