@@ -33,25 +33,26 @@ jobs:
 
       - name: install valgrind
         run: |
-          sudo apt install valgrind
+          sudo apt install -y valgrind
 
-      - name: cargo bench
+      - name: valgrind bench
         run: |
           git tag here
           git checkout main
           cargo test --no-run --release
-          for f in `find target/release/deps -executable -type f -name 'ex*'`; do 
-            echo $f
-            valgrind --tool=cachegrind $f --test-threads 1 | tee -a output.txt
+          for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
+            echo "\n\n## $f" | tee -a output.txt
+            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a output.txt
           done
+
           git checkout here
           # rm -rf ./target/release/deps
           cargo test --no-run --release
-          for f in `find target/release/deps -executable -type f -name 'ex*'`; do 
-            echo "\n\n## $f"
-            valgrind --tool=cachegrind $f --test-threads 1 | tee -a output.txt
-          done          
-          
+          for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
+            echo "\n\n## $f" | tee -a output.txt
+            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a output.txt
+          done
+                  
       - name: "Post to PR"
         uses: EliLillyCo/github-actions-post-to-pr@main
         with:
@@ -61,6 +62,5 @@ jobs:
               {
                 "message_file": "./output.txt",
                 "title": "Valgrind Execution",
-                "modifier": "grep -B 1 -A 3 'test '"
               }
             ]
