@@ -4,7 +4,7 @@ use ex13::part2;
 fn criterion_benchmark(c: &mut Criterion) {
     let input = include_str!("../input.txt");
     c.bench_function(
-        "part2",
+        "ex13::part2",
         |b| b.iter(
             || part2(black_box(input))
         )

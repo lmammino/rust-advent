@@ -5,6 +5,8 @@ name: PR Benchmarks
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -22,6 +24,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       
       - uses: actions-rs/toolchain@v1
         with:
@@ -29,6 +33,10 @@ jobs:
 
       - name: cargo bench
         run: |
+          git tag here
+          git checkout main
+          cargo bench
+          git checkout here
           cargo bench | tee output.txt
           
       - name: "Post to PR"
@@ -39,6 +47,7 @@ jobs:
             [
               {
                 "message_file": "./output.txt",
-                "title": "Cargo Bench Execution"
+                "title": "Cargo Bench Execution",
+                "modifier": "grep -B 4 -A 1 'time:'"
               }
             ]
