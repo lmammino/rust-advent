@@ -35,7 +35,7 @@ jobs:
           git checkout main
           cargo bench
           git checkout here
-          cargo bench | grep -B 4 -A 1 'time:' | tee output.txt
+          cargo bench | tee output.txt
           
       - name: "Post to PR"
         uses: EliLillyCo/github-actions-post-to-pr@main
@@ -46,5 +46,6 @@ jobs:
               {
                 "message_file": "./output.txt",
                 "title": "Cargo Bench Execution"
+                "modifier": "grep -B 4 -A 1 'time:'"
               }
             ]
