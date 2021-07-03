@@ -43,6 +43,8 @@ jobs:
             valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a this_pr.txt
           done
 
+          cp ./tools/delta.py /tmp/delta.py  # when I change branch to main the file can disappear
+
           git checkout main
           # rm -rf ./target/release/deps
           cargo test --no-run --release
@@ -53,7 +55,7 @@ jobs:
 
       - name: compute delta
         run: |
-          python ./tools/delta.py main.txt this_pr.txt > delta.txt
+          python /tmp/delta.py main.txt this_pr.txt > delta.txt
                   
       - name: "Post to PR"
         uses: EliLillyCo/github-actions-post-to-pr@main
