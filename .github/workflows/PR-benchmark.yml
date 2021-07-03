@@ -48,6 +48,7 @@ jobs:
               {
                 "message_file": "./output.txt",
                 "title": "Cargo Bench Execution",
+                "compare_branches": [],
                 "modifier": "grep -B 4 -A 1 'time:'"
               }
             ]
