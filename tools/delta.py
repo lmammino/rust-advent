@@ -25,4 +25,4 @@ for line in first:
 
 print("Negative deltas means faster code\n\n")
 for k,v in delta.items():
-    print("{} {} ({:.02f} %)\n".format(k, data[k], v))
+    print("{} {} ({:+.02f} %)\n".format(k, data[k], v))
