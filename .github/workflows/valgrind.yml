@@ -41,17 +41,21 @@ jobs:
           git checkout main
           cargo test --no-run --release
           for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
-            echo "\n\n## $f" | tee -a output.txt
-            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a output.txt
+            echo "## $f" | tee -a main.txt
+            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a main.txt
           done
 
           git checkout here
           # rm -rf ./target/release/deps
           cargo test --no-run --release
           for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
-            echo "\n\n## $f" | tee -a output.txt
-            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a output.txt
+            echo "## $f" | tee -a this_pr.txt
+            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a this_pr.txt
           done
+
+      - name: compute delta
+        run: |
+          python ./tools/delta.py main.txt this_pr.txt > delta.txt
                   
       - name: "Post to PR"
         uses: EliLillyCo/github-actions-post-to-pr@main
@@ -60,7 +64,7 @@ jobs:
           post_to_pr_definition: |
             [
               {
-                "message_file": "./output.txt",
+                "message_file": "./delta.txt",
                 "title": "Valgrind Execution"
               }
             ]
