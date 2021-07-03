@@ -37,21 +37,19 @@ jobs:
 
       - name: valgrind bench
         run: |
-          git tag here
-          git checkout main
-          cargo test --no-run --release
-          for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
-            echo "## $f" | tee -a main.txt
-            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a main.txt
-          done
-
-          git checkout here
-          # rm -rf ./target/release/deps
           cargo test --no-run --release
           for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
             echo "## $f" | tee -a this_pr.txt
             valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a this_pr.txt
           done
+
+          git checkout main
+          # rm -rf ./target/release/deps
+          cargo test --no-run --release
+          for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
+            echo "## $f" | tee -a main.txt
+            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a main.txt
+          done          
 
       - name: compute delta
         run: |

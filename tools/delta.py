@@ -24,5 +24,5 @@ for line in first:
         delta[k] = (data[k] - counter) * 100 / counter
 
 print("Negative deltas means faster code\n\n")
-for k,v in delta.items():
-    print("{} {} ({:+.02f} %)\n".format(k, data[k], v))
+for k in data:
+    print("{} {} ({} %)\n".format(k, data[k], '{:+.02f}'.format(delta[k]) if k in delta else 'N/A'))
