@@ -63,6 +63,8 @@ jobs:
             [
               {
                 "message_file": "./delta.txt",
-                "title": "Valgrind Execution"
+                "title": "Valgrind Execution",
+                "compare_branches": [],
+                "collapsible": true
               }
             ]
