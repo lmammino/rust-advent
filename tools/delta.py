@@ -9,7 +9,7 @@ k = None
 
 for line in second:
     if line.startswith('##'):
-        k = line[:k.rfind('-')]
+        k = line[:line.rfind('-')]
     elif line.startswith('=='):
         _, _, _, counter = line.split()
         counter = int(counter.replace(',',''))
@@ -17,7 +17,7 @@ for line in second:
 
 for line in first:
     if line.startswith('##'):
-        k = line[:k.rfind('-')]
+        k = line[:line.rfind('-')]
     elif line.startswith('==') and k in data:
         _, _, _, counter = line.split()
         counter = int(counter.replace(',',''))
