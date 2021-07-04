@@ -1,6 +1,7 @@
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
+use rustc_hash::FxHashSet;
 
-fn check(value: &u64, set: &HashSet<u64>) -> bool {
+fn check(value: &u64, set: &FxHashSet<u64>) -> bool {
     for a in set {
         if a>value {
             continue;
@@ -22,7 +23,7 @@ pub fn part1(input: &str) -> u64 {
                     .unwrap_or_else(|_| panic!("Cannot convert line '{:?}' to u64", l))
             });
 
-    let mut idx: HashSet<u64> = HashSet::new();
+    let mut idx: FxHashSet<u64> = FxHashSet::default();
     let mut queue: VecDeque<u64> = VecDeque::new();
 
     for _ in 0..25 {
