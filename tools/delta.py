@@ -9,7 +9,7 @@ k = None
 
 for line in second:
     if line.startswith('##'):
-        k = line
+        k = line[:k.rfind('-')]
     elif line.startswith('=='):
         _, _, _, counter = line.split()
         counter = int(counter.replace(',',''))
@@ -17,8 +17,8 @@ for line in second:
 
 for line in first:
     if line.startswith('##'):
-        k = line
-    elif line.startswith('=='):
+        k = line[:k.rfind('-')]
+    elif line.startswith('==') and k in data:
         _, _, _, counter = line.split()
         counter = int(counter.replace(',',''))
         delta[k] = (data[k] - counter) * 100 / counter
