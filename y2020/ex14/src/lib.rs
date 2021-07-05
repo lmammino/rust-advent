@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 #[derive(Debug)]
 enum Instr<'a> {
@@ -27,29 +28,33 @@ struct MaskParts {
     floating_bits: Vec<usize>,
 }
 
-fn parse_mask(mask: &str) -> MaskParts {
-    let mut and_mask = 0;
-    let mut or_mask = 0;
-    let mut floating_bits: Vec<usize> = Vec::with_capacity(36);
+impl FromStr for MaskParts {
+    type Err = ();
 
-    mask.chars().enumerate().for_each(|(i, c)| {
-        and_mask <<= 1;
-        or_mask <<= 1;
-        if c == '1' {
-            or_mask |= 1;
-        }
-        if c != '0' {
-            and_mask |= 1;
-        }
-        if c == 'X' {
-            floating_bits.push(35 - i)
-        }
-    });
+    fn from_str(mask: &str) -> Result<Self, Self::Err> {
+        let mut and_mask = 0;
+        let mut or_mask = 0;
+        let mut floating_bits: Vec<usize> = Vec::with_capacity(36);
 
-    MaskParts {
-        or_mask,
-        and_mask,
-        floating_bits,
+        mask.chars().enumerate().for_each(|(i, c)| {
+            and_mask <<= 1;
+            or_mask <<= 1;
+            if c == '1' {
+                or_mask |= 1;
+            }
+            if c != '0' {
+                and_mask |= 1;
+            }
+            if c == 'X' {
+                floating_bits.push(35 - i)
+            }
+        });
+
+        Ok(MaskParts {
+            or_mask,
+            and_mask,
+            floating_bits,
+        })
     }
 }
 
@@ -58,11 +63,11 @@ pub fn part1(input: &str) -> u64 {
 
     let mut mem: HashMap<u64, u64> = HashMap::new();
 
-    let mut mask_parts = parse_mask("X".repeat(36).as_str());
+    let mut mask_parts: MaskParts = "X".repeat(36).parse().unwrap();
     for instruction in instr {
         match instruction {
             Instr::Mask(mask) => {
-                mask_parts = parse_mask(mask);
+                mask_parts = mask.parse().unwrap();
             }
             Instr::Mem(key, val) => {
                 mem.insert(key, val & mask_parts.and_mask | mask_parts.or_mask);
@@ -77,12 +82,12 @@ pub fn part2(input: &str) -> u64 {
     let instr = input.lines().map(|x| x.into());
 
     let mut mem: HashMap<u64, u64> = HashMap::new();
-    let mut mask_parts = parse_mask("X".repeat(36).as_str());
+    let mut mask_parts: MaskParts = "X".repeat(36).parse().unwrap();
 
     for instruction in instr {
         match instruction {
             Instr::Mask(mask) => {
-                mask_parts = parse_mask(mask);
+                mask_parts = mask.parse().unwrap();
             }
             Instr::Mem(addr, val) => {
                 let base_addr = addr | mask_parts.or_mask;
