@@ -21,31 +21,51 @@ impl<'a> From<&'a str> for Instr<'a> {
     }
 }
 
+struct MaskParts {
+    or_mask: u64,
+    and_mask: u64,
+    floating_bits: Vec<usize>,
+}
+
+fn parse_mask(mask: &str) -> MaskParts {
+    let mut and_mask = 0;
+    let mut or_mask = 0;
+    let mut floating_bits: Vec<usize> = Vec::with_capacity(36);
+
+    mask.chars().enumerate().for_each(|(i, c)| {
+        and_mask <<= 1;
+        or_mask <<= 1;
+        if c == '1' {
+            or_mask |= 1;
+        }
+        if c != '0' {
+            and_mask |= 1;
+        }
+        if c == 'X' {
+            floating_bits.push(35 - i)
+        }
+    });
+
+    MaskParts {
+        or_mask,
+        and_mask,
+        floating_bits,
+    }
+}
+
 pub fn part1(input: &str) -> u64 {
     let instr = input.lines().map(|x| x.into());
 
     let mut mem: HashMap<u64, u64> = HashMap::new();
 
-    let mut and_mask: u64 = 2_u64.pow(36) - 1;
-    let mut or_mask: u64 = 0;
+    let mut mask_parts = parse_mask("X".repeat(36).as_str());
     for instruction in instr {
         match instruction {
             Instr::Mask(mask) => {
-                and_mask = 0;
-                or_mask = 0;
-                mask.chars().for_each(|c| {
-                    and_mask <<= 1;
-                    or_mask <<= 1;
-                    if c == '1' {
-                        or_mask |= 1;
-                    }
-                    if c != '0' {
-                        and_mask |= 1;
-                    }
-                })
+                mask_parts = parse_mask(mask);
             }
             Instr::Mem(key, val) => {
-                mem.insert(key, val & and_mask | or_mask);
+                mem.insert(key, val & mask_parts.and_mask | mask_parts.or_mask);
             }
         }
     }
@@ -53,8 +73,37 @@ pub fn part1(input: &str) -> u64 {
     mem.values().sum()
 }
 
-pub fn part2(_input: &str) -> u64 {
-    2625449018811
+pub fn part2(input: &str) -> u64 {
+    let instr = input.lines().map(|x| x.into());
+
+    let mut mem: HashMap<u64, u64> = HashMap::new();
+    let mut mask_parts = parse_mask("X".repeat(36).as_str());
+
+    for instruction in instr {
+        match instruction {
+            Instr::Mask(mask) => {
+                mask_parts = parse_mask(mask);
+            }
+            Instr::Mem(addr, val) => {
+                let base_addr = addr | mask_parts.or_mask;
+                // Now we have to do n inserts where n = 2.pow(numX)
+                for i in 0..2_u64.pow(mask_parts.floating_bits.len() as u32) {
+                    let mut final_addr = base_addr;
+                    for (from_bit, to_bit) in mask_parts.floating_bits.iter().enumerate() {
+                        if i & (1 << from_bit) != 0 {
+                            final_addr |= 1 << to_bit;
+                        } else {
+                            final_addr &= !(1 << to_bit);
+                        }
+                    }
+
+                    mem.insert(final_addr, val);
+                }
+            }
+        }
+    }
+
+    mem.values().sum()
 }
 
 #[cfg(test)]
