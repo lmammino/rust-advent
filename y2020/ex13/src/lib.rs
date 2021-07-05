@@ -30,6 +30,7 @@ pub fn part1(input: &str) -> u32 {
 struct Bus {
     id: u64,
     offset: u64,
+    satisfied: bool
 }
 
 pub fn part2(input: &str) -> u64 {
@@ -44,6 +45,7 @@ pub fn part2(input: &str) -> u64 {
                 .map(|bus_id| Bus {
                     id: bus_id as u64,
                     offset: offset as u64,
+                    satisfied: false,
                 })
                 .ok()
         })
@@ -54,19 +56,21 @@ pub fn part2(input: &str) -> u64 {
     let mut step = 1;
     let mut candidate = max_bus.id - max_bus.offset - step;
 
-    while !buses.is_empty() {
-        let mut satisfied_buses= vec![];
+    let mut done = 0;
+    let buses_len = buses.len();
+
+    while done < buses_len {
         candidate += step;
         // now we check if this creates a scale of timestamps
-        for (index, bus) in buses.iter().enumerate() {
+        for bus in buses.iter_mut() {
+            if bus.satisfied {
+                continue;
+            }
             if (candidate + bus.offset as u64) % bus.id as u64 == 0 {
                 step *= bus.id;  // here we should have done a LCM, but the bus ids are all prime, so...
-                satisfied_buses.push(index);
+                done += 1;
+                bus.satisfied = true;
             }
-        }
-
-        for index in satisfied_buses.into_iter().rev() {
-            buses.remove(index);
         }
     }
 
