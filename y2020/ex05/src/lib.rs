@@ -27,8 +27,8 @@ pub fn part2(input: &str) -> u16 {
     for current_seat in &seat_ids {
         let next_seat = current_seat + 1;
         let next_next_seat = &next_seat + 1;
-        if !seat_ids.contains(&next_seat) && seat_ids.contains(&next_next_seat)  {
-            return next_seat
+        if !seat_ids.contains(&next_seat) && seat_ids.contains(&next_next_seat) {
+            return next_seat;
         }
     }
 

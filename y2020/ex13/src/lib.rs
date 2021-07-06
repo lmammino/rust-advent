@@ -55,12 +55,12 @@ pub fn part2(input: &str) -> u64 {
     let mut candidate = max_bus.id - max_bus.offset - step;
 
     while !buses.is_empty() {
-        let mut satisfied_buses= vec![];
+        let mut satisfied_buses = vec![];
         candidate += step;
         // now we check if this creates a scale of timestamps
         for (index, bus) in buses.iter().enumerate() {
             if (candidate + bus.offset as u64) % bus.id as u64 == 0 {
-                step *= bus.id;  // here we should have done a LCM, but the bus ids are all prime, so...
+                step *= bus.id; // here we should have done a LCM, but the bus ids are all prime, so...
                 satisfied_buses.push(index);
             }
         }
@@ -90,7 +90,7 @@ mod tests {
 
     #[test]
     fn part_2() {
-    // TODO: currently takes too long
+        // TODO: currently takes too long
         let input = include_str!("../input.txt");
         assert_eq!(part2(input), 305068317272992);
     }

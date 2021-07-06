@@ -170,21 +170,21 @@ impl Waypoint {
 }
 
 pub fn part1(input: &str) -> u32 {
-    let mut ship:Ship = Default::default();
+    let mut ship: Ship = Default::default();
     input.lines().for_each(|l| ship.go(l.parse().unwrap()));
 
     ship.get_manhattan_distance()
 }
 
 pub fn part2(input: &str) -> u32 {
-    let mut ship:Ship = Default::default();
+    let mut ship: Ship = Default::default();
     let mut waypoint = Waypoint::new();
     input.lines().for_each(|l| {
-        let instruction:Instruction = l.parse().unwrap();
+        let instruction: Instruction = l.parse().unwrap();
         if let Action::Forward = instruction.action {
             ship.apply_waypoint(instruction.value, &waypoint);
         } else {
-            waypoint.transform(instruction);    
+            waypoint.transform(instruction);
         }
     });
 

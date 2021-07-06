@@ -2,7 +2,7 @@ use std::collections::{HashSet, VecDeque};
 
 fn check(value: &u64, set: &HashSet<u64>) -> bool {
     for a in set {
-        if a>value {
+        if a > value {
             continue;
         }
         let b = value - a;
@@ -13,14 +13,11 @@ fn check(value: &u64, set: &HashSet<u64>) -> bool {
     false
 }
 
-
 pub fn part1(input: &str) -> u64 {
-    let mut values = input
-            .lines()
-            .map(|l| {
-                l.parse::<u64>()
-                    .unwrap_or_else(|_| panic!("Cannot convert line '{:?}' to u64", l))
-            });
+    let mut values = input.lines().map(|l| {
+        l.parse::<u64>()
+            .unwrap_or_else(|_| panic!("Cannot convert line '{:?}' to u64", l))
+    });
 
     let mut idx: HashSet<u64> = HashSet::new();
     let mut queue: VecDeque<u64> = VecDeque::new();
@@ -47,19 +44,20 @@ pub fn part1(input: &str) -> u64 {
 pub fn part2(input: &str) -> u64 {
     let to_find = part1(input);
     let values: Vec<u64> = input
-            .lines()
-            .map(|l| {
-                l.parse::<u64>()
-                    .unwrap_or_else(|_| panic!("Cannot convert line '{:?}' to u64", l))
-            }).collect();
+        .lines()
+        .map(|l| {
+            l.parse::<u64>()
+                .unwrap_or_else(|_| panic!("Cannot convert line '{:?}' to u64", l))
+        })
+        .collect();
     for window in 2..values.len() {
-        for start in 0..(values.len()-window) {
-            let segment = &values[start..start+window];
+        for start in 0..(values.len() - window) {
+            let segment = &values[start..start + window];
             let sum: u64 = segment.iter().sum();
-            if to_find==sum {
+            if to_find == sum {
                 let min = segment.iter().min().unwrap();
                 let max = segment.iter().max().unwrap();
-                return min+max;
+                return min + max;
             }
         }
     }
