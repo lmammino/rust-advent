@@ -38,23 +38,32 @@ jobs:
           cargo install flamegraph
 
       - name: flamegraph bench
+        id: fgb
         run: |
           export CARGO_PROFILE_RELEASE_DEBUG=true
           sudo sysctl -w kernel.perf_event_paranoid=1
           sudo sysctl -p
 
           cargo flamegraph --bench bench_ex13 -- --bench > /dev/null || true
-                  
+
+          FG="$(cat flamegraph.svg)"        
+          echo "::set-output name=flamegraph::${FG//$'\n'/%0A}"
+
       - name: "Post to PR"
-        uses: EliLillyCo/github-actions-post-to-pr@main
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          post_to_pr_definition: |
-            [
-              {
-                "message_file": "./flamegraph.svg",
-                "title": "Valgrind Execution",
-                "compare_branches": [],
-                "collapsible": true
-              }
-            ]
+          msg: |
+            ## Flamegraph
+            _*TODO*_ define a better formatting
+
+            http://github.com/lmammino/rust-advent/runs/${{ github.run_id }}
+
+            <details>
+            <summary>Flamegraph</summary>
+            ${{ steps.fgb.outputs.flamegraph }}
+            </details>
+          check_for_duplicate_msg: true
+  
