@@ -1,0 +1,60 @@
+name: Flamegraph Benchmarks
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  # push:
+  #   branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  flamegraph:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: install linux-perf
+        run: |
+          sudo apt install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
+
+      - name: install flamegraph
+        run: |
+          cargo install flamegraph
+
+      - name: flamegraph bench
+        run: |
+          export CARGO_PROFILE_RELEASE_DEBUG=true
+          sudo sysctl -w kernel.perf_event_paranoid=1
+          sysctl -p
+
+          cargo flamegraph --bench bench_ex13   
+                  
+      - name: "Post to PR"
+        uses: EliLillyCo/github-actions-post-to-pr@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          post_to_pr_definition: |
+            [
+              {
+                "message_file": "./flamegraph.svg",
+                "title": "Valgrind Execution",
+                "compare_branches": [],
+                "collapsible": true
+              }
+            ]
