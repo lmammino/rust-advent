@@ -35,9 +35,9 @@ jobs:
         run: |
           sudo apt install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
 
-      - name: install flamegraph
-        run: |
-          cargo install flamegraph
+#      - name: install flamegraph
+#        run: |
+#          cargo install flamegraph
 
       - name: flamegraph bench
         id: fgb
@@ -46,8 +46,12 @@ jobs:
           sudo sysctl -w kernel.perf_event_paranoid=1
           sudo sysctl -p
 
-          cargo flamegraph --bench bench_ex13 -- --bench > /dev/null || true
-          perf script | ./tools/stackcollapse-perf.pl | grep '::bench::' | ./tools/flamegraph.pl > flamegraphs/bench_ex13.svg 
+          # cargo flamegraph --bench bench_ex13 -- --bench > /dev/null || true
+          cargo bench --no-run
+          for f in `find target/release/deps -executable -type f -name 'bench_ex13*' | sort`; do
+              perf record -a -g -- $f --bench
+              perf script | ./tools/stackcollapse-perf.pl | grep '::bench::' | ./tools/flamegraph.pl > flamegraphs/bench_ex13.svg 
+          done
 
           FG="$(cat flamegraph.svg)"        
           echo "::set-output name=flamegraph::${FG//$'\n'/%0A}"
