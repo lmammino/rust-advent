@@ -33,7 +33,7 @@ jobs:
 
       - name: install linux-perf
         run: |
-          sudo apt install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
+          sudo apt install -y linux-tools-`uname -r`
 
 #      - name: install flamegraph
 #        run: |
@@ -53,8 +53,8 @@ jobs:
               sudo perf script | ./tools/stackcollapse-perf.pl | grep '::bench::' | ./tools/flamegraph.pl > flamegraphs/bench_ex13.svg 
           done
 
-          FG="$(cat flamegraph.svg)"        
-          echo "::set-output name=flamegraph::${FG//$'\n'/%0A}"
+#          FG="$(cat flamegraph.svg)"        
+#          echo "::set-output name=flamegraph::${FG//$'\n'/%0A}"
 
       # - name: "Post to PR"
       #   if: ${{ github.event_name == 'pull_request' }}
