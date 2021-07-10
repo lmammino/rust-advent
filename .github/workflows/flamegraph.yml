@@ -41,9 +41,9 @@ jobs:
         run: |
           export CARGO_PROFILE_RELEASE_DEBUG=true
           sudo sysctl -w kernel.perf_event_paranoid=1
-          sysctl -p
+          sudo sysctl -p
 
-          cargo flamegraph --bench bench_ex13   
+          cargo flamegraph --bench bench_ex13 -- --bench > /dev/null || true
                   
       - name: "Post to PR"
         uses: EliLillyCo/github-actions-post-to-pr@main
