@@ -50,8 +50,7 @@ jobs:
           cargo bench --no-run
           for f in `find target/release/deps -executable -type f -name 'bench_ex13*' | sort`; do
               sudo perf record -a -g -- $f --bench > /dev/null
-              sudo chmod 666 perf.data
-              perf script | ./tools/stackcollapse-perf.pl | grep '::bench::' | ./tools/flamegraph.pl > flamegraphs/bench_ex13.svg 
+              sudo perf script | ./tools/stackcollapse-perf.pl | grep '::bench::' | ./tools/flamegraph.pl > flamegraphs/bench_ex13.svg 
           done
 
           FG="$(cat flamegraph.svg)"        
