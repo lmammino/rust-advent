@@ -3,7 +3,7 @@ name: Rust
 on:
   push:
     paths-ignore:
-      - 'flamegraphs/**.svg'
+      - 'flamegraphs/**'
 
 env:
   CARGO_TERM_COLOR: always
