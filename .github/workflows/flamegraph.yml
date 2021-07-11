@@ -31,9 +31,10 @@ jobs:
         with:
           toolchain: stable
 
-      - name: install linux-perf
+      - name: install tools and libs
         run: |
           sudo apt install -y linux-tools-`uname -r`
+          pip install pillow
 
       - name: install flamegraph
         run: |
