@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
 fn game(input: &str, iterations: usize) -> usize {
-    let start_vals: Vec<usize> = input.split(',').map(|x| x.parse().unwrap()).collect();
+    let start_vals: Vec<usize> = input
+        .split(',')
+        .map(|x| x.parse().expect("Invalid input"))
+        .collect();
 
     let mut occurence: HashMap<usize, usize> = HashMap::with_capacity(iterations);
 
