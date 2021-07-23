@@ -34,7 +34,7 @@ jobs:
       - name: install tools and libs
         run: |
           sudo apt install -y linux-tools-`uname -r`
-          pip install pillow
+          # pip install pillow
 
       - name: install flamegraph
         run: |
@@ -54,10 +54,6 @@ jobs:
               cargo flamegraph --bench $name -- --bench > /dev/null || true
               cp flamegraph.svg flamegraphs/${name}.svg
           done
-
-#          I leave this here as an example of how to put a file in a step output
-#          FG="$(cat flamegraph.svg)"        
-#          echo "::set-output name=flamegraph::${FG//$'\n'/%0A}"
       
       - name: Commit flamegraph
         uses: EndBug/add-and-commit@v7
@@ -66,10 +62,11 @@ jobs:
           message: 'Update flamegraphs SVGs'
           add: 'flamegraphs/*'
 
-      - name: "Get current git hash"
-        id: gcgh
+      - name: "Create the PR comment message"
+        id: pr_comment
         run: |
-          echo "::set-output name=hash::$(git rev-parse HEAD)" 
+          PRCOMMENT="$(python tools/flamegraph_comment_template.py ${{ github.repository }} $(git rev-parse HEAD) flamegraphs/*)"        
+          echo "::set-output name=pr_comment::${PRCOMMENT//$'\n'/%0A}" 
 
       - name: "Post to PR"
         if: ${{ github.event_name == 'pull_request' }}
@@ -77,13 +74,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          check_for_duplicate_msg: true
           msg: |
             ## Flamegraph
 
             http://github.com/${{ github.repository }}/runs/${{ github.run_id }}
             
-            <details>
-            <summary>bench_ex13</summary>
-            ![](https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.gcgh.outputs.hash }}/flamegraphs/bench_ex13.svg)
-            </details>
-          check_for_duplicate_msg: true
+            ${{ steps.pr_comment.outputs.pr_comment }}
