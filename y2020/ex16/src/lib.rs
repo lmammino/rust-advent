@@ -12,11 +12,11 @@ lazy_static! {
 
 struct Rule {
     _name: String,
-    ranges: (RangeInclusive<u16>, RangeInclusive<u16>)
+    ranges: (RangeInclusive<u64>, RangeInclusive<u64>)
 }
 
 impl Rule {
-    fn contains(&self, n: &u16) -> bool {
+    fn contains(&self, n: &u64) -> bool {
         self.ranges.0.contains(n) || self.ranges.1.contains(n)
     }
 }
@@ -28,10 +28,10 @@ impl FromStr for Rule {
         let capture = RULE_REGEX.captures(line).unwrap();
 
         let name = String::from(&capture[1]);
-        let range_1_start: u16 = capture[2].parse().unwrap();
-        let range_1_end: u16 = capture[3].parse().unwrap();
-        let range_2_start: u16 = capture[4].parse().unwrap();
-        let range_2_end: u16 = capture[5].parse().unwrap();
+        let range_1_start: u64 = capture[2].parse().unwrap();
+        let range_1_end: u64 = capture[3].parse().unwrap();
+        let range_2_start: u64 = capture[4].parse().unwrap();
+        let range_2_end: u64 = capture[5].parse().unwrap();
 
         Ok(Rule {
             _name: name,
@@ -43,26 +43,28 @@ impl FromStr for Rule {
     } 
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> u64 {
     let mut i = input.split("\n\n");
     let unparsed_rules = i.next().unwrap();
     let _own_ticket = i.next().unwrap();
     let other_tickets = i.next().unwrap();
 
     let rules: Vec<Rule> = unparsed_rules.lines().map(|l| l.parse().unwrap()).collect();
-    let mut failed_numbers: u32 = 0;
-    for ticket in other_tickets.lines().skip(1) {
-        for number in ticket.split(",") {
-            let n: u16 = number.parse().unwrap();
-            let found = rules.iter().find(|rule| rule.contains(&n));
-            if found.is_none() {
-                failed_numbers += n as u32;
-            }
-        }
-    }
 
-    // 21996
-    failed_numbers
+    other_tickets.lines()
+        .skip(1)
+        // We don't car about which tickets are invalid
+        // So we can flat into a single iterator
+        .flat_map(|l| l.split(','))
+        // Cast to u64
+        .map(&str::parse::<u64>)
+        // Removing the non-number
+        .filter_map(Result::ok)
+        // or
+        // .map(Result::unwrap)
+        .filter(|n| !rules.iter().any(|rule| rule.contains(n)))
+        // Sum together
+        .sum()
 }
 
 pub fn part2(_input: &str) -> u64 {
