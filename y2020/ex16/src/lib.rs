@@ -4,15 +4,13 @@ use regex::Regex;
 use std::{ops::RangeInclusive, str::FromStr};
 
 lazy_static! {
-    static ref RULE_REGEX: Regex = Regex::new(
-        r"^(.+): ([0-9]+)-([0-9]+) or ([0-9]+)-([0-9]+)$"
-    )
-    .unwrap();
+    static ref RULE_REGEX: Regex =
+        Regex::new(r"^(.+): ([0-9]+)-([0-9]+) or ([0-9]+)-([0-9]+)$").unwrap();
 }
 
 struct Rule {
     _name: String,
-    ranges: (RangeInclusive<u16>, RangeInclusive<u16>)
+    ranges: (RangeInclusive<u16>, RangeInclusive<u16>),
 }
 
 impl Rule {
@@ -37,10 +35,10 @@ impl FromStr for Rule {
             _name: name,
             ranges: (
                 RangeInclusive::new(range_1_start, range_1_end),
-                RangeInclusive::new(range_2_start, range_2_end)
-            )
+                RangeInclusive::new(range_2_start, range_2_end),
+            ),
         })
-    } 
+    }
 }
 
 pub fn part1(input: &str) -> u32 {
@@ -52,7 +50,7 @@ pub fn part1(input: &str) -> u32 {
     let rules: Vec<Rule> = unparsed_rules.lines().map(|l| l.parse().unwrap()).collect();
     let mut failed_numbers: u32 = 0;
     for ticket in other_tickets.lines().skip(1) {
-        for number in ticket.split(",") {
+        for number in ticket.split(',') {
             let n: u16 = number.parse().unwrap();
             let found = rules.iter().find(|rule| rule.contains(&n));
             if found.is_none() {
