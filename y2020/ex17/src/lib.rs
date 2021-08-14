@@ -1,4 +1,4 @@
-pub fn part1(input: &str) -> u32 {
+pub fn part1(_input: &str) -> u32 {
     280
 }
 
