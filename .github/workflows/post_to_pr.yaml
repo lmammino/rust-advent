@@ -1,0 +1,28 @@
+on:
+  workflow_run:
+    workflows: ["Valgrind Benchmarks"]
+    types: [completed]
+
+jobs:
+  on-success:
+    runs-on: ubuntu-latest
+#     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: "Post to PR"
+#         if: ${{ github.event_name == 'pull_request' }}
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          check_for_duplicate_msg: true
+          msg: |
+            ## Valgrind Benchmarks
+            http://github.com/${{ github.repository }}/runs/${{ github.run_id }}
+            
+            Test
+
+#   on-failure:
+#     runs-on: ubuntu-latest
+#     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+#     steps:
+#       ...
