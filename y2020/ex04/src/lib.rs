@@ -33,10 +33,9 @@ pub fn part1(lines: Vec<&str>) -> u32 {
 
     let re = Regex::new(r"\b(\w+):").unwrap();
     for line in raw_passports {
-        let captures: Vec<String> = re
+        let captures = re
             .captures_iter(&line)
-            .map(|x| x.get(1).unwrap().as_str().to_string())
-            .collect();
+            .map(|x| x.get(1).unwrap().as_str().to_string());
 
         let passport: HashSet<String> = captures.into_iter().collect();
         let expected_fields_present: HashSet<&String> =

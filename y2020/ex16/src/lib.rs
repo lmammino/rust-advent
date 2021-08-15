@@ -4,10 +4,8 @@ use regex::Regex;
 use std::{ops::RangeInclusive, str::FromStr};
 
 lazy_static! {
-    static ref RULE_REGEX: Regex = Regex::new(
-        r"^(.+): ([0-9]+)-([0-9]+) or ([0-9]+)-([0-9]+)$"
-    )
-    .unwrap();
+    static ref RULE_REGEX: Regex =
+        Regex::new(r"^(.+): ([0-9]+)-([0-9]+) or ([0-9]+)-([0-9]+)$").unwrap();
 }
 
 struct Rule {
@@ -37,10 +35,10 @@ impl FromStr for Rule {
             _name: name,
             ranges: (
                 RangeInclusive::new(range_1_start, range_1_end),
-                RangeInclusive::new(range_2_start, range_2_end)
-            )
+                RangeInclusive::new(range_2_start, range_2_end),
+            ),
         })
-    } 
+    }
 }
 
 pub fn part1(input: &str) -> u64 {
@@ -50,7 +48,6 @@ pub fn part1(input: &str) -> u64 {
     let other_tickets = i.next().unwrap();
 
     let rules: Vec<Rule> = unparsed_rules.lines().map(|l| l.parse().unwrap()).collect();
-
     other_tickets.lines()
         .skip(1)
         // We don't car about which tickets are invalid
