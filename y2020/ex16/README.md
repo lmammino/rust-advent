@@ -79,6 +79,6 @@ nearby tickets:
 
 Based on the nearby tickets in the above example, the first position must be row, the second position must be class, and the third position must be seat; you can conclude that in your ticket, class is `12`, row is `11`, and seat is `13`.
 
-Once you work out which field is which, look for the six fields on your ticket that start with the word departure. What do you get if you multiply those six values together?
+Once you work out which field is which, look for the six fields **on your ticket** that start with the word `departure`. What do you get if you multiply those six values together?
 
 Your puzzle answer was `650080463519`.
