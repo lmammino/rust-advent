@@ -23,8 +23,16 @@ for line in first:
         counter = int(counter.replace(",", ""))
         delta[k] = (data[k] - counter) * 100 / counter
 
-print("## Valgrind Benchmarks\n\nNegative deltas means faster code\n\n")
+print(
+    """## Valgrind Benchmarks
+
+<details>
+    <summary>Negative deltas means faster code</summary>  
+    <pre>                      
+"""
+)
 for k in data:
     print(
         "{} {} ({} %)\n".format(k, data[k], "{:+.02f}".format(delta[k]) if k in delta else "N/A")
     )
+print("</pre></details>")
