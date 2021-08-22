@@ -13,10 +13,10 @@ on:
     branches: [ main ]
     paths-ignore:
       - 'flamegraphs/**'
-  pull_request_target:
-    branches: [ main ]
-    paths-ignore:
-      - 'flamegraphs/**'
+#   pull_request_target:
+#     branches: [ main ]
+#     paths-ignore:
+#       - 'flamegraphs/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
+    steps:        
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
@@ -63,18 +63,28 @@ jobs:
 
       - name: compute delta
         run: |
-          python /tmp/delta.py main.txt this_pr.txt > delta.txt
-                  
-      - name: "Post to PR"
-        uses: EliLillyCo/github-actions-post-to-pr@main
+          python /tmp/delta.py main.txt this_pr.txt > message.txt
+          echo ${{ github.event.number }} > pid.txt
+                                    
+      - name: Archive results
+        uses: actions/upload-artifact@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          post_to_pr_definition: |
-            [
-              {
-                "message_file": "./delta.txt",
-                "title": "Valgrind Execution",
-                "compare_branches": [],
-                "collapsible": true
-              }
-            ]
+          retention-days: 5
+          name: pr-comment
+          path: |
+            message.txt
+            pid.txt
+            
+#       - name: "Post to PR"
+#         uses: EliLillyCo/github-actions-post-to-pr@main
+#         with:
+#           github_token: ${{ secrets.GITHUB_TOKEN }}
+#           post_to_pr_definition: |
+#             [
+#               {
+#                 "message_file": "./delta.txt",
+#                 "title": "Valgrind Execution",
+#                 "compare_branches": [],
+#                 "collapsible": true
+#               }
+#             ]

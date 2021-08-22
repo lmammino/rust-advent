@@ -42,17 +42,35 @@ jobs:
           cargo bench
           git checkout here
           cargo bench | tee output.txt
-          
-      - name: "Post to PR"
-        uses: EliLillyCo/github-actions-post-to-pr@main
+
+      - name: Compute PR message
+        run: |
+          echo $"## Cargo Bench Execution\n\n" > message.txt
+          echo '<details><summary>Cargo Bench</summary><pre>' >> message.txt
+          grep -B 4 -A 1 'time:' output.txt >> message.txt
+          echo $"\n</pre></details>\n" >> message.txt
+          sed -i 's/--/<hr>/' message.txt
+          echo ${{ github.event.number }} > pid.txt
+                                    
+      - name: Archive PR message
+        uses: actions/upload-artifact@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          post_to_pr_definition: |
-            [
-              {
-                "message_file": "./output.txt",
-                "title": "Cargo Bench Execution",
-                "compare_branches": [],
-                "modifier": "grep -B 4 -A 1 'time:'"
-              }
-            ]
+          retention-days: 5
+          name: pr-comment
+          path: |
+            message.txt
+            pid.txt          
+          
+      # - name: "Post to PR"
+      #   uses: EliLillyCo/github-actions-post-to-pr@main
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     post_to_pr_definition: |
+      #       [
+      #         {
+      #           "message_file": "./output.txt",
+      #           "title": "Cargo Bench Execution",
+      #           "compare_branches": [],
+      #           "modifier": "grep -B 4 -A 1 'time:'"
+      #         }
+      #       ]
