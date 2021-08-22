@@ -14,13 +14,18 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
 
-      - name: Download Artifact
-        run: |
-          curl `curl ${{ github.event.workflow_run.artifacts_url }} | jq -r ".artifacts[0].archive_download_url"`
-          ls
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: ${{ github.event.workflow.id }}
+          # Optional, will use specified workflow run
+          # run_id: 1122334455
+          # name: artifact_name
           
+      - run: ls
+
       - name: "Post to PR"
-#         if: ${{ github.event_name == 'pull_request' }}
         uses: malagolichiara/comment-on-pr@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
