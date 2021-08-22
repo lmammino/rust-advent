@@ -8,11 +8,16 @@ on:
 jobs:
   on-success:
     runs-on: ubuntu-latest
-#     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: Download Artifact
+        run: |
+          curl `curl ${{ github.event.workflow_run.artifacts_url }} | jq -r ".artifacts[0].archive_download_url"`
+          ls
           
       - name: "Post to PR"
 #         if: ${{ github.event_name == 'pull_request' }}
@@ -24,7 +29,7 @@ jobs:
           check_for_duplicate_msg: true
           msg: |
             ## Valgrind Benchmarks
-            http://github.com/${{ github.repository }}/runs/${{ github.run_id }}
+            http://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
             
             Test
 
