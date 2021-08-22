@@ -64,7 +64,7 @@ jobs:
       - name: compute delta
         run: |
           python /tmp/delta.py main.txt this_pr.txt > delta.txt
-          echo {{ github.event.number }} > pid.txt
+          echo ${{ github.event.number }} > pid.txt
                                     
       - name: Archive results
         uses: actions/upload-artifact@v2
