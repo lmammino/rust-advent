@@ -73,4 +73,3 @@ Licensed under [MIT License](LICENSE). © Luciano Mammino, Roberto Gambuzzi, Eug
 This is a just a chage to test the main repo workflows, do not merge this PR
 
 Change to trigger a workflow run
-Change to trigger a workflow run
