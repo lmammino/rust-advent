@@ -10,19 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 #     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: hmarr/debug-action@v2
-        name: "Debug"
-        
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           
       - name: "Post to PR"
 #         if: ${{ github.event_name == 'pull_request' }}
-        uses: unsplash/comment-on-pr@master
+        uses: malagolichiara/comment-on-pr@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          pull_request_number: 21
           check_for_duplicate_msg: true
           msg: |
             ## Valgrind Benchmarks
