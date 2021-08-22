@@ -10,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 #     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - run: |
-          echo "${{ github.event.workflow_run.head_branch }}"
-          echo "${{ github.event.workflow_run.pull_requests }}"
+      - uses: hmarr/debug-action@v2
         name: "Debug"
+        
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
