@@ -23,20 +23,22 @@ jobs:
           # run_id: 1122334455
           # name: artifact_name
           
-      - run: ls
+      - name: "Create the PR comment message"
+        id: pr_comment
+        run: |
+          PID="$(cat pr-comment/pid.txt)"        
+          echo "::set-output name=pr_id::${PID}" 
+          PRCOMMENT="$(cat pr-comment/message.txt)"        
+          echo "::set-output name=pr_comment::${PRCOMMENT//$'\n'/%0A}" 
 
       - name: "Post to PR"
         uses: malagolichiara/comment-on-pr@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          pull_request_number: 21
+          pull_request_number: ${{ steps.pr_comment.outputs.pr_id }}
           check_for_duplicate_msg: true
-          msg: |
-            ## Valgrind Benchmarks
-            http://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            
-            Test
+          msg: ${{ steps.pr_comment.outputs.pr_comment }}
 
 #   on-failure:
 #     runs-on: ubuntu-latest
