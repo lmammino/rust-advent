@@ -2,7 +2,7 @@ name: Post To PR
 
 on:
   workflow_run:
-    workflows: ["Valgrind Benchmarks"]
+    workflows: ["Valgrind Benchmarks", "Cargo Benchmarks"]
     types: [completed]
 
 jobs:
