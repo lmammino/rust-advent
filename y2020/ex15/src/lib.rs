@@ -1,26 +1,25 @@
-use std::collections::HashMap;
-
-fn game(input: &str, iterations: usize) -> usize {
+fn game<const N: usize>(input: &str) -> usize {
     let start_vals: Vec<usize> = input
         .split(',')
         .map(|x| x.parse().expect("Invalid input"))
         .collect();
 
-    let mut occurence: HashMap<usize, usize> = HashMap::with_capacity(iterations);
+    let mut occurrence = vec![0_usize; N].into_boxed_slice();
 
-    for (turn, n) in start_vals[..start_vals.len() - 1].iter().enumerate() {
-        occurence.insert(*n, turn + 1);
+    for (turn, n) in start_vals.iter().take(start_vals.len() - 1).enumerate() {
+        occurrence[*n] = turn + 1;
     }
 
     let mut next = *start_vals.last().unwrap();
     let mut new_next;
-    for turn in start_vals.len()..iterations {
-        if let Some(last_seen) = occurence.get(&next) {
+    for turn in start_vals.len()..N {
+        let last_seen = occurrence.get(next).unwrap();
+        if *last_seen != 0 {
             new_next = turn - last_seen;
         } else {
             new_next = 0;
         }
-        occurence.insert(next, turn);
+        occurrence[next] = turn;
         next = new_next;
     }
 
@@ -28,11 +27,11 @@ fn game(input: &str, iterations: usize) -> usize {
 }
 
 pub fn part1(input: &str) -> usize {
-    game(input, 2020)
+    game::<2020>(input)
 }
 
 pub fn part2(input: &str) -> usize {
-    game(input, 30_000_000)
+    game::<30_000_000>(input)
 }
 
 #[cfg(test)]
@@ -41,25 +40,31 @@ mod tests {
 
     #[test]
     fn examples() {
-        let expectations = [
-            ("1,3,2", 1, 2020),
-            ("2,1,3", 10, 2020),
-            ("1,2,3", 27, 2020),
-            ("2,3,1", 78, 2020),
-            ("3,2,1", 438, 2020),
-            ("3,1,2", 1836, 2020),
-            // These ones will make the tests horrendously slow -.-"
-            // ("0,3,6", 175594, 30000000),
-            // ("1,3,2", 2578, 30000000),
-            // ("2,1,3", 3544142, 30000000),
-            // ("1,2,3", 261214, 30000000),
-            // ("2,3,1", 6895259, 30000000),
-            // ("3,2,1", 18, 30000000),
-            // ("3,1,2", 362, 30000000),
+        let expectations_2020 = [
+            ("1,3,2", 1),
+            ("2,1,3", 10),
+            ("1,2,3", 27),
+            ("2,3,1", 78),
+            ("3,2,1", 438),
+            ("3,1,2", 1836),
         ];
 
-        for (input, output, iterations) in expectations.iter() {
-            assert_eq!(game(*input, *iterations), *output);
+        let expectations_30_000_000 = [
+            ("0,3,6", 175594),
+            ("1,3,2", 2578),
+            ("2,1,3", 3544142),
+            ("1,2,3", 261214),
+            ("2,3,1", 6895259),
+            ("3,2,1", 18),
+            ("3,1,2", 362),
+        ];
+
+        for (input, output) in expectations_2020.iter() {
+            assert_eq!(game::<2020>(*input), *output);
+        }
+
+        for (input, output) in expectations_30_000_000.iter() {
+            assert_eq!(game::<30_000_000>(*input), *output);
         }
     }
 
