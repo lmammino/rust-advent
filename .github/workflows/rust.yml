@@ -4,7 +4,11 @@ on:
   push:
     paths-ignore:
       - 'flamegraphs/**'
-
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - 'flamegraphs/**'
+      
 env:
   CARGO_TERM_COLOR: always
 
