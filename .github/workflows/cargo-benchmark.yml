@@ -45,10 +45,10 @@ jobs:
 
       - name: Compute PR message
         run: |
-          echo "## Cargo Bench Execution\n\n" > message.txt
+          echo $"## Cargo Bench Execution\n\n" > message.txt
           echo '<details><summary>Cargo Bench</summary>' >> message.txt
           grep -B 4 -A 1 'time:' output.txt >> message.txt
-          echo "\n</details>\n" >> message.txt
+          echo $"\n</details>\n" >> message.txt
           sed -i 's/--/<hr>/' message.txt
           echo ${{ github.event.number }} > pid.txt
                                     
