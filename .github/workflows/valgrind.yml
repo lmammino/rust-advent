@@ -30,6 +30,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Debug
+        uses: hmarr/debug-action@v2
+        
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
@@ -64,7 +67,15 @@ jobs:
       - name: compute delta
         run: |
           python /tmp/delta.py main.txt this_pr.txt > delta.txt
-                  
+                                    
+      - name: Archive results
+        uses: actions/upload-artifact@v2
+        with:
+          retention-days: 5
+          name: valgrind
+          path: |
+            delta.txt
+            
 #       - name: "Post to PR"
 #         uses: EliLillyCo/github-actions-post-to-pr@main
 #         with:
