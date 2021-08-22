@@ -29,10 +29,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      - name: Debug
-        uses: hmarr/debug-action@v2
-        
+    steps:        
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
@@ -67,6 +64,7 @@ jobs:
       - name: compute delta
         run: |
           python /tmp/delta.py main.txt this_pr.txt > delta.txt
+          echo {{ github.event.number }} > pid.txt
                                     
       - name: Archive results
         uses: actions/upload-artifact@v2
@@ -75,6 +73,7 @@ jobs:
           name: valgrind
           path: |
             delta.txt
+            pid.txt
             
 #       - name: "Post to PR"
 #         uses: EliLillyCo/github-actions-post-to-pr@main
