@@ -9,7 +9,7 @@ k = None
 
 for line in second:
     if line.startswith("##"):
-        k = line[: line.rfind("-")]
+        k = line[2 : line.rfind("-")]
     elif line.startswith("=="):
         _, _, _, counter = line.split()
         counter = int(counter.replace(",", ""))
@@ -17,7 +17,7 @@ for line in second:
 
 for line in first:
     if line.startswith("##"):
-        k = line[: line.rfind("-")]
+        k = line[2 : line.rfind("-")]
     elif line.startswith("==") and k in data:
         _, _, _, counter = line.split()
         counter = int(counter.replace(",", ""))
@@ -33,6 +33,6 @@ print(
 )
 for k in data:
     print(
-        "{} {} ({} %)\n".format(k.strip('#'), data[k], "{:+.02f}".format(delta[k]) if k in delta else "N/A")
+        "{} {} ({} %)\n".format(k, data[k], "{:+.02f}".format(delta[k]) if k in delta else "N/A")
     )
 print("</pre></details>")
