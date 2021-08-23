@@ -50,7 +50,8 @@ pub fn part1(input: &str) -> u64 {
 
     let rules: Vec<Rule> = unparsed_rules.lines().map(|l| l.parse().unwrap()).collect();
 
-    other_tickets.lines()
+    other_tickets
+        .lines()
         .skip(1)
         // We don't car about which tickets are invalid
         // So we can flat into a single iterator
@@ -89,6 +90,8 @@ pub fn part2(input: &str) -> u64 {
             let ticket: Vec<u64> = line.split(',').map(|l| l.parse().unwrap()).collect();
             for number in &ticket {
                 let found = rules.iter().find(|rule| rule.contains(number));
+
+                #[allow(clippy::question_mark)]
                 if found.is_none() {
                     return None;
                 }
@@ -129,9 +132,9 @@ pub fn part2(input: &str) -> u64 {
         .find(|rules| rules.len() == 1)
         .expect("There needs to be at least 1!");
     sure_columns.insert(start_column.iter().next().unwrap());
-    loop {
-        for i in 0..guesses.len() {
-            let columns = guesses.get_mut(i).unwrap();
+
+    while sure_columns.len() < guesses.len() {
+        for columns in guesses.iter_mut() {
             if columns.len() > 1 {
                 for col in sure_columns.iter() {
                     columns.remove(col);
@@ -140,9 +143,6 @@ pub fn part2(input: &str) -> u64 {
             if columns.len() == 1 {
                 sure_columns.insert(columns.iter().next().unwrap());
             }
-        }
-        if sure_columns.len() == guesses.len() {
-            break;
         }
     }
 
