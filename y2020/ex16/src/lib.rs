@@ -42,25 +42,28 @@ impl FromStr for Rule {
     }
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> u64 {
     let mut i = input.split("\n\n");
     let unparsed_rules = i.next().unwrap();
     let _own_ticket = i.next().unwrap();
     let other_tickets = i.next().unwrap();
 
     let rules: Vec<Rule> = unparsed_rules.lines().map(|l| l.parse().unwrap()).collect();
-    let mut failed_numbers: u32 = 0;
-    for ticket in other_tickets.lines().skip(1) {
-        for number in ticket.split(',') {
-            let n: u64 = number.parse().unwrap();
-            let found = rules.iter().find(|rule| rule.contains(&n));
-            if found.is_none() {
-                failed_numbers += n as u32;
-            }
-        }
-    }
 
-    failed_numbers
+    other_tickets.lines()
+        .skip(1)
+        // We don't car about which tickets are invalid
+        // So we can flat into a single iterator
+        .flat_map(|l| l.split(','))
+        // Cast to u64
+        .map(&str::parse::<u64>)
+        // Removing the non-number
+        .filter_map(Result::ok)
+        // or
+        // .map(Result::unwrap)
+        .filter(|n| !rules.iter().any(|rule| rule.contains(n)))
+        // Sum together
+        .sum()
 }
 
 pub fn part2(input: &str) -> u64 {
