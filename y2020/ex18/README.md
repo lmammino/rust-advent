@@ -1,418 +1,58 @@
-# Day 17: Conway Cubes
-
-As your flight slowly drifts through the sky, the Elves at the Mythical Information Bureau at the North Pole contact you. They'd like some help debugging a malfunctioning experimental energy source aboard one of their super-secret imaging satellites.
-
-The experimental energy source is based on cutting-edge technology: a set of Conway Cubes contained in a pocket dimension! When you hear it's having problems, you can't help but agree to take a look.
-
-The pocket dimension contains an infinite 3-dimensional grid. At every integer 3-dimensional coordinate (`x`,`y`,`z`), there exists a single cube which is either `active` or `inactive`.
-
-In the initial state of the pocket dimension, almost all cubes start `inactive`. The only exception to this is a small flat region of cubes (your puzzle input); the cubes in this region start in the specified `active` (`#`) or `inactive` (`.`) state.
-
-The energy source then proceeds to boot up by executing six cycles.
-
-Each cube only ever considers its neighbors: any of the `26` other cubes where any of their coordinates differ by at most 1. For example, given the cube at `x=1,y=2,z=3`, its neighbors include the cube at `x=2,y=2,z=2`, the cube at `x=0,y=2,z=3`, and so on.
-
-During a cycle, all cubes simultaneously change their state according to the following rules:
-
-If a cube is `active` and exactly `2` or `3` of its neighbors are also `active`, the cube remains `active`. Otherwise, the cube becomes `inactive`.
-If a cube is `inactive` but exactly `3` of its neighbors are `active`, the cube becomes `active`. Otherwise, the cube remains `inactive`.
-The engineers responsible for this experimental energy source would like you to simulate the pocket dimension and determine what the configuration of cubes should be at the end of the six-cycle boot process.
-
-For example, consider the following initial state:
-
-```
-.#.
-..#
-###
-```
-
-Even though the pocket dimension is 3-dimensional, this initial state represents a small 2-dimensional slice of it. (In particular, this initial state defines a `3x3x1` region of the 3-dimensional space.)
-
-Simulating a few cycles from this initial state produces the following configurations, where the result of each cycle is shown layer-by-layer at each given z coordinate (and the frame of view follows the `active` cells in each cycle):
-
-Before any cycles:
-
-```
-z=0
-.#.
-..#
-###
-```
-
-After 1 cycle:
-
-```
-z=-1
-#..
-..#
-.#.
-
-z=0
-#.#
-.##
-.#.
-
-...
-#.#
-.##
-.#.
-
-
-
-
-z=1
-#..
-..#
-.#.
-```
-
-After 2 cycles:
-
-```
-z=-2
-.....
-.....
-..#..
-.....
-.....
-
-z=-1
-..#..
-.#..#
-....#
-.#...
-.....
-
-z=0
-##...
-##...
-#....
-....#
-.###.
-
-z=1
-..#..
-.#..#
-....#
-.#...
-.....
-
-z=2
-.....
-.....
-..#..
-.....
-.....
-```
-
-After 3 cycles:
-
-```
-z=-2
-.......
-.......
-..##...
-..###..
-.......
-.......
-.......
-
-z=-1
-..#....
-...#...
-#......
-.....##
-.#...#.
-..#.#..
-...#...
-
-z=0
-...#...
-.......
-#......
-.......
-.....##
-.##.#..
-...#...
-
-z=1
-..#....
-...#...
-#......
-.....##
-.#...#.
-..#.#..
-...#...
-
-z=2
-.......
-.......
-..##...
-..###..
-.......
-.......
-.......
-```
-
-After the full six-cycle boot process completes, `112` cubes are left in the `active` state.
-
-Starting with your given initial configuration, simulate six cycles. How many cubes are left in the `active` state after the sixth cycle?
-
-Your puzzle answer was `280`.
-
-## Part Two
-
-For some reason, your simulated results don't match what the experimental energy source engineers expected. Apparently, the pocket dimension actually has four spatial dimensions, not three.
-
-The pocket dimension contains an infinite 4-dimensional grid. At every integer 4-dimensional coordinate (`x`,`y`,`z`,`w`), there exists a single cube (really, a hypercube) which is still either `active` or `inactive`.
-
-Each cube only ever considers its neighbors: any of the `80` other cubes where any of their coordinates differ by at most `1`. For example, given the cube at `x=1`,`y=2`,`z=3`,`w=4`, its neighbors include the cube at `x=2`,`y=2`,`z=3`,`w=3`, the cube at `x=0`,`y=2`,`z=3`,`w=4`, and so on.
-
-The initial state of the pocket dimension still consists of a small flat region of cubes. Furthermore, the same rules for cycle updating still apply: during each cycle, consider the number of `active` neighbors of each cube.
-
-For example, consider the same initial state as in the example above. Even though the pocket dimension is 4-dimensional, this initial state represents a small 2-dimensional slice of it. (In particular, this initial state defines a `3x3x1x1` region of the 4-dimensional space.)
-
-Simulating a few cycles from this initial state produces the following configurations, where the result of each cycle is shown layer-by-layer at each given `z` and `w` coordinate:
-
-Before any cycles:
-
-```
-z=0, w=0
-.#.
-..#
-###
-```
-
-After 1 cycle:
-
-```
-z=-1, w=-1
-#..
-..#
-.#.
-
-z=0, w=-1
-#..
-..#
-.#.
-
-z=1, w=-1
-#..
-..#
-.#.
-
-z=-1, w=0
-#..
-..#
-.#.
-
-z=0, w=0
-#.#
-.##
-.#.
-
-z=1, w=0
-#..
-..#
-.#.
-
-z=-1, w=1
-#..
-..#
-.#.
-
-z=0, w=1
-#..
-..#
-.#.
-
-z=1, w=1
-#..
-..#
-.#.
-```
-
-After 2 cycles:
-
-```
-z=-2, w=-2
-.....
-.....
-..#..
-.....
-.....
-
-z=-1, w=-2
-.....
-.....
-.....
-.....
-.....
-
-z=0, w=-2
-###..
-##.##
-#...#
-.#..#
-.###.
-
-z=1, w=-2
-.....
-.....
-.....
-.....
-.....
-
-z=2, w=-2
-.....
-.....
-..#..
-.....
-.....
-
-z=-2, w=-1
-.....
-.....
-.....
-.....
-.....
-
-z=-1, w=-1
-.....
-.....
-.....
-.....
-.....
-
-z=0, w=-1
-.....
-.....
-.....
-.....
-.....
-
-z=1, w=-1
-.....
-.....
-.....
-.....
-.....
-
-z=2, w=-1
-.....
-.....
-.....
-.....
-.....
-
-z=-2, w=0
-###..
-##.##
-#...#
-.#..#
-.###.
-
-z=-1, w=0
-.....
-.....
-.....
-.....
-.....
-
-z=0, w=0
-.....
-.....
-.....
-.....
-.....
-
-z=1, w=0
-.....
-.....
-.....
-.....
-.....
-
-z=2, w=0
-###..
-##.##
-#...#
-.#..#
-.###.
-
-z=-2, w=1
-.....
-.....
-.....
-.....
-.....
-
-z=-1, w=1
-.....
-.....
-.....
-.....
-.....
-
-z=0, w=1
-.....
-.....
-.....
-.....
-.....
-
-z=1, w=1
-.....
-.....
-.....
-.....
-.....
-
-z=2, w=1
-.....
-.....
-.....
-.....
-.....
-
-z=-2, w=2
-.....
-.....
-..#..
-.....
-.....
-
-z=-1, w=2
-.....
-.....
-.....
-.....
-.....
-
-z=0, w=2
-###..
-##.##
-#...#
-.#..#
-.###.
-
-z=1, w=2
-.....
-.....
-.....
-.....
-.....
-
-z=2, w=2
-.....
-.....
-..#..
-.....
-.....
-```
-
-After the full six-cycle boot process completes, `848` cubes are left in the `active` state.
-
-Starting with your given initial configuration, simulate six cycles in a 4-dimensional space. How many cubes are left in the `active` state after the sixth cycle?
-
-Your puzzle answer was `1696`.
+--- Day 18: Operation Order ---
+As you look out the window and notice a heavily-forested continent slowly appear over the horizon, you are interrupted by the child sitting next to you. They're curious if you could help them with their math homework.
+
+Unfortunately, it seems like this "math" follows different rules than you remember.
+
+The homework (your puzzle input) consists of a series of expressions that consist of addition (+), multiplication (*), and parentheses ((...)). Just like normal math, parentheses indicate that the expression inside must be evaluated before it can be used by the surrounding expression. Addition still finds the sum of the numbers on both sides of the operator, and multiplication still finds the product.
+
+However, the rules of operator precedence have changed. Rather than evaluating multiplication before addition, the operators have the same precedence, and are evaluated left-to-right regardless of the order in which they appear.
+
+For example, the steps to evaluate the expression 1 + 2 * 3 + 4 * 5 + 6 are as follows:
+
+1 + 2 * 3 + 4 * 5 + 6
+  3   * 3 + 4 * 5 + 6
+      9   + 4 * 5 + 6
+         13   * 5 + 6
+             65   + 6
+                 71
+Parentheses can override this order; for example, here is what happens if parentheses are added to form 1 + (2 * 3) + (4 * (5 + 6)):
+
+1 + (2 * 3) + (4 * (5 + 6))
+1 +    6    + (4 * (5 + 6))
+     7      + (4 * (5 + 6))
+     7      + (4 *   11   )
+     7      +     44
+            51
+Here are a few more examples:
+
+2 * 3 + (4 * 5) becomes 26.
+5 + (8 * 3 + 9 + 3 * 4 * 3) becomes 437.
+5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4)) becomes 12240.
+((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2 becomes 13632.
+Before you can help with the homework, you need to understand it yourself. Evaluate the expression on each line of the homework; what is the sum of the resulting values?
+
+Your puzzle answer was 701339185745.
+
+--- Part Two ---
+You manage to answer the child's questions and they finish part 1 of their homework, but get stuck when they reach the next section: advanced math.
+
+Now, addition and multiplication have different precedence levels, but they're not the ones you're familiar with. Instead, addition is evaluated before multiplication.
+
+For example, the steps to evaluate the expression 1 + 2 * 3 + 4 * 5 + 6 are now as follows:
+
+1 + 2 * 3 + 4 * 5 + 6
+  3   * 3 + 4 * 5 + 6
+  3   *   7   * 5 + 6
+  3   *   7   *  11
+     21       *  11
+         231
+Here are the other examples from above:
+
+1 + (2 * 3) + (4 * (5 + 6)) still becomes 51.
+2 * 3 + (4 * 5) becomes 46.
+5 + (8 * 3 + 9 + 3 * 4 * 3) becomes 1445.
+5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4)) becomes 669060.
+((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2 becomes 23340.
+What do you get if you add up the results of evaluating the homework problems using these new rules?
+
+Your puzzle answer was 4208490449905.
