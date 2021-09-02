@@ -3,6 +3,25 @@ use std::collections::HashSet;
 type Point = (i32, i32, i32);
 type Cube = HashSet<Point>;
 
+struct GameOfLiveIterator {
+    cube: Cube
+}
+
+impl Iterator for GameOfLiveIterator {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut n = Cube::new();
+        std::mem::swap(&mut self.cube, &mut n);
+        self.cube = next_state(n);
+        Some(self.cube.len() as u32)
+    }
+}
+
+fn play(cube: Cube) -> impl Iterator<Item = u32> {
+    GameOfLiveIterator { cube }
+}
+
 fn neighbours_of_point(point: &Point) -> [Point; 26] {
     let mut points = [(0, 0, 0); 26];
     let mut index = 0;
@@ -34,32 +53,24 @@ fn next_state(old_cube: Cube) -> Cube {
     }
 
     points_to_check.into_iter().filter(|point| {
-        let active_neighbours = count_active_neighbours(&point, &old_cube);
-        let point_is_alive = old_cube.contains(&point);
-        match (point_is_alive, active_neighbours) {
-            (_, 3) | (true, 2) => true,
-            _ => false
-        }
+        let active_neighbours = count_active_neighbours(point, &old_cube);
+        let point_is_alive = old_cube.contains(point);
+        matches!((point_is_alive, active_neighbours), (_, 3) | (true, 2))
     }).collect()
 }
 
 pub fn part1(input: &str) -> u32 {
-    let mut cube = Cube::new();
+    let cube: Cube = input.lines()
+        .enumerate()
+        .flat_map(|(y, l)| {
+            l.chars()
+                .enumerate()
+                .filter(|(_, cell)| *cell == '#')
+                .map(move |(x, _)| (y as i32, x as i32, 0_i32))
+        })
+        .collect();
 
-    for (y, line) in input.lines().enumerate() {
-        for (x, cell) in line.chars().enumerate() {
-            let new_point = (x as i32, y as i32, 0);
-            if cell == '#' {
-                cube.insert(new_point);
-            }
-        }
-    }
-
-    for _ in 0..6 {
-        cube = next_state(cube);
-    }
-
-    cube.len() as u32
+    play(cube).nth(5).unwrap()
 }
 
 pub fn part2(_input: &str) -> u32 {
