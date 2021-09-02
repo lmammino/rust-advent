@@ -11,8 +11,10 @@ impl Iterator for GameOfLiveIterator {
     type Item = u32;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // the following lines can be avoided if `next_state` doesn't consume Cube
         let mut n = Cube::new();
         std::mem::swap(&mut self.cube, &mut n);
+
         self.cube = next_state(n);
         Some(self.cube.len() as u32)
     }
