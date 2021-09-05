@@ -1,69 +1,109 @@
+mod neighbours;
+
+use neighbours::*;
 use std::collections::HashSet;
+use std::ops;
 
-type Point = (i32, i32, i32);
-type Cube = HashSet<Point>;
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub struct Point<const D: usize>([i32; D]);
 
-fn neighbours_of_point(point: &Point) -> [Point; 26] {
-    let mut points = [(0, 0, 0); 26];
-    let mut index = 0;
-    for z in -1..=1 {
-        for y in -1..=1 {
-            for x in -1..=1 {
-                if (z, y, x) != (0, 0, 0) {
-                    points[index] = (x + point.0, y + point.1, z + point.2);
-                    index += 1;
+impl<const D: usize> ops::Add<[i32; D]> for &Point<D> {
+    type Output = Point<D>;
+
+    fn add(self, rhs: [i32; D]) -> Point<D> {
+        let mut res = [0; D];
+        for (i, n) in self.0.iter().enumerate() {
+            res[i] = n + rhs[i];
+        }
+
+        Point::<D>(res)
+    }
+}
+
+#[derive(Debug)]
+struct Universe<const D: usize> {
+    points: HashSet<Point<D>>,
+    neighbour_maker: NeighboursMaker<D>,
+}
+
+impl<const D: usize> Universe<D> {
+    fn from_input(input: &str) -> Self {
+        let mut points = HashSet::new();
+
+        for (y, line) in input.lines().enumerate() {
+            for (x, cell) in line.chars().enumerate() {
+                let mut point_data = [0; D];
+                point_data[0] = x as i32;
+                point_data[1] = y as i32;
+                let new_point = Point(point_data);
+                if cell == '#' {
+                    points.insert(new_point);
                 }
             }
         }
-    }
 
-    points
-}
-
-fn count_active_neighbours(point: &Point, cube: &Cube) -> usize {
-    neighbours_of_point(point).iter().filter(|p| cube.contains(p)).count()
-}
-
-fn next_state(old_cube: Cube) -> Cube {
-    let mut points_to_check: HashSet<Point> = HashSet::new();
-    for point in old_cube.iter() {
-        points_to_check.insert(*point);
-        for p in neighbours_of_point(point).iter() {
-            points_to_check.insert(*p);
+        Universe {
+            points,
+            neighbour_maker: NeighboursMaker::<D>::new(),
         }
     }
 
-    points_to_check.into_iter().filter(|point| {
-        let active_neighbours = count_active_neighbours(&point, &old_cube);
-        let point_is_alive = old_cube.contains(&point);
-        match (point_is_alive, active_neighbours) {
-            (_, 3) | (true, 2) => true,
-            _ => false
-        }
-    }).collect()
-}
-
-pub fn part1(input: &str) -> u32 {
-    let mut cube = Cube::new();
-
-    for (y, line) in input.lines().enumerate() {
-        for (x, cell) in line.chars().enumerate() {
-            let new_point = (x as i32, y as i32, 0);
-            if cell == '#' {
-                cube.insert(new_point);
-            }
-        }
+    fn count_active_neighbours(&self, point: &Point<D>) -> usize {
+        self.neighbour_maker
+            .for_point(point)
+            .filter(|p| self.points.contains(p))
+            .count()
     }
 
-    for _ in 0..6 {
-        cube = next_state(cube);
+    fn active_cells(&self) -> usize {
+        self.points.len()
     }
 
-    cube.len() as u32
+    fn transition_next_state(&mut self) {
+        let new_points: HashSet<Point<D>> = self
+            .points
+            .iter() // TODO: check if this could be made multi-thread
+            .flat_map(|p| self.neighbour_maker.for_point_with_self(p))
+            // TODO: check if we can make elements unique here
+            .filter(|point| {
+                let active_neighbours = self.count_active_neighbours(point);
+                let point_is_alive = self.points.contains(point);
+                matches!((point_is_alive, active_neighbours), (_, 3) | (true, 2))
+            })
+            .collect();
+
+        self.points = new_points;
+    }
 }
 
-pub fn part2(_input: &str) -> u32 {
-    1696
+struct Game<const D: usize> {
+    universe: Universe<D>,
+}
+
+impl<const D: usize> Game<D> {
+    fn new(input: &str) -> Self {
+        let universe = Universe::<D>::from_input(input);
+        Game { universe }
+    }
+}
+
+impl<const D: usize> Iterator for Game<D> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.universe.transition_next_state();
+        Some(self.universe.active_cells())
+    }
+}
+
+pub fn part1(input: &str) -> usize {
+    let mut game = Game::<3>::new(input);
+    game.nth(5).unwrap()
+}
+
+pub fn part2(input: &str) -> usize {
+    let mut game = Game::<4>::new(input);
+    game.nth(5).unwrap()
 }
 
 #[cfg(test)]
@@ -80,40 +120,5 @@ mod ex17_tests {
     fn part_2() {
         let input = include_str!("../input.txt");
         assert_eq!(part2(input), 1696);
-    }
-    #[test]
-    fn test_neighbours() {
-        let result = neighbours_of_point(&(0, 0, 0));
-        assert_eq!(
-            result,
-            [
-                (-1, -1, -1,),
-                (0, -1, -1,),
-                (1, -1, -1,),
-                (-1, 0, -1,),
-                (0, 0, -1,),
-                (1, 0, -1,),
-                (-1, 1, -1,),
-                (0, 1, -1,),
-                (1, 1, -1,),
-                (-1, -1, 0,),
-                (0, -1, 0,),
-                (1, -1, 0,),
-                (-1, 0, 0,),
-                (1, 0, 0,),
-                (-1, 1, 0,),
-                (0, 1, 0,),
-                (1, 1, 0,),
-                (-1, -1, 1,),
-                (0, -1, 1,),
-                (1, -1, 1,),
-                (-1, 0, 1,),
-                (0, 0, 1,),
-                (1, 0, 1,),
-                (-1, 1, 1,),
-                (0, 1, 1,),
-                (1, 1, 1,),
-            ]
-        );
     }
 }
