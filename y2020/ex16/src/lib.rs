@@ -86,17 +86,11 @@ pub fn part2(input: &str) -> u64 {
     let other_tickets_values: Vec<Vec<u64>> = other_tickets
         .lines()
         .skip(1)
-        .filter_map(|line| {
-            let ticket: Vec<u64> = line.split(',').map(|l| l.parse().unwrap()).collect();
-            for number in &ticket {
-                let found = rules.iter().find(|rule| rule.contains(number));
-
-                #[allow(clippy::question_mark)]
-                if found.is_none() {
-                    return None;
-                }
-            }
-            Some(ticket)
+        .map(|line| {
+            line.split(',').map(|l| l.parse::<u64>().unwrap()).collect::<Vec<u64>>()
+        })
+        .filter(|ticket: &Vec<u64>| {
+            ticket.iter().all(|number| rules.iter().any(|rule| rule.contains(number)))
         })
         .collect();
 
@@ -108,15 +102,8 @@ pub fn part2(input: &str) -> u64 {
     for ticket in other_tickets_values {
         for (col, val) in ticket.iter().enumerate() {
             let set = guesses.get_mut(col).unwrap();
-            let cloned_set = set.clone();
-            let rules_to_remove: Vec<&&Rule> = cloned_set
-                .iter()
-                .filter(|rule| !rule.contains(val))
-                .collect();
-
-            for rule in rules_to_remove {
-                set.remove(rule);
-            }
+            set
+                .retain(|rule| rule.contains(val));
         }
     }
 
@@ -146,19 +133,17 @@ pub fn part2(input: &str) -> u64 {
         }
     }
 
-    let guess_names: Vec<&String> = guesses
+    guesses
         .iter()
         .map(|s| s.iter().map(|r| &(r.name)).next().unwrap())
-        .collect();
-
-    let mut result = 1;
-    for (i, name) in guess_names.iter().enumerate() {
-        if name.starts_with("departure") {
-            result *= own_ticket_values.get(i).unwrap();
-        }
-    }
-
-    result
+        .enumerate()
+        .filter_map(|(i, name)| {
+            match name.starts_with("departure") {
+                true => own_ticket_values.get(i),
+                false => None,
+            }
+        })
+        .product()
 }
 
 #[cfg(test)]
