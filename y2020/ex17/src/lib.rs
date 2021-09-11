@@ -44,7 +44,9 @@ impl<const D: usize> Game<D> {
                 *coord = (n % 3) - 1;
                 n /= 3;
             }
-            relative_neighbours.push(relative_coords);
+            if relative_coords != [0; D] {
+                relative_neighbours.push(relative_coords);
+            }
         }
 
         Game {
@@ -66,7 +68,7 @@ impl<const D: usize> Iterator for Game<D> {
 
 fn neighbours_of_point<'a, const D: usize>(
     point: &'a Point<D>,
-    relative_neighbours: &'a Vec<[i32; D]>,
+    relative_neighbours: &'a [[i32; D]],
 ) -> impl Iterator<Item = Point<D>> + 'a {
     relative_neighbours.iter().map(move |neighbour| {
         let mut data = [0; D];
@@ -129,7 +131,7 @@ fn count_active_neighbours_4d(point: &Point4D, cube: &Universe4D) -> usize {
 
 fn count_active_neighbours<const D: usize>(
     point: &Point<D>,
-    relative_neighbours: &Vec<[i32; D]>,
+    relative_neighbours: &[[i32; D]],
     universe: &Universe<D>,
 ) -> usize {
     neighbours_of_point(point, relative_neighbours)
@@ -176,7 +178,7 @@ fn next_state_4d(old_universe: Universe4D) -> Universe4D {
 }
 
 fn next_state<const D: usize>(
-    relative_neighbours: &Vec<[i32; D]>,
+    relative_neighbours: &[[i32; D]],
     old_universe: &Universe<D>,
 ) -> Universe<D> {
     let mut points_to_check: HashSet<Point<D>> = HashSet::new();
@@ -192,7 +194,7 @@ fn next_state<const D: usize>(
             .into_iter()
             .filter(|point| {
                 let active_neighbours =
-                    count_active_neighbours(point, relative_neighbours, &old_universe);
+                    count_active_neighbours(point, relative_neighbours, old_universe);
                 let point_is_alive = old_universe.0.contains(point);
                 matches!((point_is_alive, active_neighbours), (_, 3) | (true, 2))
             })
@@ -278,36 +280,36 @@ mod ex17_tests {
 
     #[test]
     fn test_neighbours() {
-        let result = neighbours_of_point_3d(&(0, 0, 0));
+        let game = Game::<3>::from_input(".");
         assert_eq!(
-            result,
+            game.relative_neighbours,
             [
-                (-1, -1, -1,),
-                (0, -1, -1,),
-                (1, -1, -1,),
-                (-1, 0, -1,),
-                (0, 0, -1,),
-                (1, 0, -1,),
-                (-1, 1, -1,),
-                (0, 1, -1,),
-                (1, 1, -1,),
-                (-1, -1, 0,),
-                (0, -1, 0,),
-                (1, -1, 0,),
-                (-1, 0, 0,),
-                (1, 0, 0,),
-                (-1, 1, 0,),
-                (0, 1, 0,),
-                (1, 1, 0,),
-                (-1, -1, 1,),
-                (0, -1, 1,),
-                (1, -1, 1,),
-                (-1, 0, 1,),
-                (0, 0, 1,),
-                (1, 0, 1,),
-                (-1, 1, 1,),
-                (0, 1, 1,),
-                (1, 1, 1,),
+                [-1, -1, -1],
+                [0, -1, -1],
+                [1, -1, -1],
+                [-1, 0, -1],
+                [0, 0, -1],
+                [1, 0, -1],
+                [-1, 1, -1],
+                [0, 1, -1],
+                [1, 1, -1],
+                [-1, -1, 0],
+                [0, -1, 0],
+                [1, -1, 0],
+                [-1, 0, 0],
+                [1, 0, 0],
+                [-1, 1, 0],
+                [0, 1, 0],
+                [1, 1, 0],
+                [-1, -1, 1],
+                [0, -1, 1],
+                [1, -1, 1],
+                [-1, 0, 1],
+                [0, 0, 1],
+                [1, 0, 1],
+                [-1, 1, 1],
+                [0, 1, 1],
+                [1, 1, 1],
             ]
         );
     }
