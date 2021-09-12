@@ -1,5 +1,10 @@
 # Day 12: Rain Risk
 
+[Check it out on adventofcode.com](https://adventofcode.com/2020/day/12)
+
+
+## Part One
+
 Your ferry made decent progress toward the island, but the storm came in faster than anyone expected. The ferry needs to take evasive actions!
 
 Unfortunately, the ship's navigation computer seems to be malfunctioning; rather than giving a route directly to safety, it produced extremely circuitous instructions. When the captain uses the PA system to ask if anyone can help, you quickly volunteer.

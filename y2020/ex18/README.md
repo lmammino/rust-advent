@@ -1,8 +1,9 @@
 # Day 18: Operation Order
 
-[https://adventofcode.com/2020/day/18]
+[Check it out on adventofcode.com](https://adventofcode.com/2020/day/18)
 
-## Part 1
+
+## Part One
 
 As you look out the window and notice a heavily-forested continent slowly appear over the horizon, you are interrupted by the child sitting next to you. They're curious if you could help them with their math homework.
 
@@ -44,6 +45,7 @@ Here are a few more examples:
 Before you can help with the homework, you need to understand it yourself. **Evaluate the expression on each line of the homework; what is the sum of the resulting values?**
 
 Your puzzle answer was `701339185745`.
+
 
 ## Part Two
 
