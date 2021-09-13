@@ -28,9 +28,9 @@ fn eval(s: &str) -> u64 {
     let mut acc = 0;
     let mut op = Op::Add;
 
-    let mut expr: VecDeque<char> = s.chars().collect();
-    while !expr.is_empty() {
-        let c = expr.pop_front().unwrap();
+    let mut items: VecDeque<(usize, char)> = s.char_indices().collect();
+    while !items.is_empty() {
+        let (i, c) = items.pop_front().unwrap();
         if ('0'..='9').contains(&c) {
             let right = (c as u64) - ('0' as u64); // from WHATEWZ code to numeric value
             acc = op.apply(acc, right);
@@ -39,18 +39,15 @@ fn eval(s: &str) -> u64 {
         } else if c == '(' {
             // search for the matching closing parenthesis
             let mut open = 1;
-            let mut sub_expr = String::from("");
-            while !expr.is_empty() {
-                let c = expr.pop_front().unwrap();
-                sub_expr.push(c);
+            while !items.is_empty() {
+                let (j, c) = items.pop_front().unwrap();
                 if c == '(' {
                     open += 1;
                 } else if c == ')' {
                     open -= 1;
                     if open == 0 {
-                        sub_expr.pop();
                         // call eval recursively with substring
-                        let right = eval(&sub_expr);
+                        let right = eval(&s[i + 1..j]);
                         // take the result as value to apply
                         acc = op.apply(acc, right);
                         break;
