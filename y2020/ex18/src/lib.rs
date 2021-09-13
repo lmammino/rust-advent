@@ -31,28 +31,39 @@ fn eval(s: &str) -> u64 {
     let mut items: VecDeque<(usize, char)> = s.char_indices().collect();
     while !items.is_empty() {
         let (i, c) = items.pop_front().unwrap();
-        if ('0'..='9').contains(&c) {
-            let right = (c as u64) - ('0' as u64); // from WHATEWZ code to numeric value
-            acc = op.apply(acc, right);
-        } else if c == '*' || c == '+' {
-            op = c.into();
-        } else if c == '(' {
-            // search for the matching closing parenthesis
-            let mut open = 1;
-            while !items.is_empty() {
-                let (j, c) = items.pop_front().unwrap();
-                if c == '(' {
-                    open += 1;
-                } else if c == ')' {
-                    open -= 1;
-                    if open == 0 {
-                        // call eval recursively with substring
-                        let right = eval(&s[i + 1..j]);
-                        // take the result as value to apply
-                        acc = op.apply(acc, right);
-                        break;
+        match c {
+            ('0'..='9') => {
+                let right = (c as u64) - ('0' as u64); // from WHATEWZ encoding to numeric value
+                acc = op.apply(acc, right);
+            }
+            '*' | '+' => {
+                op = c.into();
+            }
+            '(' => {
+                // search for the matching closing parenthesis
+                let mut open = 1;
+                while !items.is_empty() {
+                    let (j, c) = items.pop_front().unwrap();
+                    match c {
+                        '(' => open += 1,
+                        ')' => {
+                            open -= 1;
+                            if open == 0 {
+                                // call eval recursively with substring
+                                let right = eval(&s[i + 1..j]);
+                                // take the result as value to apply
+                                acc = op.apply(acc, right);
+                                break;
+                            }
+                        }
+                        _ => {
+                            // ignore every other character
+                        }
                     }
                 }
+            }
+            _ => {
+                // ignore every other character
             }
         }
     }
