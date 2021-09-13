@@ -24,13 +24,11 @@ impl From<char> for Op {
     }
 }
 
-fn eval(s: &str) -> u64 {
+fn inner_eval<I: Iterator<Item = char>>(iter: &mut I) -> u64 {    
     let mut acc = 0;
     let mut op = Op::Add;
 
-    let mut items: VecDeque<(usize, char)> = s.char_indices().collect();
-    while !items.is_empty() {
-        let (i, c) = items.pop_front().unwrap();
+    while let Some(c) = iter.next() {
         match c {
             ('0'..='9') => {
                 let right = (c as u64) - ('0' as u64); // from WHATEWZ encoding to numeric value
@@ -39,28 +37,13 @@ fn eval(s: &str) -> u64 {
             '*' | '+' => {
                 op = c.into();
             }
+            // This was a sub expression
+            ')' => return acc,
+            // Start a sub process
             '(' => {
-                // search for the matching closing parenthesis
-                let mut open = 1;
-                while !items.is_empty() {
-                    let (j, c) = items.pop_front().unwrap();
-                    match c {
-                        '(' => open += 1,
-                        ')' => {
-                            open -= 1;
-                            if open == 0 {
-                                // call eval recursively with substring
-                                let right = eval(&s[i + 1..j]);
-                                // take the result as value to apply
-                                acc = op.apply(acc, right);
-                                break;
-                            }
-                        }
-                        _ => {
-                            // ignore every other character
-                        }
-                    }
-                }
+                let right = inner_eval(iter);
+                // take the result as value to apply
+                acc = op.apply(acc, right);
             }
             _ => {
                 // ignore every other character
@@ -69,6 +52,12 @@ fn eval(s: &str) -> u64 {
     }
 
     acc
+}
+
+fn eval(s: &str) -> u64 {
+    let mut it = s.chars();
+    inner_eval(&mut it)
+    // TODO: add a check if "it" is ended
 }
 
 pub fn part1(input: &str) -> u64 {
