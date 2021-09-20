@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 enum Op {
     Add,
     Mul,
@@ -24,7 +22,7 @@ impl From<char> for Op {
     }
 }
 
-fn inner_eval<I: Iterator<Item = char>>(iter: &mut I) -> u64 {    
+fn inner_eval<I: Iterator<Item = char>>(iter: &mut I) -> u64 {
     let mut acc = 0;
     let mut op = Op::Add;
 
@@ -65,8 +63,27 @@ pub fn part1(input: &str) -> u64 {
     // 701339185745
 }
 
-pub fn part2(_input: &str) -> u64 {
-    4208490449905
+fn math_with_priority(input: &str) -> u64 {
+    if let Some(i) = input.find(')') {
+        let j = input[..i].rfind('(').unwrap();
+        let subresult = math_with_priority(&input[(j + 1)..i]);
+        let new_string = format!("{}{}{}", &input[..j], subresult, &input[(i + 1)..]);
+        return math_with_priority(&new_string);
+    } else {
+        return input
+            .split("*")
+            .map(|expr| {
+                expr.split("+")
+                    .map(|x| x.trim().parse::<u64>().unwrap())
+                    .sum::<u64>()
+            })
+            .product();
+    }
+}
+
+pub fn part2(input: &str) -> u64 {
+    input.lines().map(math_with_priority).sum()
+    // 4208490449905
 }
 
 #[cfg(test)]
@@ -79,6 +96,12 @@ mod ex18_tests {
         assert_eq!(eval("2 + 3 * 9 + 4"), (2 + 3) * 9 + 4);
         assert_eq!(eval("2 + (3 * 9) + 4"), 2 + 3 * 9 + 4);
         assert_eq!(eval("2 + (3 * (9 + 2)) + 4"), 2 + 3 * (9 + 2) + 4);
+    }
+
+    #[test]
+    fn test_math_with_priority() {
+        assert_eq!(math_with_priority("2 + 3 * 9"), 45);
+        assert_eq!(math_with_priority("9 * 2 + 3"), 45);
     }
 
     #[test]
