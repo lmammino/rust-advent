@@ -87,10 +87,14 @@ pub fn part2(input: &str) -> u64 {
         .lines()
         .skip(1)
         .map(|line| {
-            line.split(',').map(|l| l.parse::<u64>().unwrap()).collect::<Vec<u64>>()
+            line.split(',')
+                .map(|l| l.parse::<u64>().unwrap())
+                .collect::<Vec<u64>>()
         })
         .filter(|ticket: &Vec<u64>| {
-            ticket.iter().all(|number| rules.iter().any(|rule| rule.contains(number)))
+            ticket
+                .iter()
+                .all(|number| rules.iter().any(|rule| rule.contains(number)))
         })
         .collect();
 
@@ -102,8 +106,7 @@ pub fn part2(input: &str) -> u64 {
     for ticket in other_tickets_values {
         for (col, val) in ticket.iter().enumerate() {
             let set = guesses.get_mut(col).unwrap();
-            set
-                .retain(|rule| rule.contains(val));
+            set.retain(|rule| rule.contains(val));
         }
     }
 
@@ -137,11 +140,9 @@ pub fn part2(input: &str) -> u64 {
         .iter()
         .map(|s| s.iter().map(|r| &(r.name)).next().unwrap())
         .enumerate()
-        .filter_map(|(i, name)| {
-            match name.starts_with("departure") {
-                true => own_ticket_values.get(i),
-                false => None,
-            }
+        .filter_map(|(i, name)| match name.starts_with("departure") {
+            true => own_ticket_values.get(i),
+            false => None,
         })
         .product()
 }
