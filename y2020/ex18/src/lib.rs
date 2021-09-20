@@ -101,8 +101,8 @@ mod ex18_tests {
 
     #[test]
     fn test_math_with_priority() {
-        assert_eq!(math_with_priority("2 + 3 * 9"), 45);
-        assert_eq!(math_with_priority("9 * 2 + 3"), 45);
+        assert_eq!(math_with_priority("2+3*9"), 45);
+        assert_eq!(math_with_priority("9*2+3"), 45);
     }
 
     #[test]
