@@ -75,7 +75,7 @@ fn math_with_priority(input: &str) -> u64 {
             .split("*")
             .map(|expr| {
                 expr.split("+")
-                    .map(|x| x.parse::<u64>().unwrap())
+                    .map(|x| x.trim().parse::<u64>().unwrap())
                     .sum::<u64>()
             })
             .product(),
@@ -83,7 +83,7 @@ fn math_with_priority(input: &str) -> u64 {
 }
 
 pub fn part2(input: &str) -> u64 {
-    input.replace(" ","").lines().map(math_with_priority).sum()
+    input.lines().map(math_with_priority).sum()
     // 4208490449905
 }
 
