@@ -64,9 +64,6 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
             let mut next = strings;
             for rule in seq {
                 next = validate(next, ruleset, *rule);
-                if next.is_empty() {
-                    break;
-                }
             }
             next
         }
@@ -80,16 +77,10 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
             let mut next_left = strings.iter().map(|x| *x).collect();
             for rule in left {
                 next_left = validate(next_left, ruleset, *rule);
-                if next_left.is_empty() {
-                    break;
-                }
             }
             let mut next_right = strings.iter().map(|x| *x).collect();
             for rule in right {
                 next_right = validate(next_right, ruleset, *rule);
-                if next_right.is_empty() {
-                    break;
-                }
             }
 
             let mut new_vec: Vec<&'a str> = vec![];
