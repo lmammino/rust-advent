@@ -65,6 +65,44 @@ fn validate<'a>(string: &'a str, ruleset: &RuleSet, current_rule: RuleId) -> Opt
             // if any of the two works we go on
             // so this is logically like an or.
             // If both of them fail this fails.
+
+            let mut next_left = string;
+            let mut left_failed = false;
+            for rule in left {
+                let maybe_next_left = validate(next_left, ruleset, *rule);
+                match maybe_next_left {
+                    Some(l) => next_left = l,
+                    None => {
+                        left_failed = true;
+                        break;
+                    }
+                }
+            }
+            let mut next_right = string;
+            let mut right_failed = false;
+            for rule in right {
+                let maybe_next_right = validate(next_right, ruleset, *rule);
+                match maybe_next_right {
+                    Some(r) => next_right = r,
+                    None => {
+                        right_failed = true;
+                        break;
+                    }
+                }
+            }
+            
+            // Due to the fixed inputs of this exercise, this will never be reached, but there are cases where both branches can succeed
+            if !left_failed && !right_failed {
+                unimplemented!("What happened here?");
+            }
+
+            if !left_failed {
+                return Some(next_left)
+            }
+            if !right_failed {
+                return Some(next_right)
+            }
+    
             None
         }
     }
@@ -74,8 +112,8 @@ pub fn part1(input: &str) -> usize {
     let (rules, strings) = input.split_once("\n\n").unwrap();
     let ruleset = create_ruleset(rules);
 
-    // strings.lines().filter(|s| validate(s, &ruleset, 0)).count()
-    195
+    strings.lines().filter(|s| matches!(validate(s, &ruleset, 0), Some(""))).count()
+    // 195
 }
 
 pub fn part2(_input: &str) -> usize {
