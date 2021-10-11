@@ -48,18 +48,16 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
     }
     let rule = ruleset.0.get(&current_rule).unwrap();
     match rule {
-        Rule::Leaf(c) => {
-            return strings
-                .iter()
-                .filter_map(|s| {
-                    if s.starts_with(*c) {
-                        return Some(&s[1..]);
-                    } else {
-                        return None;
-                    }
-                })
-                .collect();
-        }
+        Rule::Leaf(c) => strings
+            .iter()
+            .filter_map(|s| {
+                if s.starts_with(*c) {
+                    return Some(&s[1..]);
+                } else {
+                    return None;
+                }
+            })
+            .collect(),
         Rule::Seq(seq) => {
             let mut next = strings;
             for rule in seq {
