@@ -81,15 +81,8 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
                 next_right = validate(next_right, ruleset, *rule);
             }
 
-            let mut new_vec: Vec<&'a str> = vec![];
-            for v in next_left {
-                new_vec.push(v);
-            }
-            for v in next_right {
-                new_vec.push(v);
-            }
-
-            new_vec
+            next_left.extend(next_right.iter());
+            next_left
         }
     }
 }
