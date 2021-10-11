@@ -49,22 +49,23 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
     let rule = ruleset.0.get(&current_rule).unwrap();
     match rule {
         Rule::Leaf(c) => {
-            return strings.iter().filter_map(| s| {
-                if s.starts_with(*c) {
-                    return Some(&s[1..])
-                } else {
-                    return None
-                }
-            }).collect();
+            return strings
+                .iter()
+                .filter_map(|s| {
+                    if s.starts_with(*c) {
+                        return Some(&s[1..]);
+                    } else {
+                        return None;
+                    }
+                })
+                .collect();
         }
         Rule::Seq(seq) => {
             let mut next = strings;
             for rule in seq {
-                let maybe_next = validate(next, ruleset, *rule);
-                if maybe_next.len() > 0 {
-                    next = maybe_next;
-                } else {
-                    return vec![]
+                next = validate(next, ruleset, *rule);
+                if next.is_empty() {
+                    break;
                 }
             }
             next
@@ -76,45 +77,30 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
             // so this is logically like an or.
             // If both of them fail this fails.
 
-            let mut next_left = strings;
-            let mut left_failed = false;
+            let mut next_left = strings.iter().map(|x| *x).collect();
             for rule in left {
-                let maybe_next_left = validate(next_left, ruleset, *rule);
-                if maybe_next_left.len() > 0 {
-                    next_left = maybe_next_left;
-                } else {
-                    left_failed = true;
+                next_left = validate(next_left, ruleset, *rule);
+                if next_left.is_empty() {
                     break;
                 }
             }
-            let mut next_right = strings;
-            let mut right_failed = false;
+            let mut next_right = strings.iter().map(|x| *x).collect();
             for rule in right {
-                let maybe_next_right = validate(next_right, ruleset, *rule);
-                if maybe_next_right.len() > 0 {
-                    next_right = maybe_next_right
-                } else {
-                    right_failed = true;
+                next_right = validate(next_right, ruleset, *rule);
+                if next_right.is_empty() {
                     break;
                 }
-            }
-            
-            if !left_failed && !right_failed {
-                let mut new_vec: Vec<&'a str> = vec![];
-                for v in next_left.iter() {
-                    new_vec.push(v);
-                }
-                return next_left;
             }
 
-            if !left_failed {
-                return next_left;
+            let mut new_vec: Vec<&'a str> = vec![];
+            for v in next_left {
+                new_vec.push(v);
             }
-            if !right_failed {
-                return next_right;
+            for v in next_right {
+                new_vec.push(v);
             }
-    
-            vec![]
+
+            new_vec
         }
     }
 }
@@ -123,7 +109,10 @@ pub fn part1(input: &str) -> usize {
     let (rules, strings) = input.split_once("\n\n").unwrap();
     let ruleset = create_ruleset(rules);
 
-    strings.lines().filter(|s| validate(vec![s], &ruleset, 0).contains(&"")).count()
+    strings
+        .lines()
+        .filter(|s| validate(vec![s], &ruleset, 0).contains(&""))
+        .count()
     // 195
 }
 
@@ -132,11 +121,16 @@ pub fn part2(input: &str) -> usize {
     let mut ruleset = create_ruleset(rules);
 
     ruleset.0.insert(8, Rule::Fork(vec![42], vec![42, 8]));
-    ruleset.0.insert(11, Rule::Fork(vec![42, 31], vec![42, 11, 31]));
+    ruleset
+        .0
+        .insert(11, Rule::Fork(vec![42, 31], vec![42, 11, 31]));
     // 8: 42 | 42 8
     // 11: 42 31 | 42 11 31
 
-    strings.lines().filter(|s| validate(vec![s], &ruleset, 0).contains(&"")).count()
+    strings
+        .lines()
+        .filter(|s| validate(vec![s], &ruleset, 0).contains(&""))
+        .count()
     // 309
 }
 
