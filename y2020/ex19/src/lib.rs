@@ -72,11 +72,11 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
             // so this is logically like an or.
             // If both of them fail this fails.
 
-            let mut next_left = strings.iter().map(|x| *x).collect();
+            let mut next_left = strings.clone();
             for rule in left {
                 next_left = validate(next_left, ruleset, *rule);
             }
-            let mut next_right = strings.iter().map(|x| *x).collect();
+            let mut next_right = strings;
             for rule in right {
                 next_right = validate(next_right, ruleset, *rule);
             }
