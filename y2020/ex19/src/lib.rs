@@ -42,22 +42,28 @@ fn create_ruleset(raw_rules: &str) -> RuleSet {
     RuleSet(rules)
 }
 
-fn validate<'a>(string: &'a str, ruleset: &RuleSet, current_rule: RuleId) -> Option<&'a str> {
-    // base case
+fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) -> Vec<&'a str> {
+    if strings.is_empty() {
+        return strings;
+    }
     let rule = ruleset.0.get(&current_rule).unwrap();
     match rule {
-        Rule::Leaf(c) => {
-            if string.starts_with(*c) {
-                return Some(&string[1..]);
-            }
-            None
-        }
+        Rule::Leaf(c) => strings
+            .iter()
+            .filter_map(|s| {
+                if s.starts_with(*c) {
+                    return Some(&s[1..]);
+                } else {
+                    return None;
+                }
+            })
+            .collect(),
         Rule::Seq(seq) => {
-            let mut next = string;
+            let mut next = strings;
             for rule in seq {
-                next = validate(next, ruleset, *rule)?;
+                next = validate(next, ruleset, *rule);
             }
-            Some(next)
+            next
         }
         Rule::Fork(left, right) => {
             // this is like the previous step
@@ -66,44 +72,17 @@ fn validate<'a>(string: &'a str, ruleset: &RuleSet, current_rule: RuleId) -> Opt
             // so this is logically like an or.
             // If both of them fail this fails.
 
-            let mut next_left = string;
-            let mut left_failed = false;
+            let mut next_left = strings.clone();
             for rule in left {
-                let maybe_next_left = validate(next_left, ruleset, *rule);
-                match maybe_next_left {
-                    Some(l) => next_left = l,
-                    None => {
-                        left_failed = true;
-                        break;
-                    }
-                }
+                next_left = validate(next_left, ruleset, *rule);
             }
-            let mut next_right = string;
-            let mut right_failed = false;
+            let mut next_right = strings;
             for rule in right {
-                let maybe_next_right = validate(next_right, ruleset, *rule);
-                match maybe_next_right {
-                    Some(r) => next_right = r,
-                    None => {
-                        right_failed = true;
-                        break;
-                    }
-                }
-            }
-            
-            // Due to the fixed inputs of this exercise, this will never be reached, but there are cases where both branches can succeed
-            if !left_failed && !right_failed {
-                unimplemented!("What happened here?");
+                next_right = validate(next_right, ruleset, *rule);
             }
 
-            if !left_failed {
-                return Some(next_left)
-            }
-            if !right_failed {
-                return Some(next_right)
-            }
-    
-            None
+            next_left.extend(next_right.iter());
+            next_left
         }
     }
 }
@@ -112,12 +91,29 @@ pub fn part1(input: &str) -> usize {
     let (rules, strings) = input.split_once("\n\n").unwrap();
     let ruleset = create_ruleset(rules);
 
-    strings.lines().filter(|s| matches!(validate(s, &ruleset, 0), Some(""))).count()
+    strings
+        .lines()
+        .filter(|s| validate(vec![s], &ruleset, 0).contains(&""))
+        .count()
     // 195
 }
 
-pub fn part2(_input: &str) -> usize {
-    309
+pub fn part2(input: &str) -> usize {
+    let (rules, strings) = input.split_once("\n\n").unwrap();
+    let mut ruleset = create_ruleset(rules);
+
+    ruleset.0.insert(8, Rule::Fork(vec![42], vec![42, 8]));
+    ruleset
+        .0
+        .insert(11, Rule::Fork(vec![42, 31], vec![42, 11, 31]));
+    // 8: 42 | 42 8
+    // 11: 42 31 | 42 11 31
+
+    strings
+        .lines()
+        .filter(|s| validate(vec![s], &ruleset, 0).contains(&""))
+        .count()
+    // 309
 }
 
 #[cfg(test)]
