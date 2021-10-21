@@ -47,11 +47,10 @@ impl<const N: usize> FromStr for Tiles<N> {
         let mut tiles: HashMap<u16, Tile<N>> = HashMap::new();
 
         for raw_tile in s.split("\n\n").take_while(|t| !t.is_empty()) {
-            let raw_id = raw_tile.lines().next().unwrap();
+            let mut lines = raw_tile.lines();
+            let raw_id = lines.next().unwrap();
             let id: u16 = raw_id[5..9].parse().unwrap();
-            let cells:[[char; N]; N] = raw_tile
-                .lines()
-                .skip(1)
+            let cells:[[char; N]; N] = lines
                 .map(|l| l.chars().collect::<Vec<char>>().try_into().unwrap())
                 .collect::<Vec<[char; N]>>()
                 .try_into().unwrap();
