@@ -1,33 +1,35 @@
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, convert::TryInto, str::FromStr};
 
 #[derive(Debug)]
-struct Tile {
+struct Tile<const N: usize> {
     id: u16,
-    cells: Vec<Vec<char>>,
-    borders: Vec<Vec<char>>,
+    cells: [[char; N]; N],
+    borders: Vec<[char; N]>,
 }
 
-impl Tile {
-    fn new(id: u16, cells: Vec<Vec<char>>) -> Self {
-        let top = cells[0].clone();
-        let mut rtop = top.clone();
+struct Tiles<const N: usize>(HashMap<u16, Tile<N>>);
+
+impl<const N: usize> Tile<N> {
+    fn new(id: u16, cells: [[char; N]; N]) -> Self {
+        let top = cells[0];
+        let mut rtop = top;
         rtop.reverse();
-        let bottom = cells[cells.len() - 1].clone();
-        let mut rbottom = bottom.clone();
+        let bottom = cells[cells.len() - 1];
+        let mut rbottom = bottom;
         rbottom.reverse();
-        let left: Vec<_> = cells.iter().map(|r| r[0]).collect();
-        let mut rleft = left.clone();
+        let left: [char; N] = cells.iter().map(|r| r[0]).collect::<Vec<char>>().try_into().unwrap();
+        let mut rleft = left;
         rleft.reverse();
-        let right: Vec<_> = cells.iter().map(|r| r[r.len() - 1]).collect();
-        let mut rright = right.clone();
+        let right: [char; N] = cells.iter().map(|r| r[r.len() - 1]).collect::<Vec<char>>().try_into().unwrap();
+        let mut rright = right;
         rright.reverse();
 
-        let borders: Vec<Vec<char>> = vec![top, rtop, bottom, rbottom, left, rleft, right, rright];
+        let borders: Vec<[char; N]> = vec![top, rtop, bottom, rbottom, left, rleft, right, rright];
 
         Tile { id, cells, borders }
     }
 
-    fn is_neighbour_of(&self, tile: &Tile) -> bool {
+    fn is_neighbour_of(&self, tile: &Tile<N>) -> bool {
         for border in &self.borders {
             if tile.borders.contains(border) {
                 return true;
@@ -38,24 +40,37 @@ impl Tile {
     }
 }
 
-pub fn part1(input: &str) -> u64 {
-    let mut tiles: HashMap<u16, Tile> = HashMap::new();
-    for raw_tile in input.split("\n\n").take_while(|t| !t.is_empty()) {
-        let raw_id = raw_tile.lines().next().unwrap();
-        let id: u16 = raw_id[5..9].parse().unwrap();
-        let cells: Vec<Vec<char>> = raw_tile
-            .lines()
-            .skip(1)
-            .map(|l| l.chars().collect())
-            .collect();
+impl<const N: usize> FromStr for Tiles<N> {
+    type Err = ();
 
-        let tile = Tile::new(id, cells);
-        tiles.insert(id, tile);
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut tiles: HashMap<u16, Tile<N>> = HashMap::new();
+
+        for raw_tile in s.split("\n\n").take_while(|t| !t.is_empty()) {
+            let raw_id = raw_tile.lines().next().unwrap();
+            let id: u16 = raw_id[5..9].parse().unwrap();
+            let cells:[[char; N]; N] = raw_tile
+                .lines()
+                .skip(1)
+                .map(|l| l.chars().collect::<Vec<char>>().try_into().unwrap())
+                .collect::<Vec<[char; N]>>()
+                .try_into().unwrap();
+    
+            let tile = Tile::new(id, cells);
+            tiles.insert(id, tile);
+        }
+
+        Ok(Self(tiles))
     }
+}
+
+pub fn part1<const N: usize>(input: &str) -> u64 {
+    let tiles: Tiles<N> = input.parse().unwrap();
+    
     let mut neighbours: HashMap<u16, HashSet<u16>> = HashMap::new();
 
-    for (id, tile) in &tiles {
-        for (other_id, other_tile) in &tiles {
+    for (id, tile) in &tiles.0 {
+        for (other_id, other_tile) in &tiles.0 {
             if id != other_id && tile.is_neighbour_of(other_tile) {
                 neighbours.entry(*id).or_default().insert(*other_id);
                 neighbours.entry(*other_id).or_default().insert(*id);
@@ -90,7 +105,7 @@ mod ex20_tests {
     #[test]
     fn part_1() {
         let input = include_str!("../input.txt");
-        assert_eq!(part1(input), 17032646100079);
+        assert_eq!(part1::<10>(input), 17032646100079);
     }
 
     #[test]
