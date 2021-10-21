@@ -11,6 +11,7 @@ struct Tiles<const N: usize>(HashMap<u16, Tile<N>>);
 
 impl<const N: usize> Tile<N> {
     fn new(id: u16, cells: [[char; N]; N]) -> Self {
+        // In the all following lines the assignment means copy (array implements Copy trait)
         let top = cells[0];
         let mut rtop = top;
         rtop.reverse();
