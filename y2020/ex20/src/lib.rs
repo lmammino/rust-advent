@@ -4,7 +4,7 @@ use std::{collections::{HashMap, HashSet}, convert::TryInto, str::FromStr};
 struct Tile<const N: usize> {
     id: u16,
     cells: [[char; N]; N],
-    borders: Vec<[char; N]>,
+    borders: [[char; N]; 8],
 }
 
 struct Tiles<const N: usize>(HashMap<u16, Tile<N>>);
@@ -18,6 +18,8 @@ impl<const N: usize> Tile<N> {
         let bottom = cells[cells.len() - 1];
         let mut rbottom = bottom;
         rbottom.reverse();
+        // `[char; N]` doens't implement FromIterator, so `collect` cannot be used to transform a iterator into an array.
+        // Instead, it is possible to convert Vec<char> into a fixed length array of char through `try_into` method of the trait `TryInto`.
         let left: [char; N] = cells.iter().map(|r| r[0]).collect::<Vec<char>>().try_into().unwrap();
         let mut rleft = left;
         rleft.reverse();
@@ -25,7 +27,7 @@ impl<const N: usize> Tile<N> {
         let mut rright = right;
         rright.reverse();
 
-        let borders: Vec<[char; N]> = vec![top, rtop, bottom, rbottom, left, rleft, right, rright];
+        let borders: [[char; N]; 8] = [top, rtop, bottom, rbottom, left, rleft, right, rright];
 
         Tile { id, cells, borders }
     }
@@ -64,8 +66,8 @@ impl<const N: usize> FromStr for Tiles<N> {
     }
 }
 
-pub fn part1<const N: usize>(input: &str) -> u64 {
-    let tiles: Tiles<N> = input.parse().unwrap();
+pub fn part1(input: &str) -> u64 {
+    let tiles: Tiles<10> = input.parse().unwrap();
     
     let mut neighbours: HashMap<u16, HashSet<u16>> = HashMap::new();
 
@@ -105,7 +107,7 @@ mod ex20_tests {
     #[test]
     fn part_1() {
         let input = include_str!("../input.txt");
-        assert_eq!(part1::<10>(input), 17032646100079);
+        assert_eq!(part1(input), 17032646100079);
     }
 
     #[test]
