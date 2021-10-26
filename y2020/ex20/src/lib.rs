@@ -4,7 +4,7 @@ use std::{
     str::FromStr,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Tile<const N: usize> {
     id: u16,
     cells: [[char; N]; N],
@@ -12,6 +12,15 @@ struct Tile<const N: usize> {
 }
 
 struct Tiles<const N: usize>(HashMap<u16, Tile<N>>);
+
+const TOP: usize = 0;
+const RTOP: usize = 1;
+const BOTTOM: usize = 2;
+const RBOTTOM: usize = 3;
+const LEFT: usize = 4;
+const RLEFT: usize = 5;
+const RIGHT: usize = 6;
+const RRIGHT: usize = 7;
 
 impl<const N: usize> Tile<N> {
     fn new(id: u16, cells: [[char; N]; N]) -> Self {
@@ -55,6 +64,70 @@ impl<const N: usize> Tile<N> {
 
         false
     }
+
+    // rotating 90 deg clockwise
+    fn rotate(&self) -> Self {
+        let rotated_cells: [[char; N]; N] = self
+            .cells
+            .iter()
+            .enumerate()
+            .map(|(i, _)| {
+                let mut col: [char; N] = [' '; N];
+                for j in 0..N {
+                    col[N - 1 - j] = self.cells[j][i];
+                }
+                col
+            })
+            .collect::<Vec<[char; N]>>()
+            .try_into()
+            .unwrap();
+
+        Tile::new(self.id, rotated_cells)
+    }
+
+    fn flip_horiz(&self) -> Self {
+        let flipped_cells: [[char; N]; N] = self
+            .cells
+            .iter()
+            .map(|row| {
+                let mut rev_row = *row;
+                rev_row.reverse();
+                rev_row
+            })
+            .collect::<Vec<[char; N]>>()
+            .try_into()
+            .unwrap();
+
+        Tile::new(self.id, flipped_cells)
+    }
+
+    fn flip_vert(&self) -> Self {
+        let mut flipped_cells = self.cells;
+        flipped_cells.reverse();
+
+        Tile::new(self.id, flipped_cells)
+    }
+}
+
+fn fit_tile_right<const N: usize>(left: &Tile<N>, right: &Tile<N>) -> Tile<N> {
+    if left.borders[RIGHT] == right.borders[LEFT] {
+        return right.clone();
+    } else if left.borders[RIGHT] == right.borders[RLEFT] {
+        return right.flip_vert();
+    } else if left.borders[RIGHT] == right.borders[RIGHT] {
+        return right.flip_horiz();
+    } else if left.borders[RIGHT] == right.borders[RRIGHT] {
+        return right.flip_horiz().flip_vert();
+    } else if left.borders[RIGHT] == right.borders[TOP] {
+        return right.rotate().flip_horiz();
+    } else if left.borders[RIGHT] == right.borders[RTOP] {
+        return right.rotate().rotate().rotate();
+    } else if left.borders[RIGHT] == right.borders[BOTTOM] {
+        return right.rotate();
+    } else if left.borders[RIGHT] == right.borders[RBOTTOM] {
+        return right.rotate().flip_vert();
+    }
+    unreachable!("Tested all the cases already");
 }
 
 impl<const N: usize> FromStr for Tiles<N> {
@@ -112,102 +185,96 @@ pub fn part1(input: &str) -> u64 {
 }
 
 pub fn part2(input: &str) -> u64 {
-    // let tiles: Tiles<10> = input.parse().unwrap();
+    let tiles: Tiles<10> = input.parse().unwrap();
 
-    // let mut neighbours: HashMap<u16, HashSet<u16>> = HashMap::new();
+    let mut neighbours: HashMap<u16, HashSet<u16>> = HashMap::new();
 
-    // for (id, tile) in &tiles.0 {
-    //     for (other_id, other_tile) in &tiles.0 {
-    //         if id != other_id && tile.is_neighbour_of(other_tile) {
-    //             neighbours.entry(*id).or_default().insert(*other_id);
-    //             neighbours.entry(*other_id).or_default().insert(*id);
-    //         }
-    //     }
-    // }
+    for (id, tile) in &tiles.0 {
+        for (other_id, other_tile) in &tiles.0 {
+            if id != other_id && tile.is_neighbour_of(other_tile) {
+                neighbours.entry(*id).or_default().insert(*other_id);
+                neighbours.entry(*other_id).or_default().insert(*id);
+            }
+        }
+    }
 
-    // // Corner tiles will only have 2 neighbours
-    // let corners = neighbours
-    //     .iter()
-    //     .filter_map(|(key, val)| {
-    //         if val.len() == 2 {
-    //             return Some(*key);
-    //         }
+    // Corner tiles will only have 2 neighbours
+    let corners = neighbours
+        .iter()
+        .filter_map(|(key, val)| {
+            if val.len() == 2 {
+                return Some(*key);
+            }
 
-    //         None
-    //     })
-    //     .collect::<Vec<u16>>();
+            None
+        })
+        .collect::<Vec<u16>>();
 
-    // let edges = neighbours
-    //     .iter()
-    //     .filter_map(|(key, val)| {
-    //         if val.len() == 3 {
-    //             return Some(*key);
-    //         }
+    let edges = neighbours
+        .iter()
+        .filter_map(|(key, val)| {
+            if val.len() == 3 {
+                return Some(*key);
+            }
 
-    //         None
-    //     })
-    //     .collect::<HashSet<u16>>();
+            None
+        })
+        .collect::<HashSet<u16>>();
 
-    // let mut tilemap: [[u16; 12]; 12] = [[0; 12]; 12];
-    // // we take an arbitrary corner (the first one) and we place it at 0,0 in the tilemap
-    // let first_corner = *corners.get(0).unwrap();
-    // tilemap[0][0] = first_corner;
-    // // same for the 2 neighbours of the first corner
-    // let neighbours_of_first_corner = neighbours
-    //     .get(&first_corner)
-    //     .unwrap()
-    //     .iter()
-    //     .collect::<Vec<&u16>>();
-    // tilemap[0][1] = *neighbours_of_first_corner[0];
-    // tilemap[1][0] = *neighbours_of_first_corner[1];
+    let mut tilemap: [[u16; 12]; 12] = [[0; 12]; 12];
+    // we take an arbitrary corner (the first one) and we place it at 0,0 in the tilemap
+    let first_corner = *corners.get(0).unwrap();
+    tilemap[0][0] = first_corner;
+    // same for the 2 neighbours of the first corner
+    let neighbours_of_first_corner = neighbours
+        .get(&first_corner)
+        .unwrap()
+        .iter()
+        .collect::<Vec<&u16>>();
+    tilemap[0][1] = *neighbours_of_first_corner[0];
+    tilemap[1][0] = *neighbours_of_first_corner[1];
 
-    // let mut stack: VecDeque<(u16, usize, usize)> = VecDeque::new();
-    // stack.push_back((tilemap[0][1], 0, 1));
-    // stack.push_back((tilemap[1][0], 1, 0));
+    let mut stack: VecDeque<(u16, usize, usize)> = VecDeque::new();
+    stack.push_back((tilemap[0][1], 0, 1));
+    stack.push_back((tilemap[1][0], 1, 0));
 
-    // while !stack.is_empty() {
-    //     let (tileid, row, col) = stack.pop_front().unwrap();
+    while !stack.is_empty() {
+        let (tileid, row, col) = stack.pop_front().unwrap();
 
-    //     let mut local_neighbours = neighbours.get(&tileid).unwrap().clone();
-    //     // we try to remove the neighbours that we have already placed
-    //     dbg!(&local_neighbours);
-    //     if col > 0 {
-    //         dbg!(tilemap[row][col - 1]);
-    //         local_neighbours.remove(&tilemap[row][col - 1]);
-    //     }
-    //     if row > 0 {
-    //         local_neighbours.remove(&tilemap[row - 1][col]);
-    //     }
-    //     if row < 11 && tilemap[row + 1][col] != 0 {
-    //         local_neighbours.remove(&tilemap[row + 1][col]);
-    //     }
-    //     if col < 11 && tilemap[row][col + 1] != 0 {
-    //         local_neighbours.remove(&tilemap[row][col + 1]);
-    //     }
-    //     dbg!(&local_neighbours);
+        let mut local_neighbours = neighbours.get(&tileid).unwrap().clone();
+        // we try to remove the neighbours that we have already placed
+        if col > 0 {
+            local_neighbours.remove(&tilemap[row][col - 1]);
+        }
+        if row > 0 {
+            local_neighbours.remove(&tilemap[row - 1][col]);
+        }
+        if row < 11 && tilemap[row + 1][col] != 0 {
+            local_neighbours.remove(&tilemap[row + 1][col]);
+        }
+        if col < 11 && tilemap[row][col + 1] != 0 {
+            local_neighbours.remove(&tilemap[row][col + 1]);
+        }
 
-    //     // if we 2 neighbours left we need to decide which one goes right and below
-    //     if local_neighbours.len() == 2 {
-    //         for n in local_neighbours {
-    //             if corners.contains(&n) || edges.contains(&n) {
-    //                 dbg!((row, col));
-    //                 tilemap[row][col + 1] = n;
-    //                 stack.push_back((n, row, col + 1));
-    //             } else {
-    //                 dbg!((row, col));
-    //                 tilemap[row + 1][col] = n;
-    //                 stack.push_back((n, row + 1, col));
-    //             }
-    //         }
-    //     } else if local_neighbours.len() == 1 {
-    //         dbg!((row, col));
-    //         let n = *local_neighbours.iter().next().unwrap();
-    //         tilemap[row + 1][col] = n;
-    //         stack.push_back((n, row + 1, col));
-    //     }
-    // }
+        // if we 2 neighbours left we need to decide which one goes right and below
+        if local_neighbours.len() == 2 {
+            for n in local_neighbours {
+                if corners.contains(&n) || edges.contains(&n) {
+                    tilemap[row][col + 1] = n;
+                } else {
+                    tilemap[row + 1][col] = n;
+                }
+            }
+            stack.push_back((tilemap[row][col + 1], row, col + 1));
+            stack.push_back((tilemap[row + 1][col], row + 1, col));
+        } else if local_neighbours.len() == 1 {
+            let n = *local_neighbours.iter().next().unwrap();
+            tilemap[row + 1][col] = n;
+            stack.push_back((n, row + 1, col));
+        }
+    }
 
-    // dbg!(tilemap);
+    dbg!(tilemap);
 
     2006
 }
@@ -215,6 +282,75 @@ pub fn part2(input: &str) -> u64 {
 #[cfg(test)]
 mod ex20_tests {
     use super::*;
+
+    #[test]
+    fn rotate_tile() {
+        let cells = [
+            ['a', 'b', 'c', 'd'],
+            ['e', 'f', 'g', 'h'],
+            ['i', 'j', 'k', 'l'],
+            ['m', 'n', 'o', 'p'],
+        ];
+
+        let tile = Tile::new(0, cells);
+
+        let rotated_tile = tile.rotate();
+
+        let expected = [
+            ['m', 'i', 'e', 'a'],
+            ['n', 'j', 'f', 'b'],
+            ['o', 'k', 'g', 'c'],
+            ['p', 'l', 'h', 'd'],
+        ];
+
+        assert_eq!(rotated_tile.cells, expected)
+    }
+
+    #[test]
+    fn flip_horiz_tile() {
+        let cells = [
+            ['a', 'b', 'c', 'd'],
+            ['e', 'f', 'g', 'h'],
+            ['i', 'j', 'k', 'l'],
+            ['m', 'n', 'o', 'p'],
+        ];
+
+        let tile = Tile::new(0, cells);
+
+        let flipped_tile = tile.flip_horiz();
+
+        let expected = [
+            ['d', 'c', 'b', 'a'],
+            ['h', 'g', 'f', 'e'],
+            ['l', 'k', 'j', 'i'],
+            ['p', 'o', 'n', 'm'],
+        ];
+
+        assert_eq!(flipped_tile.cells, expected)
+    }
+
+    #[test]
+    fn flip_vert_tile() {
+        let cells = [
+            ['a', 'b', 'c', 'd'],
+            ['e', 'f', 'g', 'h'],
+            ['i', 'j', 'k', 'l'],
+            ['m', 'n', 'o', 'p'],
+        ];
+
+        let tile = Tile::new(0, cells);
+
+        let flipped_tile = tile.flip_vert();
+
+        let expected = [
+            ['m', 'n', 'o', 'p'],
+            ['i', 'j', 'k', 'l'],
+            ['e', 'f', 'g', 'h'],
+            ['a', 'b', 'c', 'd'],
+        ];
+
+        assert_eq!(flipped_tile.cells, expected)
+    }
 
     #[test]
     fn part_1() {
