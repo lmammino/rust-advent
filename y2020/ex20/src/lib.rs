@@ -109,14 +109,13 @@ impl<const N: usize> Tile<N> {
     }
 }
 
-fn fit_tile_right<const N: usize>(left: &Tile<N>, right: &Tile<N>) -> Tile<N> {
+fn fit_tile_right<const N: usize>(left: &Tile<N>, right: &Tile<N>) -> Option<Tile<N>> {
     let right_tile_overlapping_border = right
         .borders
         .iter()
-        .position(|x| *x == left.borders[RIGHT])
-        .unwrap();
+        .position(|x| *x == left.borders[RIGHT])?;
 
-    match right_tile_overlapping_border {
+    Some(match right_tile_overlapping_border {
         LEFT => right.clone(),
         RLEFT => right.flip_vert(),
         RIGHT => right.flip_horiz(),
@@ -126,7 +125,7 @@ fn fit_tile_right<const N: usize>(left: &Tile<N>, right: &Tile<N>) -> Tile<N> {
         BOTTOM => right.rotate(),
         RBOTTOM => right.rotate().flip_vert(),
         _ => unreachable!(),
-    }
+    })
 }
 
 impl<const N: usize> FromStr for Tiles<N> {
@@ -275,6 +274,34 @@ pub fn part2(input: &str) -> u64 {
 
     dbg!(tilemap);
 
+    // now that we have a tilemap of relative tiles
+    // we need to make sure that all the tiles are rotated/flipped correctly
+    // to do that we start with the first tile (top/left corner).
+    // For this one we need to find a possible rotation that fits its bottom and right tile.
+
+    let zero_zero = tiles.0.get(&tilemap[0][0]).unwrap();
+    let zero_one = tiles.0.get(&tilemap[0][1]).unwrap();
+
+    let possible_zero_zero: Vec<Tile<10>> = vec![
+        fit_tile_right(zero_zero, zero_one),
+        fit_tile_right(&zero_zero.rotate(), zero_one),
+        fit_tile_right(&zero_zero.rotate().rotate(), zero_one),
+        fit_tile_right(&zero_zero.rotate().rotate().rotate(), zero_one),
+        fit_tile_right(&zero_zero.flip_horiz(), zero_one),
+        fit_tile_right(&zero_zero.flip_horiz().rotate(), zero_one),
+        fit_tile_right(&zero_zero.flip_horiz().rotate().rotate(), zero_one),
+        fit_tile_right(&zero_zero.flip_horiz().rotate().rotate().rotate(), zero_one),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
+
+    // We expect 2 possible tiles
+    dbg!(possible_zero_zero.len());
+
+    // TODO: do the same with the tile below
+    // we should find other 2 possible combinations and there will be only one in common
+
     2006
 }
 
@@ -349,6 +376,113 @@ mod ex20_tests {
         ];
 
         assert_eq!(flipped_tile.cells, expected)
+    }
+
+    #[test]
+    fn test_fit_tile_right() {
+        let left = [
+            ['l', 'l', 'l', '1'],
+            ['l', 'l', 'l', '2'],
+            ['l', 'l', 'l', '3'],
+            ['l', 'l', 'l', '4'],
+        ];
+        let left_tile = Tile::new(0, left);
+
+        let test_data = [
+            // LEFT
+            [
+                ['1', 'x', 'x', 'x'],
+                ['2', 'x', 'x', 'x'],
+                ['3', 'x', 'x', 'x'],
+                ['4', 'x', 'x', 'x'],
+            ],
+            // RLEFT
+            [
+                ['4', 'x', 'x', 'x'],
+                ['3', 'x', 'x', 'x'],
+                ['2', 'x', 'x', 'x'],
+                ['1', 'x', 'x', 'x'],
+            ],
+            // RIGHT
+            [
+                ['x', 'x', 'x', '1'],
+                ['x', 'x', 'x', '2'],
+                ['x', 'x', 'x', '3'],
+                ['x', 'x', 'x', '4'],
+            ],
+            // RRIGHT
+            [
+                ['x', 'x', 'x', '4'],
+                ['x', 'x', 'x', '3'],
+                ['x', 'x', 'x', '2'],
+                ['x', 'x', 'x', '1'],
+            ],
+            // TOP
+            [
+                ['1', '2', '3', '4'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+            ],
+            // RTOP
+            [
+                ['4', '3', '2', '1'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+            ],
+            // BOTTOM
+            [
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['1', '2', '3', '4'],
+            ],
+            // RBOTTOM
+            [
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['4', '3', '2', '1'],
+            ],
+        ];
+
+        let expected = [
+            ['1', 'x', 'x', 'x'],
+            ['2', 'x', 'x', 'x'],
+            ['3', 'x', 'x', 'x'],
+            ['4', 'x', 'x', 'x'],
+        ];
+
+        for right in test_data.iter() {
+            let right_tile = Tile::new(1, *right);
+            let test_tile = fit_tile_right::<4>(&left_tile, &right_tile).unwrap();
+            assert_eq!(test_tile.cells, expected);
+        }
+    }
+
+    #[test]
+    fn test_fit_tile_right_not_matching() {
+        let left = [
+            ['x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x'],
+            ['1', '2', '3', '4'],
+        ];
+        let left_tile = Tile::new(0, left);
+
+        let right = [
+            ['1', 'y', 'y', 'y'],
+            ['2', 'y', 'y', 'y'],
+            ['3', 'y', 'y', 'y'],
+            ['4', 'y', 'y', 'y'],
+        ];
+        let right_tile = Tile::new(0, right);
+
+        // these two tiles cannot fit, so we expect a None
+        let result = fit_tile_right::<4>(&left_tile, &right_tile);
+
+        assert!(result.is_none());
     }
 
     #[test]
