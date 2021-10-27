@@ -110,24 +110,23 @@ impl<const N: usize> Tile<N> {
 }
 
 fn fit_tile_right<const N: usize>(left: &Tile<N>, right: &Tile<N>) -> Tile<N> {
-    if left.borders[RIGHT] == right.borders[LEFT] {
-        return right.clone();
-    } else if left.borders[RIGHT] == right.borders[RLEFT] {
-        return right.flip_vert();
-    } else if left.borders[RIGHT] == right.borders[RIGHT] {
-        return right.flip_horiz();
-    } else if left.borders[RIGHT] == right.borders[RRIGHT] {
-        return right.flip_horiz().flip_vert();
-    } else if left.borders[RIGHT] == right.borders[TOP] {
-        return right.rotate().flip_horiz();
-    } else if left.borders[RIGHT] == right.borders[RTOP] {
-        return right.rotate().rotate().rotate();
-    } else if left.borders[RIGHT] == right.borders[BOTTOM] {
-        return right.rotate();
-    } else if left.borders[RIGHT] == right.borders[RBOTTOM] {
-        return right.rotate().flip_vert();
+    let right_tile_overlapping_border = right
+        .borders
+        .iter()
+        .position(|x| *x == left.borders[RIGHT])
+        .unwrap();
+
+    match right_tile_overlapping_border {
+        LEFT => right.clone(),
+        RLEFT => right.flip_vert(),
+        RIGHT => right.flip_horiz(),
+        RRIGHT => right.flip_horiz().flip_vert(),
+        TOP => right.rotate().flip_horiz(),
+        RTOP => right.rotate().rotate().rotate(),
+        BOTTOM => right.rotate(),
+        RBOTTOM => right.rotate().flip_vert(),
+        _ => unreachable!(),
     }
-    unreachable!("Tested all the cases already");
 }
 
 impl<const N: usize> FromStr for Tiles<N> {
