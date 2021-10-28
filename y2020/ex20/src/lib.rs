@@ -156,7 +156,34 @@ pub fn part2(input: &str) -> u64 {
 
     // We expect 1 possible tiles
     dbg!(zero_zero_oriented_right.len());
-    dbg!(&zero_zero_oriented_right[0]);
+    // dbg!(&zero_zero_oriented_right[0]);
+
+    let mut img: [[Tile::<10>;12];12] = [[zero_zero_oriented_right[0];12];12];
+    // img[0][0] = zero_zero_oriented_right[0];
+    for y in 0..12 {
+        if y>0 {
+            let top = &img[y-1][0];
+            let bottom = tiles.0.get(&tilemap[y][0]).unwrap();
+            img[y][0] = fit_tile_bottom(top, bottom).unwrap();
+        }
+        for x in 1..12 {
+            let left = &img[y][x-1];
+            let right = tiles.0.get(&tilemap[y][x]).unwrap();
+            img[y][x] = fit_tile_right(left, right).unwrap();
+        }    
+    }
+
+    // change 1..9 into 0..10 to see the image with border
+
+    for row in img.iter() {
+        for inner_row in 1..9 {
+            for tile in row {
+                print!("{}", tile.cells[inner_row][1..9].iter().cloned().collect::<String>());
+            }
+            print!("\n");
+        }
+    }
+
 
     2006
 }
