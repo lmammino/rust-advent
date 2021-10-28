@@ -132,28 +132,31 @@ pub fn part2(input: &str) -> u64 {
     // to do that we start with the first tile (top/left corner).
     // For this one we need to find a possible rotation that fits its bottom and right tile.
 
-    let zero_zero = tiles.0.get(&tilemap[0][0]).unwrap();
-    let zero_one = tiles.0.get(&tilemap[0][1]).unwrap();
-
+    let zero_zero = tiles.0.get(&tilemap[0][0]).unwrap();  // top left corner
+    let zero_one = tiles.0.get(&tilemap[0][1]).unwrap();  // right
+    let one_zero = tiles.0.get(&tilemap[1][0]).unwrap();  // bottom
     let possible_zero_zero: Vec<Tile<10>> = vec![
-        fit_tile_right(zero_zero, zero_one),
-        fit_tile_right(&zero_zero.rotate(), zero_one),
-        fit_tile_right(&zero_zero.rotate().rotate(), zero_one),
-        fit_tile_right(&zero_zero.rotate().rotate().rotate(), zero_one),
-        fit_tile_right(&zero_zero.flip_horiz(), zero_one),
-        fit_tile_right(&zero_zero.flip_horiz().rotate(), zero_one),
-        fit_tile_right(&zero_zero.flip_horiz().rotate().rotate(), zero_one),
-        fit_tile_right(&zero_zero.flip_horiz().rotate().rotate().rotate(), zero_one),
-    ]
-    .into_iter()
-    .flatten()
+        zero_zero.clone(),
+        zero_zero.rotate(),
+        zero_zero.rotate().rotate(),
+        zero_zero.rotate().rotate().rotate(),
+        zero_zero.flip_horiz(),
+        zero_zero.flip_horiz().rotate(),
+        zero_zero.flip_horiz().rotate().rotate(),
+        zero_zero.flip_horiz().rotate().rotate().rotate(),
+    ];
+
+    let zero_zero_oriented_right: Vec<Tile<10>> = possible_zero_zero.into_iter()
+    .filter(
+    |x| {
+        fit_tile_right(x, zero_one).is_some() && fit_tile_bottom(x, one_zero).is_some()
+    }
+    )
     .collect();
 
-    // We expect 2 possible tiles
-    dbg!(possible_zero_zero.len());
-
-    // TODO: do the same with the tile below
-    // we should find other 2 possible combinations and there will be only one in common
+    // We expect 1 possible tiles
+    dbg!(zero_zero_oriented_right.len());
+    dbg!(&zero_zero_oriented_right[0]);
 
     2006
 }
