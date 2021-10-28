@@ -1,4 +1,5 @@
 use std::convert::TryInto;
+use std::fmt;
 
 pub const TOP: usize = 0;
 pub const RTOP: usize = 1;
@@ -14,6 +15,15 @@ pub struct Tile<const N: usize> {
     pub id: u16,
     pub cells: [[char; N]; N],
     pub borders: [[char; N]; 8],
+}
+
+impl<const N: usize> fmt::Display for Tile<N> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for row in self.cells {
+            writeln!(f, "{}", row.iter().collect::<String>())?;
+        }
+        write!(f, "")
+    }
 }
 
 impl<const N: usize> Tile<N> {
@@ -110,12 +120,12 @@ pub fn fit_tile_bottom<const N: usize>(top: &Tile<N>, bottom: &Tile<N>) -> Optio
         .position(|x| *x == top.borders[BOTTOM])?;
 
     Some(match tile_overlapping_border {
-        TOP => bottom.clone(),
+        TOP => *bottom,
         BOTTOM => bottom.flip_vert(),
         RTOP => bottom.flip_horiz(),
         RBOTTOM => bottom.flip_horiz().flip_vert(),
         LEFT => bottom.rotate().flip_horiz(),
-        RIGHT=> bottom.rotate().rotate().rotate(),
+        RIGHT => bottom.rotate().rotate().rotate(),
         RLEFT => bottom.rotate(),
         RRIGHT => bottom.rotate().flip_vert(),
         _ => unreachable!(),
@@ -129,7 +139,7 @@ pub fn fit_tile_right<const N: usize>(left: &Tile<N>, right: &Tile<N>) -> Option
         .position(|x| *x == left.borders[RIGHT])?;
 
     Some(match right_tile_overlapping_border {
-        LEFT => right.clone(),
+        LEFT => *right,
         RLEFT => right.flip_vert(),
         RIGHT => right.flip_horiz(),
         RRIGHT => right.flip_horiz().flip_vert(),
@@ -298,6 +308,89 @@ mod tests {
     }
 
     #[test]
+    fn test_fit_tile_bottom() {
+        let top = [
+            ['t', 't', 't', 't'],
+            ['t', 't', 't', 't'],
+            ['t', 't', 't', 't'],
+            ['1', '2', '3', '4'],
+        ];
+        let top_tile = Tile::new(0, top);
+
+        let test_data = [
+            // LEFT
+            [
+                ['1', 'x', 'x', 'x'],
+                ['2', 'x', 'x', 'x'],
+                ['3', 'x', 'x', 'x'],
+                ['4', 'x', 'x', 'x'],
+            ],
+            // RLEFT
+            [
+                ['4', 'x', 'x', 'x'],
+                ['3', 'x', 'x', 'x'],
+                ['2', 'x', 'x', 'x'],
+                ['1', 'x', 'x', 'x'],
+            ],
+            // RIGHT
+            [
+                ['x', 'x', 'x', '1'],
+                ['x', 'x', 'x', '2'],
+                ['x', 'x', 'x', '3'],
+                ['x', 'x', 'x', '4'],
+            ],
+            // RRIGHT
+            [
+                ['x', 'x', 'x', '4'],
+                ['x', 'x', 'x', '3'],
+                ['x', 'x', 'x', '2'],
+                ['x', 'x', 'x', '1'],
+            ],
+            // TOP
+            [
+                ['1', '2', '3', '4'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+            ],
+            // RTOP
+            [
+                ['4', '3', '2', '1'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+            ],
+            // BOTTOM
+            [
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['1', '2', '3', '4'],
+            ],
+            // RBOTTOM
+            [
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['x', 'x', 'x', 'x'],
+                ['4', '3', '2', '1'],
+            ],
+        ];
+
+        let expected = [
+            ['1', '2', '3', '4'],
+            ['x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x'],
+        ];
+
+        for bottom in test_data.iter() {
+            let bottom_tile = Tile::new(1, *bottom);
+            let test_tile = fit_tile_bottom::<4>(&top_tile, &bottom_tile).unwrap();
+            assert_eq!(test_tile.cells, expected);
+        }
+    }
+
+    #[test]
     fn test_fit_tile_right_not_matching() {
         let left = [
             ['x', 'x', 'x', 'x'],
@@ -317,6 +410,30 @@ mod tests {
 
         // these two tiles cannot fit, so we expect a None
         let result = fit_tile_right::<4>(&left_tile, &right_tile);
+
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_fit_tile_bottom_not_matching() {
+        let top = [
+            ['x', 'x', 'x', '1'],
+            ['x', 'x', 'x', '2'],
+            ['x', 'x', 'x', '3'],
+            ['x', 'x', 'x', '4'],
+        ];
+        let top_tile = Tile::new(0, top);
+
+        let bottom = [
+            ['1', 'y', 'y', 'y'],
+            ['2', 'y', 'y', 'y'],
+            ['3', 'y', 'y', 'y'],
+            ['4', 'y', 'y', 'y'],
+        ];
+        let bottom_tile = Tile::new(0, bottom);
+
+        // these two tiles cannot fit, so we expect a None
+        let result = fit_tile_bottom::<4>(&top_tile, &bottom_tile);
 
         assert!(result.is_none());
     }

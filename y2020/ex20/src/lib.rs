@@ -132,11 +132,11 @@ pub fn part2(input: &str) -> u64 {
     // to do that we start with the first tile (top/left corner).
     // For this one we need to find a possible rotation that fits its bottom and right tile.
 
-    let zero_zero = tiles.0.get(&tilemap[0][0]).unwrap();  // top left corner
-    let zero_one = tiles.0.get(&tilemap[0][1]).unwrap();  // right
-    let one_zero = tiles.0.get(&tilemap[1][0]).unwrap();  // bottom
+    let zero_zero = tiles.0.get(&tilemap[0][0]).unwrap(); // top left corner
+    let zero_one = tiles.0.get(&tilemap[0][1]).unwrap(); // right
+    let one_zero = tiles.0.get(&tilemap[1][0]).unwrap(); // bottom
     let possible_zero_zero: Vec<Tile<10>> = vec![
-        zero_zero.clone(),
+        *zero_zero,
         zero_zero.rotate(),
         zero_zero.rotate().rotate(),
         zero_zero.rotate().rotate().rotate(),
@@ -146,31 +146,28 @@ pub fn part2(input: &str) -> u64 {
         zero_zero.flip_horiz().rotate().rotate().rotate(),
     ];
 
-    let zero_zero_oriented_right: Vec<Tile<10>> = possible_zero_zero.into_iter()
-    .filter(
-    |x| {
-        fit_tile_right(x, zero_one).is_some() && fit_tile_bottom(x, one_zero).is_some()
-    }
-    )
-    .collect();
+    let zero_zero_oriented_right: Vec<Tile<10>> = possible_zero_zero
+        .into_iter()
+        .filter(|x| fit_tile_right(x, zero_one).is_some() && fit_tile_bottom(x, one_zero).is_some())
+        .collect();
 
     // We expect 1 possible tiles
     dbg!(zero_zero_oriented_right.len());
     // dbg!(&zero_zero_oriented_right[0]);
 
-    let mut img: [[Tile::<10>;12];12] = [[zero_zero_oriented_right[0];12];12];
+    let mut img: [[Tile<10>; 12]; 12] = [[zero_zero_oriented_right[0]; 12]; 12];
     // img[0][0] = zero_zero_oriented_right[0];
     for y in 0..12 {
-        if y>0 {
-            let top = &img[y-1][0];
+        if y > 0 {
+            let top = &img[y - 1][0];
             let bottom = tiles.0.get(&tilemap[y][0]).unwrap();
             img[y][0] = fit_tile_bottom(top, bottom).unwrap();
         }
         for x in 1..12 {
-            let left = &img[y][x-1];
+            let left = &img[y][x - 1];
             let right = tiles.0.get(&tilemap[y][x]).unwrap();
             img[y][x] = fit_tile_right(left, right).unwrap();
-        }    
+        }
     }
 
     // change 1..9 into 0..10 to see the image with border
@@ -178,12 +175,17 @@ pub fn part2(input: &str) -> u64 {
     for row in img.iter() {
         for inner_row in 1..9 {
             for tile in row {
-                print!("{}", tile.cells[inner_row][1..9].iter().cloned().collect::<String>());
+                print!(
+                    "{}",
+                    tile.cells[inner_row][1..9]
+                        .iter()
+                        .cloned()
+                        .collect::<String>()
+                );
             }
-            print!("\n");
+            println!();
         }
     }
-
 
     2006
 }
