@@ -9,7 +9,7 @@ pub const RLEFT: usize = 5;
 pub const RIGHT: usize = 6;
 pub const RRIGHT: usize = 7;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Tile<const N: usize> {
     pub id: u16,
     pub cells: [[char; N]; N],
@@ -103,21 +103,21 @@ impl<const N: usize> Tile<N> {
     }
 }
 
-pub fn fit_tile_bottom<const N: usize>(left: &Tile<N>, right: &Tile<N>) -> Option<Tile<N>> {
-    let tile_overlapping_border = right
+pub fn fit_tile_bottom<const N: usize>(top: &Tile<N>, bottom: &Tile<N>) -> Option<Tile<N>> {
+    let tile_overlapping_border = bottom
         .borders
         .iter()
-        .position(|x| *x == left.borders[BOTTOM])?;
+        .position(|x| *x == top.borders[BOTTOM])?;
 
     Some(match tile_overlapping_border {
-        TOP => right.clone(),
-        BOTTOM => right.flip_vert(),
-        RTOP => right.flip_horiz(),
-        RBOTTOM => right.flip_horiz().flip_vert(),
-        RRIGHT => right.rotate().flip_horiz(),
-        RIGHT=> right.rotate().rotate().rotate(),
-        RLEFT => right.rotate(),
-        LEFT => right.rotate().flip_vert(),
+        TOP => bottom.clone(),
+        BOTTOM => bottom.flip_vert(),
+        RTOP => bottom.flip_horiz(),
+        RBOTTOM => bottom.flip_horiz().flip_vert(),
+        LEFT => bottom.rotate().flip_horiz(),
+        RIGHT=> bottom.rotate().rotate().rotate(),
+        RLEFT => bottom.rotate(),
+        RRIGHT => bottom.rotate().flip_vert(),
         _ => unreachable!(),
     })
 }
