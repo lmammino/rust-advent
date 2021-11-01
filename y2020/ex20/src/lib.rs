@@ -35,7 +35,7 @@ pub fn part1(input: &str) -> u64 {
     corners
 }
 
-pub fn part2(input: &str) -> u64 {
+pub fn part2(input: &str) -> usize {
     let tiles: TilesIndex<10> = input.parse().unwrap();
 
     let mut neighbours: HashMap<u16, HashSet<u16>> = HashMap::new();
@@ -125,8 +125,6 @@ pub fn part2(input: &str) -> u64 {
         }
     }
 
-    dbg!(tilemap);
-
     // now that we have a tilemap of relative tiles
     // we need to make sure that all the tiles are rotated/flipped correctly
     // to do that we start with the first tile (top/left corner).
@@ -152,11 +150,9 @@ pub fn part2(input: &str) -> u64 {
         .collect();
 
     // We expect 1 possible tiles
-    dbg!(zero_zero_oriented_right.len());
-    // dbg!(&zero_zero_oriented_right[0]);
+    assert_eq!(zero_zero_oriented_right.len(), 1);
 
     let mut img: [[Tile<10>; 12]; 12] = [[zero_zero_oriented_right[0]; 12]; 12];
-    // img[0][0] = zero_zero_oriented_right[0];
     for y in 0..12 {
         if y > 0 {
             let top = &img[y - 1][0];
@@ -172,22 +168,39 @@ pub fn part2(input: &str) -> u64 {
 
     // change 1..9 into 0..10 to see the image with border
 
-    for row in img.iter() {
+    let mut image = [[' '; 96]; 96];
+
+    for (row_index, row) in img.iter().enumerate() {
         for inner_row in 1..9 {
-            for tile in row {
-                print!(
-                    "{}",
-                    tile.cells[inner_row][1..9]
-                        .iter()
-                        .cloned()
-                        .collect::<String>()
-                );
+            for (tile_index, tile) in row.iter().enumerate() {
+                for cell_id in 1..9 {
+                    image[row_index * 8 + inner_row - 1][tile_index * 8 + cell_id - 1] =
+                        tile.cells[inner_row][cell_id];
+                }
             }
-            println!();
         }
     }
 
-    2006
+    let image_tile = Tile::new(1, image);
+    let possible_images: Vec<Tile<96>> = vec![
+        image_tile,
+        image_tile.rotate(),
+        image_tile.rotate().rotate(),
+        image_tile.rotate().rotate().rotate(),
+        image_tile.flip_horiz(),
+        image_tile.flip_horiz().rotate(),
+        image_tile.flip_horiz().rotate().rotate(),
+        image_tile.flip_horiz().rotate().rotate().rotate(),
+    ];
+
+    for i in possible_images {
+        let num_dragons = i.count_dragons();
+        if num_dragons > 0 {
+            return i.count_sharps() - num_dragons * DRAGON.len();
+        }
+    }
+
+    unreachable!("We must find a rotation that contains dragons");
 }
 
 #[cfg(test)]
