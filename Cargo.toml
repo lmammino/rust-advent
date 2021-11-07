@@ -19,7 +19,8 @@ members = [
   "y2020/ex17",
   "y2020/ex18",
   "y2020/ex19",
-  "y2020/ex20"
+  "y2020/ex20",
+  "y2020/ex21"
 ]
 
 [profile.bench]
