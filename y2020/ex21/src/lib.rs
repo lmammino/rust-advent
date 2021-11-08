@@ -6,13 +6,13 @@ pub fn part1(input: &str) -> usize {
 
     for line in input.lines() {
         let (ing, alle) = line[..(line.len() - 1)].split_once(" (contains ").unwrap();
-        let ings: HashSet<&str> = ing.split(" ").collect();
+        let ings: HashSet<&str> = ing.split(' ').collect();
         let alles: HashSet<&str> = alle.split(", ").collect();
         ingredients.extend(ings.iter());
         for allergen in alles {
             let values = allergens_ingredients
                 .entry(allergen)
-                .or_insert(ings.clone());
+                .or_insert_with(|| ings.clone());
             let new_values: HashSet<&str> = values.intersection(&ings).cloned().collect();
             allergens_ingredients.insert(allergen, new_values);
         }
@@ -35,12 +35,12 @@ pub fn part2(input: &str) -> String {
 
     for line in input.lines() {
         let (ing, alle) = line[..(line.len() - 1)].split_once(" (contains ").unwrap();
-        let ings: HashSet<&str> = ing.split(" ").collect();
+        let ings: HashSet<&str> = ing.split(' ').collect();
         let alles: HashSet<&str> = alle.split(", ").collect();
         for allergen in alles {
             let values = allergens_ingredients
                 .entry(allergen)
-                .or_insert(ings.clone());
+                .or_insert_with(|| ings.clone());
             let new_values: HashSet<&str> = values.intersection(&ings).cloned().collect();
             allergens_ingredients.insert(allergen, new_values);
         }
@@ -54,13 +54,13 @@ pub fn part2(input: &str) -> String {
                 sure_mappings.insert(all, ings.iter().next().unwrap());
             }
         }
-        for (_, ing) in &sure_mappings {
+        sure_mappings.iter().for_each(|(_, ing)| {
             for (_, ings_set) in allergens_ingredients.iter_mut() {
                 if ings_set.len() > 1 {
                     ings_set.remove(ing);
                 }
             }
-        }
+        });
     }
 
     let mut ret: Vec<(&str, &str)> = sure_mappings.into_iter().collect();

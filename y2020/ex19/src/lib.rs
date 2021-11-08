@@ -52,9 +52,9 @@ fn validate<'a>(strings: Vec<&'a str>, ruleset: &RuleSet, current_rule: RuleId) 
             .iter()
             .filter_map(|s| {
                 if s.starts_with(*c) {
-                    return Some(&s[1..]);
+                    Some(&s[1..])
                 } else {
-                    return None;
+                    None
                 }
             })
             .collect(),
