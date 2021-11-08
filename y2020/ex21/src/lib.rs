@@ -1,61 +1,63 @@
 use std::collections::{HashMap, HashSet};
 
-pub fn part1(input: &str) -> usize {
-    let mut allergens_ingredients: HashMap<&str, HashSet<&str>> = Default::default();
-    let mut ingredients: Vec<&str> = Default::default();
+struct AllergensIngredients<'a> {
+    mapping: HashMap<&'a str, HashSet<&'a str>>,
+    ingredients: Vec<&'a str>,
+}
 
-    for line in input.lines() {
-        let (ing, alle) = line[..(line.len() - 1)].split_once(" (contains ").unwrap();
-        let ings: HashSet<&str> = ing.split(' ').collect();
-        let alles: HashSet<&str> = alle.split(", ").collect();
-        ingredients.extend(ings.iter());
-        for allergen in alles {
-            let values = allergens_ingredients
-                .entry(allergen)
-                .or_insert_with(|| ings.clone());
-            let new_values: HashSet<&str> = values.intersection(&ings).cloned().collect();
-            allergens_ingredients.insert(allergen, new_values);
+impl<'a> From<&'a str> for AllergensIngredients<'a> {
+    fn from(input: &'a str) -> Self {
+        let mut mapping: HashMap<&'a str, HashSet<&'a str>> = Default::default();
+        let mut ingredients: Vec<&str> = Default::default();
+
+        input.lines().for_each(|line| {
+            let (ing, alle) = line[..(line.len() - 1)].split_once(" (contains ").unwrap();
+            let ings: HashSet<&str> = ing.split(' ').collect();
+            let alles: HashSet<&str> = alle.split(", ").collect();
+            ingredients.extend(ings.iter());
+            for allergen in alles {
+                let values = mapping.entry(allergen).or_insert_with(|| ings.clone());
+                let new_values: HashSet<&str> = values.intersection(&ings).cloned().collect();
+                mapping.insert(allergen, new_values);
+            }
+        });
+
+        Self {
+            mapping,
+            ingredients,
         }
     }
+}
+
+pub fn part1(input: &str) -> usize {
+    let allergens_ingredients: AllergensIngredients = input.into();
 
     let bad_ingredients_list: HashSet<&str> = allergens_ingredients
+        .mapping
         .values()
         .flat_map(|x| x.iter())
         .cloned()
         .collect();
 
-    ingredients
+    allergens_ingredients
+        .ingredients
         .into_iter()
         .filter(|x| !bad_ingredients_list.contains(x))
         .count()
 }
 
 pub fn part2(input: &str) -> String {
-    let mut allergens_ingredients: HashMap<&str, HashSet<&str>> = Default::default();
-
-    for line in input.lines() {
-        let (ing, alle) = line[..(line.len() - 1)].split_once(" (contains ").unwrap();
-        let ings: HashSet<&str> = ing.split(' ').collect();
-        let alles: HashSet<&str> = alle.split(", ").collect();
-        for allergen in alles {
-            let values = allergens_ingredients
-                .entry(allergen)
-                .or_insert_with(|| ings.clone());
-            let new_values: HashSet<&str> = values.intersection(&ings).cloned().collect();
-            allergens_ingredients.insert(allergen, new_values);
-        }
-    }
-
+    let mut allergens_ingredients: AllergensIngredients = input.into();
     let mut sure_mappings: HashMap<&str, &str> = Default::default();
 
-    while sure_mappings.len() != allergens_ingredients.len() {
-        for (all, ings) in &allergens_ingredients {
+    while sure_mappings.len() != allergens_ingredients.mapping.len() {
+        for (all, ings) in &allergens_ingredients.mapping {
             if ings.len() == 1 {
                 sure_mappings.insert(all, ings.iter().next().unwrap());
             }
         }
         sure_mappings.iter().for_each(|(_, ing)| {
-            for (_, ings_set) in allergens_ingredients.iter_mut() {
+            for (_, ings_set) in allergens_ingredients.mapping.iter_mut() {
                 if ings_set.len() > 1 {
                     ings_set.remove(ing);
                 }
