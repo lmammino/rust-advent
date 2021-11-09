@@ -35,7 +35,7 @@ pub fn part1(input: &str) -> usize {
     let bad_ingredients_list: HashSet<&str> = allergens_ingredients
         .mapping
         .values()
-        .flat_map(|x| x.iter())
+        .flatten()
         .cloned()
         .collect();
 
