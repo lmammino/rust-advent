@@ -1,24 +1,34 @@
-use std::{collections::VecDeque, str::FromStr};
+use std::{collections::{HashSet, VecDeque}, str::FromStr};
 
 type Card = u8;
 // type Deck = VecDeque<Card>;
 
+#[derive(Hash, PartialEq, Eq)]
 struct Deck {
     cards: VecDeque<Card>,
 }
 
 impl FromStr for Deck {
     type Err = ();
-
+    
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let cards: VecDeque<Card> = s
-            .lines()
-            .skip(1)
-            .map(|i| i.parse::<Card>().unwrap())
-            .collect();
-
+        .lines()
+        .skip(1)
+        .map(|i| i.parse::<Card>().unwrap())
+        .collect();
+        
         Ok(Deck { cards })
     }
+}
+
+type GameHistory = HashSet<(Deck, Deck)>;
+
+fn game(deck1:Deck, deck2:Deck) -> (usize, Deck) {
+    let mut history = GameHistory::new();
+    history.insert((deck1, deck2));
+    // TODO: do actual game :)
+    unimplemented!()
 }
 
 pub fn part1(input: &str) -> u32 {
