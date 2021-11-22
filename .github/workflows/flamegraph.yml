@@ -12,6 +12,11 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      benchName:
+        description: 'Banchmark name ex. bench_ex22'     
+        required: true
+        default: 'all'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -39,14 +44,14 @@ jobs:
       - name: install flamegraph
         run: |
           cargo install flamegraph
-
-      - name: flamegraph bench
-        id: fgb
-        run: |
-          export CARGO_PROFILE_RELEASE_DEBUG=true
           sudo sysctl -w kernel.perf_event_paranoid=1
           sudo sysctl -p
 
+      - name: flamegraph bench ALL
+        id: fgb
+        if: ${{ github.event.inputs.benchName == 'all' }}
+        run: |
+          export CARGO_PROFILE_RELEASE_DEBUG=true
           cargo bench --no-run
           for f in `find target/release/deps -executable -type f -name 'bench_*' | sort`; do
               file_name="${f##*/}"
@@ -55,6 +60,15 @@ jobs:
               cp flamegraph.svg flamegraphs/${name}.svg
           done
 
+      - name: flamegraph bench ALL
+        id: fgb_one
+        if: ${{ github.event.inputs.benchName != 'all' }}
+        run: |
+          export CARGO_PROFILE_RELEASE_DEBUG=true
+          name="${{ github.event.inputs.benchName }}"
+          cargo flamegraph --bench $name -- --bench > /dev/null || true
+          cp flamegraph.svg flamegraphs/${name}.svg
+          
       - name: "Create the PR comment message"
         id: pr_comment
         run: |
