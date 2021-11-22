@@ -1,4 +1,7 @@
-use std::{collections::{HashSet, VecDeque}, str::FromStr};
+use std::{
+    collections::{HashSet, VecDeque},
+    str::FromStr,
+};
 
 type Card = usize;
 // type Deck = VecDeque<Card>;
@@ -9,9 +12,8 @@ struct Deck {
 }
 
 impl Deck {
-    fn calculate_score (self) -> usize {
-        self
-            .cards
+    fn calculate_score(self) -> usize {
+        self.cards
             .into_iter()
             .rev()
             .enumerate()
@@ -22,25 +24,28 @@ impl Deck {
 
 impl FromStr for Deck {
     type Err = ();
-    
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let cards: VecDeque<Card> = s
-        .lines()
-        .skip(1)
-        .map(|i| i.parse::<Card>().unwrap())
-        .collect();
-        
+            .lines()
+            .skip(1)
+            .map(|i| i.parse::<Card>().unwrap())
+            .collect();
+
         Ok(Deck { cards })
     }
 }
 
 type GameHistory = HashSet<(Deck, Deck)>;
 
-enum Player { One, Two }
+enum Player {
+    One,
+    Two,
+}
 
-fn game(mut deck1:Deck, mut deck2:Deck) -> (Player, Deck) {
+fn game(mut deck1: Deck, mut deck2: Deck) -> (Player, Deck) {
     let mut history = GameHistory::new();
-    
+
     loop {
         // if decks had the same state in other rounds, P1 instantly wins
         if !history.insert((deck1.clone(), deck2.clone())) {
@@ -63,8 +68,8 @@ fn game(mut deck1:Deck, mut deck2:Deck) -> (Player, Deck) {
 
             assert_eq!(new_deck1.len(), p1_card);
             assert_eq!(new_deck2.len(), p2_card);
-            
-            match game(Deck {cards: new_deck1}, Deck {cards: new_deck2}) {
+
+            match game(Deck { cards: new_deck1 }, Deck { cards: new_deck2 }) {
                 (Player::One, _) => {
                     deck1.cards.push_back(p1_card);
                     deck1.cards.push_back(p2_card);
@@ -74,14 +79,12 @@ fn game(mut deck1:Deck, mut deck2:Deck) -> (Player, Deck) {
                     deck2.cards.push_back(p1_card);
                 }
             }
+        } else if p1_card > p2_card {
+            deck1.cards.push_back(p1_card);
+            deck1.cards.push_back(p2_card);
         } else {
-            if p1_card > p2_card {
-                deck1.cards.push_back(p1_card);
-                deck1.cards.push_back(p2_card);
-            } else {
-                deck2.cards.push_back(p2_card);
-                deck2.cards.push_back(p1_card);
-            }
+            deck2.cards.push_back(p2_card);
+            deck2.cards.push_back(p1_card);
         }
     }
 }
@@ -139,7 +142,7 @@ mod ex22_tests {
         assert_eq!(part2(input), 33651);
     }
     #[test]
-    fn test_hash_set_tuple_eq () {
+    fn test_hash_set_tuple_eq() {
         let deck1 = Deck::from_str("Player1:\n1").unwrap();
         let deck2 = Deck::from_str("Player2:\n5").unwrap();
 
