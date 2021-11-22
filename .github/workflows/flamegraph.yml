@@ -49,7 +49,7 @@ jobs:
 
       - name: flamegraph bench ALL
         id: fgb
-        if: ${{ github.event.inputs.benchName == 'all' }}
+        if: ${{ github.event.inputs.benchName == 'all' || github.event.inputs.benchName == '' }}
         run: |
           export CARGO_PROFILE_RELEASE_DEBUG=true
           cargo bench --no-run
