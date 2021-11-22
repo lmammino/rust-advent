@@ -60,7 +60,7 @@ jobs:
               cp flamegraph.svg flamegraphs/${name}.svg
           done
 
-      - name: flamegraph bench ALL
+      - name: flamegraph bench ONE
         id: fgb_one
         if: ${{ github.event.inputs.benchName != 'all' }}
         run: |
