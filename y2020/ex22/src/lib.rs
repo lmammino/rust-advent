@@ -3,7 +3,7 @@ use std::{collections::{HashSet, VecDeque}, str::FromStr};
 type Card = u8;
 // type Deck = VecDeque<Card>;
 
-#[derive(Hash, PartialEq, Eq)]
+#[derive(Hash, PartialEq, Eq, Clone, Debug)]
 struct Deck {
     cards: VecDeque<Card>,
 }
@@ -24,11 +24,51 @@ impl FromStr for Deck {
 
 type GameHistory = HashSet<(Deck, Deck)>;
 
-fn game(deck1:Deck, deck2:Deck) -> (usize, Deck) {
+fn game(mut deck1:Deck, mut deck2:Deck) -> (usize, Deck) {
     let mut history = GameHistory::new();
-    history.insert((deck1, deck2));
-    // TODO: do actual game :)
-    unimplemented!()
+    
+    loop {
+        // if decks had the same state in other rounds, P1 instantly wins
+        if history.contains(&(deck1.clone(), deck2.clone())) {
+            return (1, deck1);
+        }
+        history.insert((deck1.clone(), deck2.clone()));
+
+        if deck1.cards.is_empty() {
+            return (2, deck2);
+        }
+        if deck2.cards.is_empty() {
+            return (1, deck1);
+        }
+
+        let p1_card = deck1.cards.pop_front().unwrap();
+        let p2_card = deck2.cards.pop_front().unwrap();
+        if p1_card as usize <= deck1.cards.len() && p2_card as usize <= deck2.cards.len() {
+            // recursive combat game initiated here
+            let new_deck1: VecDeque<Card> = deck1.cards.iter().take(p1_card as usize).cloned().collect();
+            let new_deck2: VecDeque<Card> = deck2.cards.iter().take(p2_card as usize).cloned().collect();
+
+            assert_eq!(new_deck1.len(), p1_card as usize);
+            assert_eq!(new_deck2.len(), p2_card as usize);
+            
+            let (winner, _) = game(Deck {cards: new_deck1}, Deck {cards: new_deck2});
+            if winner == 1 {
+                deck1.cards.push_back(p1_card);
+                deck1.cards.push_back(p2_card);
+            } else {
+                deck2.cards.push_back(p2_card);
+                deck2.cards.push_back(p1_card);
+            }
+        } else {
+            if p1_card > p2_card {
+                deck1.cards.push_back(p1_card);
+                deck1.cards.push_back(p2_card);
+            } else {
+                deck2.cards.push_back(p2_card);
+                deck2.cards.push_back(p1_card);
+            }
+        }
+    }
 }
 
 pub fn part1(input: &str) -> u32 {
@@ -64,8 +104,19 @@ pub fn part1(input: &str) -> u32 {
         .sum()
 }
 
-pub fn part2(_input: &str) -> usize {
-    33651
+pub fn part2(input: &str) -> u32 {
+    let (p1, p2) = input.split_once("\n\n").unwrap();
+    let p1q: Deck = p1.parse().unwrap();
+    let p2q: Deck = p2.parse().unwrap();
+
+    let (_, winning_deck) = game(p1q, p2q);
+
+    winning_deck.cards
+        .into_iter()
+        .rev()
+        .enumerate()
+        .map(|(i, n)| (i as u32 + 1) * n as u32)
+        .sum()
 }
 
 #[cfg(test)]
@@ -82,5 +133,20 @@ mod ex22_tests {
     fn part_2() {
         let input = include_str!("../input.txt");
         assert_eq!(part2(input), 33651);
+    }
+    #[test]
+    fn test_hash_set_tuple_eq () {
+        let deck1 = Deck::from_str("Player1:\n1").unwrap();
+        let deck2 = Deck::from_str("Player2:\n5").unwrap();
+
+        let mut history = GameHistory::new();
+        history.insert((deck1.clone(), deck2.clone()));
+        assert!(history.contains(&(deck1.clone(), deck2.clone())));
+    }
+
+    #[test]
+    fn test_simpler_input() {
+        let input = include_str!("../example.txt");
+        assert_eq!(part2(input), 291);
     }
 }
