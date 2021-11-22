@@ -21,7 +21,7 @@ impl FromStr for Deck {
         Ok(Deck { cards })
     }
 }
-
+// TODO: this might be slower than just strings for instance
 type GameHistory = HashSet<(Deck, Deck)>;
 
 fn game(mut deck1:Deck, mut deck2:Deck) -> (usize, Deck) {
@@ -29,9 +29,12 @@ fn game(mut deck1:Deck, mut deck2:Deck) -> (usize, Deck) {
     
     loop {
         // if decks had the same state in other rounds, P1 instantly wins
+        // TODO: just insert instead of contains & insert on each loop
+        // TODO: get rid of clone
         if history.contains(&(deck1.clone(), deck2.clone())) {
             return (1, deck1);
         }
+        // TODO: get rid of clone
         history.insert((deck1.clone(), deck2.clone()));
 
         if deck1.cards.is_empty() {
