@@ -72,7 +72,7 @@ fn math_with_priority(input: &str) -> u64 {
             math_with_priority(&new_string)
         }
         _ => input
-            .split("*")
+            .split('*')
             .map(|expr| {
                 expr.split("+")
                     .map(|x| x.trim().parse::<u64>().unwrap())
