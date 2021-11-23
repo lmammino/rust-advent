@@ -22,10 +22,13 @@ impl Deck {
     }
 
     fn hash(&self) -> usize {
+        // The hashing function is similar to the calculate_score one
+        // this hash is not perfect, it can lead to some collisions, but it is "good enough" for our tests
+        // The speedup compared to use the whole cards VecDeque is huge (90% faster), still using the default rust HashSet
         (&self.cards)
             .iter()
             .enumerate()
-            .map(|(i, n)| (i + 1) * n)
+            .map(|(i, n)| (i * 29 + 1) * n)
             .sum()
     }
 }
