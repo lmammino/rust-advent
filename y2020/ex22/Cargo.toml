@@ -13,3 +13,6 @@ criterion = "0.3"
 [[bench]]
 name = "bench_ex22"
 harness = false
+
+[[example]]
+name="part2"
