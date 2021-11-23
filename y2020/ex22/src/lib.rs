@@ -20,6 +20,14 @@ impl Deck {
             .map(|(i, n)| (i + 1) * n)
             .sum()
     }
+
+    fn hash(&self) -> usize {
+        (&self.cards)
+            .iter()
+            .enumerate()
+            .map(|(i, n)| (i + 1) * n)
+            .sum()
+    }
 }
 
 impl FromStr for Deck {
@@ -36,7 +44,7 @@ impl FromStr for Deck {
     }
 }
 
-type GameHistory = HashSet<(Deck, Deck)>;
+type GameHistory = HashSet<(usize, usize)>;
 
 enum Player {
     One,
@@ -48,7 +56,7 @@ fn game(mut deck1: Deck, mut deck2: Deck) -> (Player, Deck) {
 
     loop {
         // if decks had the same state in other rounds, P1 instantly wins
-        if !history.insert((deck1.clone(), deck2.clone())) {
+        if !history.insert((deck1.hash(), deck2.hash())) {
             return (Player::One, deck1);
         }
 
@@ -147,8 +155,8 @@ mod ex22_tests {
         let deck2 = Deck::from_str("Player2:\n5").unwrap();
 
         let mut history = GameHistory::new();
-        history.insert((deck1.clone(), deck2.clone()));
-        assert!(history.contains(&(deck1.clone(), deck2.clone())));
+        history.insert((deck1.hash(), deck2.hash()));
+        assert!(history.contains(&(deck1.hash(), deck2.hash())));
     }
 
     #[test]
