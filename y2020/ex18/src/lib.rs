@@ -74,7 +74,7 @@ fn math_with_priority(input: &str) -> u64 {
         _ => input
             .split('*')
             .map(|expr| {
-                expr.split("+")
+                expr.split('+')
                     .map(|x| x.trim().parse::<u64>().unwrap())
                     .sum::<u64>()
             })
