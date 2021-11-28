@@ -152,6 +152,7 @@ mod ex22_tests {
         let input = include_str!("../input.txt");
         assert_eq!(part2(input), 33651);
     }
+    
     #[test]
     fn test_hash_set_tuple_eq() {
         let deck1 = Deck::from_str("Player1:\n1").unwrap();
