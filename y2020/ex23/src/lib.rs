@@ -21,14 +21,10 @@ impl Iterator for GameState {
     type Item = ([u64; 3], u64);
 
     fn next(&mut self) -> std::option::Option<<Self as std::iter::Iterator>::Item> {
-        let to_remove = (self.current + 1) % self.cups.len();
         let mut pick_up = [0_u64; 3];
 
         for i in 0..3 {
-            pick_up[i] = self.cups.remove(to_remove % self.cups.len());
-            if (to_remove % self.cups.len()) < self.current {
-                self.current -= 1;
-            }
+            pick_up[i] = self.cups.remove(1);
         }
 
         let mut dest_value = self.cups.get(self.current).unwrap() - 1;
@@ -61,10 +57,10 @@ impl Iterator for GameState {
             self.cups.insert(target_idx, *val);
         }
 
-        if target_idx < self.current {
-            self.current += 3;
-        }
-        self.current = (self.current + 1) % self.cups.len();
+        // move to the next element
+        let current_value = self.cups[0];
+        self.cups = self.cups[1..].to_vec();
+        self.cups.push(current_value);
 
         Some((pick_up, dest_value))
     }
@@ -90,8 +86,10 @@ impl GameState {
     }
 }
 
-pub fn part1(_input: &str) -> usize {
-    26354798
+pub fn part1(input: &str) -> usize {
+    let mut state: GameState = input.parse().unwrap();
+    state.nth(99);
+    state.result()
 }
 
 pub fn part2(_input: &str) -> usize {
@@ -168,7 +166,7 @@ mod ex23_tests {
         assert_eq!(pick_up, [7, 4, 1]);
         assert_eq!(dest, 3);
 
-        assert_eq!(state.cups, vec![5, 8, 3, 7, 4, 1, 9, 2, 6]);
+        assert_eq!(state.result(), 92658374);
     }
 
     #[test]
