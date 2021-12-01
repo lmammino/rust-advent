@@ -40,6 +40,19 @@ mod tests {
     }
 
     #[test]
+    fn test_part2_example() {
+        let input = "607
+618
+618
+617
+647
+716
+769
+792";
+        assert_eq!(part2(input), 5);
+    }
+
+    #[test]
     fn test_part1() {
         let input = include_str!("../input.txt");
         assert_eq!(part1(input), 1292);
