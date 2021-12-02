@@ -47,7 +47,7 @@ impl FromStr for Instruction {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct Ship {
     direction: u32,
     x: i32,
@@ -98,16 +98,6 @@ impl Ship {
 
     fn get_manhattan_distance(&self) -> u32 {
         self.x.abs() as u32 + self.y.abs() as u32
-    }
-}
-
-impl Default for Ship {
-    fn default() -> Self {
-        Self {
-            direction: 0,
-            x: 0,
-            y: 0,
-        }
     }
 }
 
