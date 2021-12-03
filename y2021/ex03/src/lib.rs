@@ -16,10 +16,10 @@ pub fn part1(input: &str) -> usize {
         gamma <<= 1;
         epsilon <<= 1;
         if *num_ones > (lines_count / 2) {
-            // accumulate in gamma
+            // higher number of 1s: accumulates in gamma
             gamma += 1;
         } else {
-            // accumulate in epsilon
+            // higher number of 0s: accumulates in epsilon
             epsilon += 1;
         }
     }
