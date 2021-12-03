@@ -12,21 +12,22 @@ pub fn part1(input: &str) -> usize {
     let mut gamma: usize = 0;
     let mut epsilon: usize = 0;
 
-    // TODO: revisit this to use bit shifting instead
-    for (pow2, num_ones) in num_ones_per_digit.iter().rev().enumerate() {
+    for num_ones in num_ones_per_digit.iter() {
+        gamma <<= 1;
+        epsilon <<= 1;
         if *num_ones > (lines_count / 2) {
             // accumulate in gamma
-            gamma += 2_usize.pow(pow2 as u32);
+            gamma += 1;
         } else {
             // accumulate in epsilon
-            epsilon += 2_usize.pow(pow2 as u32);
+            epsilon += 1;
         }
     }
 
     gamma * epsilon
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(_input: &str) -> usize {
     0
 }
 
