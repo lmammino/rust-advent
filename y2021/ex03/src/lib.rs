@@ -2,8 +2,8 @@ pub fn part1(input: &str) -> usize {
     let mut num_ones_per_digit: [usize; 12] = [0; 12];
     let mut lines_count: usize = 0;
     for s in input.lines() {
-        let digits: Vec<usize> = s.chars().map(|c| if c == '1' { 1 } else { 0 }).collect();
-        for (i, n) in digits.iter().enumerate() {
+        let digits = s.chars().map(|c| if c == '1' { 1 } else { 0 });
+        for (i, n) in digits.enumerate() {
             num_ones_per_digit[i] += n;
         }
         lines_count += 1;
