@@ -37,32 +37,32 @@ The submarine has a bingo subsystem to help passengers (currently, you and the g
 
 After the first five numbers are drawn (`7`, `4`, `9`, `5`, and `11`), there are no winners, but the boards are marked as follows (shown here adjacent to each other to save space):
 
-<pre><code>22 13 17 <em>11</em>  0         3 15  0  2 22        14 21 17 24  <em>4</em>
- 8  2 23  <em>4</em> 24         <em>9</em> 18 13 17  <em>5</em>        10 16 15  <em>9</em> 19
-21  <em>9</em> 14 16  <em>7</em>        19  8  <em>7</em> 25 23        18  8 23 26 20
- 6 10  3 18  <em>5</em>        20 <em>11</em> 10 24  <em>4</em>        22 <em>11</em> 13  6  <em>5</em>
- 1 12 20 15 19        14 21 16 12  6         2  0 12  3  <em>7</em>
+<pre><code>22 13 17 <strong>11</strong>  0         3 15  0  2 22        14 21 17 24  <strong>4</strong>
+ 8  2 23  <strong>4</strong> 24         <strong>9</strong> 18 13 17  <strong>5</strong>        10 16 15  <strong>9</strong> 19
+21  <strong>9</strong> 14 16  <strong>7</strong>        19  8  <strong>7</strong> 25 23        18  8 23 26 20
+ 6 10  3 18  <strong>5</strong>        20 <strong>11</strong> 10 24  <strong>4</strong>        22 <strong>11</strong> 13  6  <strong>5</strong>
+ 1 12 20 15 19        14 21 16 12  6         2  0 12  3  <strong>7</strong>
 </code></pre>
 
 
 After the next six numbers are drawn (`17`, `23`, `2`, `0`, `14`, and `21`), there are still no winners:
 
 
-<pre><code>22 13 <em>17</em> <em>11</em>  <em>0</em>         3 15  <em>0</em>  <em>2</em> 22        <em>14</em> <em>21</em> <em>17</em> 24  <em>4</em>
- 8  <em>2</em> <em>23</em>  <em>4</em> 24         <em>9</em> 18 13 <em>17</em>  <em>5</em>        10 16 15  <em>9</em> 19
-<em>21</em>  <em>9</em> <em>14</em> 16  <em>7</em>        19  8  <em>7</em> 25 <em>23</em>        18  8 <em>23</em> 26 20
- 6 10  3 18  <em>5</em>        20 <em>11</em> 10 24  <em>4</em>        22 <em>11</em> 13  6  <em>5</em>
- 1 12 20 15 19        <em>14</em> <em>21</em> 16 12  6         <em>2</em>  <em>0</em> 12  3  <em>7</em>
+<pre><code>22 13 <strong>17</strong> <strong>11</strong>  <strong>0</strong>         3 15  <strong>0</strong>  <strong>2</strong> 22        <strong>14</strong> <strong>21</strong> <strong>17</strong> 24  <strong>4</strong>
+ 8  <strong>2</strong> <strong>23</strong>  <strong>4</strong> 24         <strong>9</strong> 18 13 <strong>17</strong>  <strong>5</strong>        10 16 15  <strong>9</strong> 19
+<strong>21</strong>  <strong>9</strong> <strong>14</strong> 16  <strong>7</strong>        19  8  <strong>7</strong> 25 <strong>23</strong>        18  8 <strong>23</strong> 26 20
+ 6 10  3 18  <strong>5</strong>        20 <strong>11</strong> 10 24  <strong>4</strong>        22 <strong>11</strong> 13  6  <strong>5</strong>
+ 1 12 20 15 19        <strong>14</strong> <strong>21</strong> 16 12  6         <strong>2</strong>  <strong>0</strong> 12  3  <strong>7</strong>
 </code></pre>
 
 
 Finally, `24` is drawn:
 
-<pre><code>22 13 <em>17</em> <em>11</em>  <em>0</em>         3 15  <em>0</em>  <em>2</em> 22        <em>14</em> <em>21</em> <em>17</em> <em>24</em>  <em>4</em>
- 8  <em>2</em> <em>23</em>  <em>4</em> <em>24</em>         <em>9</em> 18 13 <em>17</em>  <em>5</em>        10 16 15  <em>9</em> 19
-<em>21</em>  <em>9</em> <em>14</em> 16  <em>7</em>        19  8  <em>7</em> 25 <em>23</em>        18  8 <em>23</em> 26 20
- 6 10  3 18  <em>5</em>        20 <em>11</em> 10 <em>24</em>  <em>4</em>        22 <em>11</em> 13  6  <em>5</em>
- 1 12 20 15 19        <em>14</em> <em>21</em> 16 12  6         <em>2</em>  <em>0</em> 12  3  <em>7</em>
+<pre><code>22 13 <strong>17</strong> <strong>11</strong>  <strong>0</strong>         3 15  <strong>0</strong>  <strong>2</strong> 22        <strong>14</strong> <strong>21</strong> <strong>17</strong> <strong>24</strong>  <strong>4</strong>
+ 8  <strong>2</strong> <strong>23</strong>  <strong>4</strong> <strong>24</strong>         <strong>9</strong> 18 13 <strong>17</strong>  <strong>5</strong>        10 16 15  <strong>9</strong> 19
+<strong>21</strong>  <strong>9</strong> <strong>14</strong> 16  <strong>7</strong>        19  8  <strong>7</strong> 25 <strong>23</strong>        18  8 <strong>23</strong> 26 20
+ 6 10  3 18  <strong>5</strong>        20 <strong>11</strong> 10 <strong>24</strong>  <strong>4</strong>        22 <strong>11</strong> 13  6  <strong>5</strong>
+ 1 12 20 15 19        <strong>14</strong> <strong>21</strong> 16 12  6         <strong>2</strong>  <strong>0</strong> 12  3  <strong>7</strong>
 </code></pre>
 
 
