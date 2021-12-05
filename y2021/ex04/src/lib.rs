@@ -140,12 +140,12 @@ mod tests {
     #[test]
     fn test_part1() {
         let input = include_str!("../input.txt");
-        assert_eq!(part1(input), 21070);
+        assert_eq!(part1(input), 5685);
     }
 
     #[test]
     fn test_part2() {
         let input = include_str!("../input.txt");
-        assert_eq!(part2(input), 5685);
+        assert_eq!(part2(input), 21070);
     }
 }
