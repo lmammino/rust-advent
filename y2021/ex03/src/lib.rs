@@ -27,25 +27,45 @@ pub fn part1(input: &str) -> usize {
     gamma * epsilon
 }
 
+#[derive(Debug, PartialEq, Copy, Clone)]
+enum Digit {
+    Zero,
+    One,
+}
+
+impl Digit {
+    fn to_usize(self) -> usize {
+        match self {
+            Digit::Zero => 0,
+            Digit::One => 1,
+        }
+    }
+}
+
 pub fn part2(input: &str) -> usize {
-    let mut nums: Vec<[usize; 12]> = vec![];
+    let mut nums: Vec<[Digit; 12]> = Vec::with_capacity(1000);
     for s in input.lines() {
-        let digits = s.chars().map(|c| if c == '1' { 1 } else { 0 });
-        let mut num: [usize; 12] = [0; 12];
+        let digits = s
+            .chars()
+            .map(|c| if c == '1' { Digit::One } else { Digit::Zero });
+        let mut num: [Digit; 12] = [Digit::Zero; 12];
         for (i, n) in digits.enumerate() {
             num[i] = n;
         }
         nums.push(num);
     }
 
-    let mut oxy_gen_candidates = nums.clone();
+    let mut oxy_gen_candidates: Vec<&[Digit; 12]> = nums.iter().collect();
     let mut i = 0_usize;
     while oxy_gen_candidates.len() > 1 {
-        let num_ones = oxy_gen_candidates.iter().filter(|n| n[i] == 1).count();
+        let num_ones = oxy_gen_candidates
+            .iter()
+            .filter(|n| n[i] == Digit::One)
+            .count();
         let most_common_digit = if num_ones >= (oxy_gen_candidates.len() - num_ones) {
-            1
+            Digit::One
         } else {
-            0
+            Digit::Zero
         };
         oxy_gen_candidates = oxy_gen_candidates
             .iter()
@@ -56,14 +76,17 @@ pub fn part2(input: &str) -> usize {
         i += 1;
     }
 
-    let mut co2_scrubber_candidates = nums.clone();
+    let mut co2_scrubber_candidates: Vec<&[Digit; 12]> = nums.iter().collect();
     let mut i = 0_usize;
     while co2_scrubber_candidates.len() > 1 {
-        let num_ones = co2_scrubber_candidates.iter().filter(|n| n[i] == 1).count();
+        let num_ones = co2_scrubber_candidates
+            .iter()
+            .filter(|n| n[i] == Digit::One)
+            .count();
         let least_common_digit = if num_ones < (co2_scrubber_candidates.len() - num_ones) {
-            1
+            Digit::One
         } else {
-            0
+            Digit::Zero
         };
         co2_scrubber_candidates = co2_scrubber_candidates
             .iter()
@@ -75,15 +98,15 @@ pub fn part2(input: &str) -> usize {
     }
 
     let mut oxy_gen: usize = 0;
-    for d in oxy_gen_candidates.first().unwrap() {
+    for d in oxy_gen_candidates[0] {
         oxy_gen <<= 1;
-        oxy_gen += d;
+        oxy_gen += d.to_usize();
     }
 
     let mut co2_scrubber: usize = 0;
-    for d in co2_scrubber_candidates.first().unwrap() {
+    for d in co2_scrubber_candidates[0] {
         co2_scrubber <<= 1;
-        co2_scrubber += d;
+        co2_scrubber += d.to_usize();
     }
 
     oxy_gen * co2_scrubber
