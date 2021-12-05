@@ -1,10 +1,9 @@
-use std::{collections::BTreeSet, str::FromStr};
+use std::{collections::HashSet, str::FromStr};
 
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Debug)]
 struct Board {
-    cells: [[u8; 5]; 5],
-    rows: [BTreeSet<u8>; 5],
-    columns: [BTreeSet<u8>; 5],
+    rows: [HashSet<u8>; 5],
+    columns: [HashSet<u8>; 5],
 }
 
 impl Board {
@@ -41,36 +40,30 @@ impl FromStr for Board {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut cells: [[u8; 5]; 5] = [[0; 5]; 5];
-        let mut rows: [BTreeSet<u8>; 5] = [
-            BTreeSet::default(),
-            BTreeSet::default(),
-            BTreeSet::default(),
-            BTreeSet::default(),
-            BTreeSet::default(),
+        let mut rows: [HashSet<u8>; 5] = [
+            HashSet::default(),
+            HashSet::default(),
+            HashSet::default(),
+            HashSet::default(),
+            HashSet::default(),
         ];
-        let mut columns: [BTreeSet<u8>; 5] = [
-            BTreeSet::default(),
-            BTreeSet::default(),
-            BTreeSet::default(),
-            BTreeSet::default(),
-            BTreeSet::default(),
+        let mut columns: [HashSet<u8>; 5] = [
+            HashSet::default(),
+            HashSet::default(),
+            HashSet::default(),
+            HashSet::default(),
+            HashSet::default(),
         ];
 
         for (row_id, line) in s.lines().enumerate() {
             for (col_id, cell) in line.split_whitespace().enumerate() {
                 let n: u8 = cell.parse().unwrap();
-                cells[row_id][col_id] = n;
                 rows[row_id].insert(n);
                 columns[col_id].insert(n);
             }
         }
 
-        Ok(Board {
-            cells,
-            rows,
-            columns,
-        })
+        Ok(Board { rows, columns })
     }
 }
 
