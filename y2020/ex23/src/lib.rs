@@ -1,4 +1,7 @@
+use cllist::CLList;
 use std::str::FromStr;
+
+mod cllist;
 
 #[derive(Debug)]
 struct GameState {
@@ -21,8 +24,8 @@ impl Iterator for GameState {
     fn next(&mut self) -> std::option::Option<<Self as std::iter::Iterator>::Item> {
         let mut pick_up = [0_u64; 3];
 
-        for i in 0..3 {
-            pick_up[i] = self.cups.remove(1);
+        for el in pick_up[0..3].iter_mut() {
+            *el = self.cups.remove(1);
         }
 
         let mut dest_value = self.cups.get(self.current).unwrap() - 1;
@@ -90,8 +93,39 @@ pub fn part1(input: &str) -> usize {
     state.result()
 }
 
-pub fn part2(_input: &str) -> usize {
-    166298218695
+pub fn part2(input: &str) -> u64 {
+    let cups: Vec<usize> = input
+        .chars()
+        .map(|c| (c as usize) - ('0' as usize))
+        .collect();
+    let first = cups[0];
+    let remaining = (cups.len() + 1)..=1_000_000;
+    let iter = cups.into_iter().chain(remaining.into_iter());
+    let mut list = CLList::from_iter(iter, first);
+
+    let mut curr = first;
+    for _ in 1..10_000_000 {
+        let picked_up = list.pop3_after(curr);
+
+        let mut target = curr - 1;
+        if target == 0 {
+            target = 1_000_000;
+        }
+        while picked_up.contains(&target) {
+            target -= 1;
+            if target == 0 {
+                target = 1_000_000;
+            }
+        }
+
+        list.push3_after(target, picked_up);
+        curr = list.next(curr);
+    }
+
+    let first_after_one = list.next(1);
+    let second_after_one = list.next(first_after_one);
+
+    first_after_one as u64 * second_after_one as u64
 }
 
 #[cfg(test)]
