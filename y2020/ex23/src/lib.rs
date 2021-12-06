@@ -1,7 +1,5 @@
 use std::str::FromStr;
 
-mod clist;
-
 #[derive(Debug)]
 struct GameState {
     cups: Vec<u64>,
@@ -116,52 +114,42 @@ mod ex23_tests {
     fn test_iter() {
         let mut state: GameState = "389125467".parse().unwrap();
 
-        dbg!(1, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [8, 9, 1]);
         assert_eq!(dest, 2);
 
-        dbg!(2, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [8, 9, 1]);
         assert_eq!(dest, 7);
 
-        dbg!(3, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [4, 6, 7]);
         assert_eq!(dest, 3);
 
-        dbg!(4, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [9, 1, 3]);
         assert_eq!(dest, 7);
 
-        dbg!(5, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [6, 7, 9]);
         assert_eq!(dest, 3);
 
-        dbg!(6, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [3, 6, 7]);
         assert_eq!(dest, 9);
 
-        dbg!(7, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [3, 6, 7]);
         assert_eq!(dest, 8);
 
-        dbg!(8, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [5, 8, 3]);
         assert_eq!(dest, 1);
 
-        dbg!(9, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [7, 4, 1]);
         assert_eq!(dest, 5);
 
-        dbg!(10, &state);
         let (pick_up, dest) = state.next().unwrap();
         assert_eq!(pick_up, [7, 4, 1]);
         assert_eq!(dest, 3);
