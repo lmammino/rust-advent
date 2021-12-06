@@ -7,7 +7,7 @@ pub fn part2(_input: &str) -> usize {
 }
 
 #[cfg(test)]
-mod ex23_tests {
+mod ex24_tests {
     use super::*;
 
     #[test]
