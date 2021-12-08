@@ -54,25 +54,25 @@ Using this information, you should be able to work out which combination of sign
 For now, **focus on the easy digits**. Consider this larger example:
 
 <pre><code>be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb |
-<em>fdgacbe</em> cefdb cefbgd <em>gcbe</em>
+<strong><em>fdgacbe</em></strong> cefdb cefbgd <strong><em>gcbe</em></strong>
 edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec |
-fcgedb <em>cgb</em> <em>dgebacf</em> <em>gc</em>
+fcgedb <strong><em>cgb</em></strong> <strong><em>dgebacf</em></strong> <strong><em>gc</em></strong>
 fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef |
-<em>cg</em> <em>cg</em> fdcagb <em>cbg</em>
+<strong><em>cg</em></strong> <strong><em>cg</em></strong> fdcagb <strong><em>cbg</em></strong>
 fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega |
-efabcd cedba gadfec <em>cb</em>
+efabcd cedba gadfec <strong><em>cb</em></strong>
 aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga |
-<em>gecf</em> <em>egdcabf</em> <em>bgf</em> bfgea
+<strong><em>gecf</em></strong> <strong><em>egdcabf</em></strong> <strong><em>bgf</em></strong> bfgea
 fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf |
-<em>gebdcfa</em> <em>ecba</em> <em>ca</em> <em>fadegcb</em>
+<strong><em>gebdcfa</em></strong> <strong><em>ecba</em></strong> <strong><em>ca</em></strong> <strong><em>fadegcb</em></strong>
 dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf |
-<em>cefg</em> dcbef <em>fcge</em> <em>gbcadfe</em>
+<strong><em>cefg</em></strong> dcbef <strong><em>fcge</em></strong> <strong><em>gbcadfe</em></strong>
 bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd |
-<em>ed</em> bcgafe cdgba cbgef
+<strong><em>ed</em></strong> bcgafe cdgba cbgef
 egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg |
-<em>gbdfcae</em> <em>bgc</em> <em>cg</em> <em>cgb</em>
+<strong><em>gbdfcae</em></strong> <strong><em>bgc</em></strong> <strong><em>cg</em></strong> <strong><em>cgb</em></strong>
 gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc |
-<em>fgae</em> cfgab <em>fg</em> bagce
+<strong><em>fgae</em></strong> cfgab <strong><em>fg</em></strong> bagce
 </code></pre>
 
 Because the digits `1`, `4`, `7`, and `8` each use a unique number of segments, you should be able to tell which combinations of signals correspond to those digits. Counting only digits in the output values (the part after | on each line), in the above example, there are `26` instances of digits that use a unique number of segments (highlighted above).
