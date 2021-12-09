@@ -13,3 +13,4 @@ Cargo.lock
 **/*.data
 **/*.data.old
 **/*.svg
+.DS_Store
