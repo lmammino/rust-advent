@@ -42,9 +42,9 @@ Adjacent flashes can cause an octopus to flash on a step even if it begins that 
 
 After step 1:
 34543
-4<u>000</u>4
-5<u>000</u>5
-4<u>000</u>4
+4<strong><em>000</em></strong>4
+5<strong><em>000</em></strong>5
+4<strong><em>000</em></strong>4
 34543
 
 After step 2:
@@ -56,7 +56,7 @@ After step 2:
 </code></pre>
 
 
-An octopus is **<u>highlighted</u>** when it flashed during the given step.
+An octopus is **<strong><em>highlighted</em></strong>** when it flashed during the given step.
 
 Here is how the larger example above progresses:
 
@@ -86,47 +86,47 @@ After step 1:
 6394862637
 
 After step 2:
-88<u>0</u>7476555
-5<u>0</u>89<u>0</u>87<u>0</u>54
-85978896<u>0</u>8
-84857696<u>00</u>
-87<u>00</u>9<u>0</u>88<u>00</u>
-66<u>000</u>88989
-68<u>0000</u>5943
-<u>000000</u>7456
-9<u>000000</u>876
-87<u>0000</u>6848
+88<strong><em>0</em></strong>7476555
+5<strong><em>0</em></strong>89<strong><em>0</em></strong>87<strong><em>0</em></strong>54
+85978896<strong><em>0</em></strong>8
+84857696<strong><em>00</em></strong>
+87<strong><em>00</em></strong>9<strong><em>0</em></strong>88<strong><em>00</em></strong>
+66<strong><em>000</em></strong>88989
+68<strong><em>0000</em></strong>5943
+<strong><em>000000</em></strong>7456
+9<strong><em>000000</em></strong>876
+87<strong><em>0000</em></strong>6848
 
 After step 3:
-<u>00</u>5<u>0</u>9<u>00</u>866
-85<u>00</u>8<u>00</u>575
-99<u>000000</u>39
-97<u>000000</u>41
-9935<u>0</u>8<u>00</u>63
-77123<u>00000</u>
-791125<u>000</u>9
-221113<u>0000</u>
-<u>0</u>421125<u>000</u>
-<u>00</u>21119<u>000</u>
+<strong><em>00</em></strong>5<strong><em>0</em></strong>9<strong><em>00</em></strong>866
+85<strong><em>00</em></strong>8<strong><em>00</em></strong>575
+99<strong><em>000000</em></strong>39
+97<strong><em>000000</em></strong>41
+9935<strong><em>0</em></strong>8<strong><em>00</em></strong>63
+77123<strong><em>00000</em></strong>
+791125<strong><em>000</em></strong>9
+221113<strong><em>0000</em></strong>
+<strong><em>0</em></strong>421125<strong><em>000</em></strong>
+<strong><em>00</em></strong>21119<strong><em>000</em></strong>
 
 After step 4:
-2263<u>0</u>31977
-<u>0</u>923<u>0</u>31697
-<u>00</u>3222115<u>0</u>
-<u>00</u>41111163
-<u>00</u>76191174
-<u>00</u>53411122
-<u>00</u>4236112<u>0</u>
+2263<strong><em>0</em></strong>31977
+<strong><em>0</em></strong>923<strong><em>0</em></strong>31697
+<strong><em>00</em></strong>3222115<strong><em>0</em></strong>
+<strong><em>00</em></strong>41111163
+<strong><em>00</em></strong>76191174
+<strong><em>00</em></strong>53411122
+<strong><em>00</em></strong>4236112<strong><em>0</em></strong>
 5532241122
 1532247211
-113223<u>0</u>211
+113223<strong><em>0</em></strong>211
 
 After step 5:
-4484144<u>000</u>
-2<u>0</u>44144<u>000</u>
+4484144<strong><em>000</em></strong>
+2<strong><em>0</em></strong>44144<strong><em>000</em></strong>
 2253333493
 1152333274
-11873<u>0</u>3285
+11873<strong><em>0</em></strong>3285
 1164633233
 1153472231
 6643352233
@@ -136,7 +136,7 @@ After step 5:
 After step 6:
 5595255111
 3155255222
-33644446<u>0</u>5
+33644446<strong><em>0</em></strong>5
 2263444496
 2298414396
 2275744344
@@ -146,70 +146,70 @@ After step 6:
 3354452433
 
 After step 7:
-67<u>0</u>7366222
+67<strong><em>0</em></strong>7366222
 4377366333
 4475555827
-34966557<u>0</u>9
-35<u>00</u>6256<u>0</u>9
-35<u>0</u>9955566
+34966557<strong><em>0</em></strong>9
+35<strong><em>00</em></strong>6256<strong><em>0</em></strong>9
+35<strong><em>0</em></strong>9955566
 3486694453
 8865585555
-486558<u>0</u>644
+486558<strong><em>0</em></strong>644
 4465574644
 
 After step 8:
 7818477333
 5488477444
 5697666949
-46<u>0</u>876683<u>0</u>
-473494673<u>0</u>
-474<u>00</u>97688
-69<u>0000</u>7564
-<u>000000</u>9666
-8<u>00000</u>4755
-68<u>0000</u>7755
+46<strong><em>0</em></strong>876683<strong><em>0</em></strong>
+473494673<strong><em>0</em></strong>
+474<strong><em>00</em></strong>97688
+69<strong><em>0000</em></strong>7564
+<strong><em>000000</em></strong>9666
+8<strong><em>00000</em></strong>4755
+68<strong><em>0000</em></strong>7755
 
 After step 9:
-9<u>0</u>6<u>0000</u>644
-78<u>00000</u>976
-69<u>000000</u>8<u>0</u>
-584<u>00000</u>82
-5858<u>0000</u>93
-69624<u>00000</u>
-8<u>0</u>2125<u>000</u>9
-222113<u>000</u>9
-9111128<u>0</u>97
+9<strong><em>0</em></strong>6<strong><em>0000</em></strong>644
+78<strong><em>00000</em></strong>976
+69<strong><em>000000</em></strong>8<strong><em>0</em></strong>
+584<strong><em>00000</em></strong>82
+5858<strong><em>0000</em></strong>93
+69624<strong><em>00000</em></strong>
+8<strong><em>0</em></strong>2125<strong><em>000</em></strong>9
+222113<strong><em>000</em></strong>9
+9111128<strong><em>0</em></strong>97
 7911119976
 
 After step 10:
-<u>0</u>481112976
-<u>00</u>31112<u>00</u>9
-<u>00</u>411125<u>0</u>4
-<u>00</u>811114<u>0</u>6
-<u>00</u>991113<u>0</u>6
-<u>00</u>93511233
-<u>0</u>44236113<u>0</u>
-553225235<u>0</u>
-<u>0</u>53225<u>0</u>6<u>00</u>
-<u>00</u>3224<u>0000</u>
+<strong><em>0</em></strong>481112976
+<strong><em>00</em></strong>31112<strong><em>00</em></strong>9
+<strong><em>00</em></strong>411125<strong><em>0</em></strong>4
+<strong><em>00</em></strong>811114<strong><em>0</em></strong>6
+<strong><em>00</em></strong>991113<strong><em>0</em></strong>6
+<strong><em>00</em></strong>93511233
+<strong><em>0</em></strong>44236113<strong><em>0</em></strong>
+553225235<strong><em>0</em></strong>
+<strong><em>0</em></strong>53225<strong><em>0</em></strong>6<strong><em>00</em></strong>
+<strong><em>00</em></strong>3224<strong><em>0000</em></strong>
 </code></pre>
 
 After step `10`, there have been a total of `204` flashes. Fast forwarding, here is the same configuration every `10` steps:
 
 <pre><code>After step 20:
 3936556452
-56865568<u>0</u>6
-449655569<u>0</u>
-444865558<u>0</u>
-445686557<u>0</u>
-568<u>00</u>86577
-7<u>00000</u>9896
-<u>0000000</u>344
-6<u>000000</u>364
-46<u>0000</u>9543
+56865568<strong><em>0</em></strong>6
+449655569<strong><em>0</em></strong>
+444865558<strong><em>0</em></strong>
+445686557<strong><em>0</em></strong>
+568<strong><em>00</em></strong>86577
+7<strong><em>00000</em></strong>9896
+<strong><em>0000000</em></strong>344
+6<strong><em>000000</em></strong>364
+46<strong><em>0000</em></strong>9543
 
 After step 30:
-<u>0</u>643334118
+<strong><em>0</em></strong>643334118
 4253334611
 3374333458
 2225333337
@@ -222,31 +222,31 @@ After step 30:
 
 After step 40:
 6211111981
-<u>0</u>421111119
-<u>00</u>42111115
-<u>000</u>3111115
-<u>000</u>3111116
-<u>00</u>65611111
-<u>0</u>532351111
+<strong><em>0</em></strong>421111119
+<strong><em>00</em></strong>42111115
+<strong><em>000</em></strong>3111115
+<strong><em>000</em></strong>3111116
+<strong><em>00</em></strong>65611111
+<strong><em>0</em></strong>532351111
 3322234597
 2222222976
 2222222762
 
 After step 50:
 9655556447
-48655568<u>0</u>5
-448655569<u>0</u>
-445865558<u>0</u>
-457486557<u>0</u>
-57<u>000</u>86566
-6<u>00000</u>9887
-8<u>000000</u>533
-68<u>00000</u>633
-568<u>0000</u>538
+48655568<strong><em>0</em></strong>5
+448655569<strong><em>0</em></strong>
+445865558<strong><em>0</em></strong>
+457486557<strong><em>0</em></strong>
+57<strong><em>000</em></strong>86566
+6<strong><em>00000</em></strong>9887
+8<strong><em>000000</em></strong>533
+68<strong><em>00000</em></strong>633
+568<strong><em>0000</em></strong>538
 
 After step 60:
-25333342<u>00</u>
-274333464<u>0</u>
+25333342<strong><em>00</em></strong>
+274333464<strong><em>0</em></strong>
 2264333458
 2225333337
 2225333338
@@ -258,27 +258,27 @@ After step 60:
 
 After step 70:
 8211111164
-<u>0</u>421111166
-<u>00</u>42111114
-<u>000</u>4211115
-<u>0000</u>211116
-<u>00</u>65611111
-<u>0</u>532351111
+<strong><em>0</em></strong>421111166
+<strong><em>00</em></strong>42111114
+<strong><em>000</em></strong>4211115
+<strong><em>0000</em></strong>211116
+<strong><em>00</em></strong>65611111
+<strong><em>0</em></strong>532351111
 7322235117
 5722223475
 4572222754
 
 After step 80:
 1755555697
-59655556<u>0</u>9
-448655568<u>0</u>
-445865558<u>0</u>
-457<u>0</u>86557<u>0</u>
-57<u>000</u>86566
-7<u>00000</u>8666
-<u>0000000</u>99<u>0</u>
-<u>0000000</u>8<u>00</u>
-<u>0000000000</u>
+59655556<strong><em>0</em></strong>9
+448655568<strong><em>0</em></strong>
+445865558<strong><em>0</em></strong>
+457<strong><em>0</em></strong>86557<strong><em>0</em></strong>
+57<strong><em>000</em></strong>86566
+7<strong><em>00000</em></strong>8666
+<strong><em>0000000</em></strong>99<strong><em>0</em></strong>
+<strong><em>0000000</em></strong>8<strong><em>00</em></strong>
+<strong><em>0000000000</em></strong>
 
 After step 90:
 7433333522
@@ -293,13 +293,13 @@ After step 90:
 3333333333
 
 After step 100:
-<u>0</u>397666866
-<u>0</u>749766918
-<u>00</u>53976933
-<u>000</u>4297822
-<u>000</u>4229892
-<u>00</u>53222877
-<u>0</u>532222966
+<strong><em>0</em></strong>397666866
+<strong><em>0</em></strong>749766918
+<strong><em>00</em></strong>53976933
+<strong><em>000</em></strong>4297822
+<strong><em>000</em></strong>4229892
+<strong><em>00</em></strong>53222877
+<strong><em>0</em></strong>532222966
 9322228966
 7922286866
 6789998766
