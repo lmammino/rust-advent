@@ -75,9 +75,26 @@ struct Lobby {
 impl Lobby {
     fn neighbours(&self, tile: &Tile) -> usize {
         tile.neighbours()
-            .iter()
+            .into_iter()
             .filter(|tile| self.tiles.contains(tile))
             .count()
+    }
+}
+
+impl FromStr for Lobby {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut tiles: HashSet<Tile> = Default::default();
+        for line in s.lines() {
+            let tile: Tile = line.parse().unwrap();
+            if tiles.contains(&tile) {
+                tiles.remove(&tile);
+            } else {
+                tiles.insert(tile);
+            }
+        }
+        Ok(Lobby { tiles })
     }
 }
 
@@ -107,30 +124,11 @@ impl Iterator for Lobby {
 }
 
 pub fn part1(input: &str) -> usize {
-    let mut lobby: HashSet<Tile> = Default::default();
-    for line in input.lines() {
-        let tile: Tile = line.parse().unwrap();
-        if lobby.contains(&tile) {
-            lobby.remove(&tile);
-        } else {
-            lobby.insert(tile);
-        }
-    }
-    lobby.len()
+    input.parse::<Lobby>().unwrap().tiles.len()
 }
 
 pub fn part2(input: &str) -> usize {
-    let mut tiles: HashSet<Tile> = Default::default();
-    for line in input.lines() {
-        let tile: Tile = line.parse().unwrap();
-        if tiles.contains(&tile) {
-            tiles.remove(&tile);
-        } else {
-            tiles.insert(tile);
-        }
-    }
-
-    Lobby { tiles }.nth(99).unwrap()
+    input.parse::<Lobby>().unwrap().nth(99).unwrap()
 }
 
 #[cfg(test)]
