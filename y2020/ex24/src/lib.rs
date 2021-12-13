@@ -74,17 +74,10 @@ struct Lobby {
 
 impl Lobby {
     fn neighbours(&self, tile: &Tile) -> usize {
-        let mut ret = 0;
-        for (dx, dy) in [(2, 0), (-2, 0), (1, 1), (-1, -1), (-1, 1), (1, -1)] {
-            let n_tile = Tile {
-                x: tile.x + dx,
-                y: tile.y + dy,
-            };
-            if self.tiles.contains(&n_tile) {
-                ret += 1;
-            }
-        }
-        ret
+        tile.neighbours()
+            .iter()
+            .filter(|tile| self.tiles.contains(tile))
+            .count()
     }
 }
 
@@ -99,12 +92,6 @@ impl Iterator for Lobby {
             for n_tile in tile.neighbours() {
                 to_check.insert(n_tile);
             }
-            // for (dx, dy) in [(2, 0), (-2, 0), (1, 1), (-1, -1), (-1, 1), (1, -1)] {
-            //     to_check.insert(Tile {
-            //         x: tile.x + dx,
-            //         y: tile.y + dy,
-            //     });
-            // }
         }
 
         for tile in to_check {
