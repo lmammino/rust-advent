@@ -1,8 +1,11 @@
-use std::{collections::HashMap, str::FromStr};
+mod charlist;
+
+use charlist::*;
+use std::{collections::HashMap, fmt::Debug, str::FromStr};
 
 #[derive(Debug)]
 struct Polymer {
-    seq: String,
+    seq: CharList,
     rules: HashMap<String, char>,
 }
 
@@ -11,7 +14,7 @@ impl FromStr for Polymer {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (raw_seq, raw_rules) = s.split_once("\n\n").unwrap();
-        let seq = String::from(raw_seq);
+        let seq = raw_seq.into();
         let mut rules: HashMap<String, char> = Default::default();
         for line in raw_rules.lines() {
             let (pair, subst) = line.split_once(" -> ").unwrap();
@@ -25,23 +28,22 @@ impl FromStr for Polymer {
 
 impl Polymer {
     fn grow(&mut self) {
-        let it1 = self.seq.chars();
-        let it2 = it1.clone().skip(1);
-        let combined = it1.zip(it2);
-
-        let mut new_seq = combined
-            .map(|(a, b)| format!("{}{}", a, b))
-            .map(|rule| {
-                let first_char = rule.chars().next().unwrap();
-                let new_el = self.rules.get(&rule).unwrap();
-                format!("{}{}", first_char, new_el)
-            })
-            .collect::<Vec<String>>()
-            .join("");
-        // needs to recover the last char from the previous seq
-        new_seq.push(self.seq.chars().last().unwrap());
-
-        self.seq = new_seq;
+        let mut current_index = Some(0_usize);
+        while let Some(index) = current_index {
+            if let Some(current_node) = self.seq.get(index) {
+                if let Some(next_index) = current_node.next {
+                    if let Some(next_node) = self.seq.next(index) {
+                        let rule = format!("{}{}", current_node.value, next_node.value);
+                        let new_el = self.rules.get(&rule).unwrap();
+                        let new_node_index = self.seq.insert_value_with_next(*new_el, next_index);
+                        self.seq.update_next(index, new_node_index);
+                        current_index = Some(next_index);
+                        continue;
+                    }
+                }
+            }
+            current_index = None;
+        }
     }
 
     fn min_max_elements(&self) -> ((char, usize), (char, usize)) {
@@ -139,17 +141,17 @@ CN -> C";
         let mut polymer: Polymer = input.parse().unwrap();
         // step 1
         polymer.grow();
-        assert_eq!(polymer.seq.as_str(), "NCNBCHB");
+        assert_eq!(polymer.seq.to_string(), "NCNBCHB");
         // step 2
         polymer.grow();
-        assert_eq!(polymer.seq.as_str(), "NBCCNBBBCBHCB");
+        assert_eq!(polymer.seq.to_string(), "NBCCNBBBCBHCB");
         // step 3
         polymer.grow();
-        assert_eq!(polymer.seq.as_str(), "NBBBCNCCNBBNBNBBCHBHHBCHB");
+        assert_eq!(polymer.seq.to_string(), "NBBBCNCCNBBNBNBBCHBHHBCHB");
         // step 4
         polymer.grow();
         assert_eq!(
-            polymer.seq.as_str(),
+            polymer.seq.to_string(),
             "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"
         );
         // ... step 10
@@ -160,7 +162,7 @@ CN -> C";
         polymer.grow(); // 9
         polymer.grow(); // 10
 
-        assert_eq!(polymer.seq.len(), 3073);
+        assert_eq!(polymer.seq.to_string().len(), 3073);
         assert_eq!(polymer.min_max_elements(), (('H', 161), ('B', 1749)));
     }
 
