@@ -100,6 +100,7 @@ impl<const N: usize> CaveMap<N> {
         active_nodes.push(initial_path);
 
         while let Some(Edge { position, cost }) = active_nodes.pop() {
+            // found the bottom right corner
             if position == (N - 1, N - 1) {
                 return cost;
             }
@@ -125,7 +126,7 @@ impl<const N: usize> CaveMap<N> {
             }
         }
 
-        0
+        unreachable!()
     }
 
     fn neighbours_of(&self, cell: &(usize, usize)) -> Vec<((usize, usize), u8)> {
