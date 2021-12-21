@@ -30,18 +30,13 @@ impl DeterministicDie {
 
 #[derive(Debug)]
 struct Player {
-    name: String,
     pos: usize,
     score: usize,
 }
 
 impl Player {
-    fn new(name: String, pos: usize) -> Self {
-        Player {
-            name,
-            pos,
-            score: 0,
-        }
+    fn new(pos: usize) -> Self {
+        Player { pos, score: 0 }
     }
 
     fn play(&mut self, die: &mut DeterministicDie) {
@@ -50,16 +45,6 @@ impl Player {
         let new_pos = (self.pos + tot) % 10;
         self.score += new_pos + 1;
         self.pos = new_pos;
-
-        // println!(
-        //     "{} rolls {}+{}+{} and moves to space {} for a total score of {}",
-        //     self.name,
-        //     rolls.0,
-        //     rolls.1,
-        //     rolls.2,
-        //     new_pos + 1,
-        //     self.score
-        // )
     }
 
     fn has_won(&self) -> bool {
@@ -86,10 +71,7 @@ pub fn part1(input: &str) -> usize {
         .parse()
         .unwrap();
 
-    let (mut player1, mut player2) = (
-        Player::new(String::from("Player 1"), player1_pos - 1),
-        Player::new(String::from("Player 2"), player2_pos - 1),
-    );
+    let (mut player1, mut player2) = (Player::new(player1_pos - 1), Player::new(player2_pos - 1));
     let mut current_player = &mut player1;
     let mut other_player = &mut player2;
     let mut die = DeterministicDie::new();
@@ -97,15 +79,10 @@ pub fn part1(input: &str) -> usize {
     loop {
         current_player.play(&mut die);
         if current_player.has_won() {
-            println!("---\n{:?}\n{:?}\n{:?}", current_player, other_player, die);
             return die.num_rolls * other_player.score;
         }
         std::mem::swap(&mut current_player, &mut other_player);
-
-        // println!("---\n{:?}\n{:?}\n{:?}", current_player, other_player, die);
     }
-
-    unreachable!()
 }
 
 #[cfg(test)]
