@@ -1,16 +1,15 @@
 [package]
-name = "ex23"
+name = "ex25"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-itertools = "0.10.1"
 
 [dev-dependencies]
 criterion = "0.3"
 
 [[bench]]
-name = "bench_ex23"
+name = "bench_ex25"
 harness = false
