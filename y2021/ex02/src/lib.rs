@@ -8,20 +8,16 @@ enum Instr {
 }
 
 impl FromStr for Instr {
-    type Err = String;
+    type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (instr_type, amount) = s
-            .split_once(' ')
-            .ok_or_else(|| String::from("Cannot parse move"))?;
-        let amount: usize = amount
-            .parse()
-            .map_err(|_| String::from("Cannot parse amount as usize"))?;
+        let (instr_type, amount) = s.split_once(' ').ok_or("Cannot parse move")?;
+        let amount: usize = amount.parse().map_err(|_| "Cannot parse amount as usize")?;
         let instr = match instr_type {
             "up" => Instr::Up(amount),
             "down" => Instr::Down(amount),
             "forward" => Instr::Forward(amount),
-            _ => return Err(String::from("Invalid move")),
+            _ => return Err("Invalid move"),
         };
 
         Ok(instr)
