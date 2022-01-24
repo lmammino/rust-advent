@@ -27,45 +27,25 @@ pub fn part1<const T: usize>(input: &str) -> usize {
     gamma * epsilon
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
-enum Digit {
-    Zero,
-    One,
-}
-
-impl Digit {
-    fn to_usize(self) -> usize {
-        match self {
-            Digit::Zero => 0,
-            Digit::One => 1,
-        }
-    }
-}
-
 pub fn part2<const T: usize>(input: &str) -> usize {
-    let mut nums: Vec<[Digit; T]> = Vec::with_capacity(1000);
+    let mut nums: Vec<[usize; T]> = Vec::with_capacity(1000);
     for s in input.lines() {
-        let digits = s
-            .chars()
-            .map(|c| if c == '1' { Digit::One } else { Digit::Zero });
-        let mut num: [Digit; T] = [Digit::Zero; T];
+        let digits = s.chars().map(|c| if c == '1' { 1 } else { 0 });
+        let mut num: [usize; T] = [0; T];
         for (i, n) in digits.enumerate() {
             num[i] = n;
         }
         nums.push(num);
     }
 
-    let mut oxy_gen_candidates: Vec<&[Digit; T]> = nums.iter().collect();
+    let mut oxy_gen_candidates: Vec<&[usize; T]> = nums.iter().collect();
     let mut i = 0_usize;
     while oxy_gen_candidates.len() > 1 {
-        let num_ones = oxy_gen_candidates
-            .iter()
-            .filter(|n| n[i] == Digit::One)
-            .count();
+        let num_ones = oxy_gen_candidates.iter().filter(|n| n[i] == 1).count();
         let most_common_digit = if num_ones >= (oxy_gen_candidates.len() - num_ones) {
-            Digit::One
+            1
         } else {
-            Digit::Zero
+            0
         };
         // The following could be eventually done this way:
         // oxy_gen_candidates.drain_filter(|digits| digits[i] == most_common_digit);
@@ -79,17 +59,14 @@ pub fn part2<const T: usize>(input: &str) -> usize {
         i += 1;
     }
 
-    let mut co2_scrubber_candidates: Vec<&[Digit; T]> = nums.iter().collect();
+    let mut co2_scrubber_candidates: Vec<&[usize; T]> = nums.iter().collect();
     let mut i = 0_usize;
     while co2_scrubber_candidates.len() > 1 {
-        let num_ones = co2_scrubber_candidates
-            .iter()
-            .filter(|n| n[i] == Digit::One)
-            .count();
+        let num_ones = co2_scrubber_candidates.iter().filter(|n| n[i] == 1).count();
         let least_common_digit = if num_ones < (co2_scrubber_candidates.len() - num_ones) {
-            Digit::One
+            1
         } else {
-            Digit::Zero
+            0
         };
         co2_scrubber_candidates = co2_scrubber_candidates
             .iter()
@@ -100,7 +77,7 @@ pub fn part2<const T: usize>(input: &str) -> usize {
         i += 1;
     }
 
-    let to_usize = |acc: usize, d: &Digit| (acc << 1) + d.to_usize();
+    let to_usize = |acc: usize, d: &usize| (acc << 1) + d;
     let oxy_gen: usize = oxy_gen_candidates[0].iter().fold(0, to_usize);
     let co2_scrubber: usize = co2_scrubber_candidates[0].iter().fold(0, to_usize);
 
