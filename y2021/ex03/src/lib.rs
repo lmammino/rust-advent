@@ -1,5 +1,5 @@
-pub fn part1(input: &str) -> usize {
-    let mut num_ones_per_digit: [usize; 12] = [0; 12];
+pub fn part1<const T: usize>(input: &str) -> usize {
+    let mut num_ones_per_digit: [usize; T] = [0; T];
     let mut lines_count: usize = 0;
     for s in input.lines() {
         let digits = s.chars().map(|c| if c == '1' { 1 } else { 0 });
@@ -42,20 +42,20 @@ impl Digit {
     }
 }
 
-pub fn part2(input: &str) -> usize {
-    let mut nums: Vec<[Digit; 12]> = Vec::with_capacity(1000);
+pub fn part2<const T: usize>(input: &str) -> usize {
+    let mut nums: Vec<[Digit; T]> = Vec::with_capacity(1000);
     for s in input.lines() {
         let digits = s
             .chars()
             .map(|c| if c == '1' { Digit::One } else { Digit::Zero });
-        let mut num: [Digit; 12] = [Digit::Zero; 12];
+        let mut num: [Digit; T] = [Digit::Zero; T];
         for (i, n) in digits.enumerate() {
             num[i] = n;
         }
         nums.push(num);
     }
 
-    let mut oxy_gen_candidates: Vec<&[Digit; 12]> = nums.iter().collect();
+    let mut oxy_gen_candidates: Vec<&[Digit; T]> = nums.iter().collect();
     let mut i = 0_usize;
     while oxy_gen_candidates.len() > 1 {
         let num_ones = oxy_gen_candidates
@@ -67,6 +67,9 @@ pub fn part2(input: &str) -> usize {
         } else {
             Digit::Zero
         };
+        // The following could be eventually done this way:
+        // oxy_gen_candidates.drain_filter(|digits| digits[i] == most_common_digit);
+        // once `drain_filter` gets stable
         oxy_gen_candidates = oxy_gen_candidates
             .iter()
             .filter(|digits| digits[i] == most_common_digit)
@@ -76,7 +79,7 @@ pub fn part2(input: &str) -> usize {
         i += 1;
     }
 
-    let mut co2_scrubber_candidates: Vec<&[Digit; 12]> = nums.iter().collect();
+    let mut co2_scrubber_candidates: Vec<&[Digit; T]> = nums.iter().collect();
     let mut i = 0_usize;
     while co2_scrubber_candidates.len() > 1 {
         let num_ones = co2_scrubber_candidates
@@ -97,17 +100,9 @@ pub fn part2(input: &str) -> usize {
         i += 1;
     }
 
-    let mut oxy_gen: usize = 0;
-    for d in oxy_gen_candidates[0] {
-        oxy_gen <<= 1;
-        oxy_gen += d.to_usize();
-    }
-
-    let mut co2_scrubber: usize = 0;
-    for d in co2_scrubber_candidates[0] {
-        co2_scrubber <<= 1;
-        co2_scrubber += d.to_usize();
-    }
+    let to_usize = |acc: usize, d: &Digit| (acc << 1) + d.to_usize();
+    let oxy_gen: usize = oxy_gen_candidates[0].iter().fold(0, to_usize);
+    let co2_scrubber: usize = co2_scrubber_candidates[0].iter().fold(0, to_usize);
 
     oxy_gen * co2_scrubber
 }
@@ -116,15 +111,37 @@ pub fn part2(input: &str) -> usize {
 mod tests {
     use super::*;
 
+    const EXAMPLE_INPUT: &str = "00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010";
+    const INPUT: &str = include_str!("../input.txt");
+
+    #[test]
+    fn test_example_part1() {
+        assert_eq!(part1::<5>(EXAMPLE_INPUT), 198);
+    }
+
     #[test]
     fn test_part1() {
-        let input = include_str!("../input.txt");
-        assert_eq!(part1(input), 1131506);
+        assert_eq!(part1::<12>(INPUT), 1131506);
+    }
+
+    #[test]
+    fn test_example_part2() {
+        assert_eq!(part2::<5>(EXAMPLE_INPUT), 230);
     }
 
     #[test]
     fn test_part2() {
-        let input = include_str!("../input.txt");
-        assert_eq!(part2(input), 7863147);
+        assert_eq!(part2::<12>(INPUT), 7863147);
     }
 }
