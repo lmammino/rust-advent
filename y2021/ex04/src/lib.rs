@@ -2,22 +2,16 @@ use std::{collections::HashSet, str::FromStr};
 
 #[derive(Debug)]
 struct Board {
-    rows: [HashSet<u8>; 5],
-    columns: [HashSet<u8>; 5],
+    rows: [HashSet<u64>; 5],
+    columns: [HashSet<u64>; 5],
 }
 
 impl Board {
-    fn mark(&mut self, num: u8) -> bool {
+    fn mark(&mut self, num: u64) -> bool {
         let mut winner = false;
-        for row in self.rows.iter_mut() {
-            row.remove(&num);
-            if row.is_empty() {
-                winner = true;
-            }
-        }
-        for col in self.columns.iter_mut() {
-            col.remove(&num);
-            if col.is_empty() {
+        for item in self.rows.iter_mut().chain(self.columns.iter_mut()) {
+            item.remove(&num);
+            if item.is_empty() {
                 winner = true;
             }
         }
@@ -25,14 +19,8 @@ impl Board {
         winner
     }
 
-    fn score(&self, final_num: u8) -> u64 {
-        let mut score = 0_u64;
-        for row in self.rows.iter() {
-            for num in row {
-                score += *num as u64;
-            }
-        }
-        score * final_num as u64
+    fn score(&self, final_num: u64) -> u64 {
+        self.rows.iter().map(|set| set.iter().sum::<u64>()).sum::<u64>() * final_num
     }
 }
 
@@ -40,24 +28,12 @@ impl FromStr for Board {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut rows: [HashSet<u8>; 5] = [
-            HashSet::default(),
-            HashSet::default(),
-            HashSet::default(),
-            HashSet::default(),
-            HashSet::default(),
-        ];
-        let mut columns: [HashSet<u8>; 5] = [
-            HashSet::default(),
-            HashSet::default(),
-            HashSet::default(),
-            HashSet::default(),
-            HashSet::default(),
-        ];
+        let mut rows: [HashSet<u64>; 5] = Default::default();
+        let mut columns: [HashSet<u64>; 5] = Default::default();
 
         for (row_id, line) in s.lines().enumerate() {
             for (col_id, cell) in line.split_whitespace().enumerate() {
-                let n: u8 = cell.parse().unwrap();
+                let n: u64 = cell.parse().unwrap();
                 rows[row_id].insert(n);
                 columns[col_id].insert(n);
             }
@@ -67,14 +43,19 @@ impl FromStr for Board {
     }
 }
 
-pub fn part1(input: &str) -> u64 {
+fn parse_input(input: &str) -> (Vec<u64>, Vec<Board>) {
     let (raw_seq, raw_boards) = input.split_once("\n\n").unwrap();
-    let seq = raw_seq.split(',').map(|n| n.parse::<u8>().unwrap());
+    let seq = raw_seq.split(',').map(|n| n.parse::<u64>().unwrap()).collect();
 
-    let mut boards: Vec<Board> = raw_boards
+    let boards: Vec<Board> = raw_boards
         .split("\n\n")
         .map(|b| b.parse().unwrap())
         .collect();
+    (seq, boards)
+}
+
+pub fn part1(input: &str) -> u64 {
+    let (seq, mut boards) = parse_input(input);
 
     for num in seq {
         for board in boards.iter_mut() {
@@ -88,24 +69,18 @@ pub fn part1(input: &str) -> u64 {
 }
 
 pub fn part2(input: &str) -> u64 {
-    let (raw_seq, raw_boards) = input.split_once("\n\n").unwrap();
-    let seq = raw_seq.split(',').map(|n| n.parse::<u8>().unwrap());
-
-    let mut boards: Vec<Board> = raw_boards
-        .split("\n\n")
-        .map(|b| b.parse().unwrap())
-        .collect();
-    let mut bb: Vec<&mut Board> = boards.iter_mut().collect();
+    let (seq, mut boards) = parse_input(input);
+    let mut active_boards: Vec<&mut Board> = boards.iter_mut().collect();
 
     for num in seq {
-        if bb.len() == 1 {
-            let board: &mut Board = bb[0];
+        if active_boards.len() == 1 {
+            let board: &mut Board = active_boards[0];
             if board.mark(num) {
                 return board.score(num);
             }
         }
 
-        bb = bb
+        active_boards = active_boards
             .into_iter()
             .filter_map(|x| if x.mark(num) { None } else { Some(x) })
             .collect();
