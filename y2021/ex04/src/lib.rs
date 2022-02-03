@@ -20,7 +20,11 @@ impl Board {
     }
 
     fn score(&self, final_num: u64) -> u64 {
-        self.rows.iter().map(|set| set.iter().sum::<u64>()).sum::<u64>() * final_num
+        self.rows
+            .iter()
+            .map(|set| set.iter().sum::<u64>())
+            .sum::<u64>()
+            * final_num
     }
 }
 
@@ -43,9 +47,9 @@ impl FromStr for Board {
     }
 }
 
-fn parse_input(input: &str) -> (Vec<u64>, Vec<Board>) {
+fn parse_input(input: &str) -> (impl Iterator<Item = u64> + '_, Vec<Board>) {
     let (raw_seq, raw_boards) = input.split_once("\n\n").unwrap();
-    let seq = raw_seq.split(',').map(|n| n.parse::<u64>().unwrap()).collect();
+    let seq = raw_seq.split(',').map(|n| n.parse::<u64>().unwrap());
 
     let boards: Vec<Board> = raw_boards
         .split("\n\n")
