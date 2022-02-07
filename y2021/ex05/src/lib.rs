@@ -55,19 +55,20 @@ struct SegmentWalker {
 
 impl SegmentWalker {
     fn new(segment: &Segment) -> Self {
+        use Ordering::*;
         let x1 = segment.p1.x;
         let y1 = segment.p1.y;
         let x2 = segment.p2.x;
         let y2 = segment.p2.y;
         let incr_x = match x2.cmp(&x1) {
-            Ordering::Greater => 1,
-            Ordering::Less => -1,
-            Ordering::Equal => 0,
+            Greater => 1,
+            Less => -1,
+            Equal => 0,
         };
         let incr_y = match y2.cmp(&y1) {
-            Ordering::Greater => 1,
-            Ordering::Less => -1,
-            Ordering::Equal => 0,
+            Greater => 1,
+            Less => -1,
+            Equal => 0,
         };
         let curr_x = x1;
         let curr_y = y1;
@@ -119,27 +120,25 @@ impl Space {
     }
 }
 
-pub fn part1(input: &str) -> usize {
-    let straight_segments = input
-        .lines()
-        .map(|s| s.parse::<Segment>().unwrap())
-        .filter(Segment::is_straight);
-    let mut space = Space::default();
-    for segment in straight_segments {
-        space.draw_segment(&segment);
-    }
-
-    space.0.iter().filter(|(_, x)| **x > 1).count()
+fn segments_iter(input: &str) -> impl Iterator<Item = Segment> + '_ {
+    input.lines().map(|s| s.parse::<Segment>().unwrap())
 }
 
-pub fn part2(input: &str) -> usize {
-    let segments = input.lines().map(|s| s.parse::<Segment>().unwrap());
+fn count_intersections(segments: impl Iterator<Item = Segment>) -> usize {
     let mut space = Space::default();
     for segment in segments {
         space.draw_segment(&segment);
     }
 
     space.0.iter().filter(|(_, x)| **x > 1).count()
+}
+
+pub fn part1(input: &str) -> usize {
+    count_intersections(segments_iter(input).filter(Segment::is_straight))
+}
+
+pub fn part2(input: &str) -> usize {
+    count_intersections(segments_iter(input))
 }
 
 #[cfg(test)]
