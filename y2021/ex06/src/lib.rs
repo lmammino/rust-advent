@@ -2,14 +2,13 @@ use std::str::FromStr;
 
 #[derive(Debug)]
 struct LanterFishSim {
-    fish: [usize; 9]
+    fish: [usize; 9],
+    day: usize,
 }
 
 impl LanterFishSim {
     pub fn new(fish: [usize; 9]) -> Self {
-        LanterFishSim {
-            fish
-        }
+        LanterFishSim { fish, day: 0 }
     }
 
     pub fn count_fishes(&self) -> usize {
@@ -21,14 +20,8 @@ impl Iterator for LanterFishSim {
     type Item = ();
 
     fn next(&mut self) -> Option<Self::Item> {
-        let new_young_fish = self.fish[0];
-        
-        for i in 1..9 {
-            self.fish[i - 1] = self.fish[i]
-        }
-        self.fish[8] = new_young_fish;
-        self.fish[6] += new_young_fish; // re-add the original breeder fish
-
+        self.fish[(self.day + 7) % 9] += self.fish[self.day % 9];
+        self.day += 1;
         Some(())
     }
 }
