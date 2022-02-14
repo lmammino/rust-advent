@@ -1,28 +1,19 @@
 #[derive(Debug)]
 struct LanterFishSim {
-    adults: [usize; 7],
-    young: [usize; 9],
+    fish: [usize; 9],
     day: usize,
 }
 
 impl LanterFishSim {
-    pub fn new(adults: [usize; 7]) -> Self {
+    pub fn new(fish: [usize; 9]) -> Self {
         LanterFishSim {
-            adults,
-            young: [0; 9],
+            fish,
             day: 0,
         }
     }
 
     pub fn count_fishes(&self) -> usize {
-        let mut count = 0_usize;
-        for fish_count in self.adults {
-            count += fish_count;
-        }
-        for fish_count in self.young {
-            count += fish_count;
-        }
-        count
+        self.fish.iter().sum()
     }
 }
 
@@ -30,19 +21,13 @@ impl Iterator for LanterFishSim {
     type Item = ();
 
     fn next(&mut self) -> Option<Self::Item> {
-        let adult_idx = self.day % 7;
-        // new fishes spawn from adults today
-        let mut new_young_fishes = self.adults[adult_idx];
-
-        let young_idx = self.day % 9;
-        // new fishes spawn from young today (also number of fishes becoming adults)
-        let num_young_breeding = self.young[young_idx];
-        new_young_fishes += num_young_breeding;
-
-        // increases the number of adults for the current day (young becoming adults)
-        self.adults[adult_idx] += num_young_breeding;
-        // replaces today with the number of young fishes
-        self.young[young_idx] = new_young_fishes;
+        let new_young_fish = self.fish[0];
+        
+        for i in 1..9 {
+            self.fish[i - 1] = self.fish[i]
+        }
+        self.fish[8] = new_young_fish;
+        self.fish[6] += new_young_fish; // re-add the original breeder fish
 
         self.day += 1;
         Some(())
@@ -51,12 +36,12 @@ impl Iterator for LanterFishSim {
 
 impl FromIterator<u8> for LanterFishSim {
     fn from_iter<T: IntoIterator<Item = u8>>(iter: T) -> Self {
-        let mut adults = [0_usize; 7];
+        let mut fishes = [0_usize; 9];
         for fish in iter {
-            adults[fish as usize] += 1;
+            fishes[fish as usize] += 1;
         }
 
-        LanterFishSim::new(adults)
+        LanterFishSim::new(fishes)
     }
 }
 
