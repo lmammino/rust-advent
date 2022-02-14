@@ -32,7 +32,6 @@ print(
 """
 )
 for k in data:
-    print(
-        "{} {} ({} %)\n".format(k, data[k], "{:+.02f}".format(delta[k]) if k in delta else "N/A")
-    )
+    if k in delta:
+        print("{} {} ({} %)\n".format(k, data[k], "{:+.02f}".format(delta[k])))
 print("</pre></details>")
