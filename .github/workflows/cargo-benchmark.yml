@@ -39,9 +39,20 @@ jobs:
         run: |
           git tag here
           git checkout main
-          cargo bench
+          cargo bench --no-run
+          mkdir -p /tmp/target/release/deps
+          find target/release/deps -executable -type f -name 'bench_*' -exec cp '{}' /tmp/target/release/deps \;
           git checkout here
-          cargo bench | tee output.txt
+          cargo bench --no-run
+
+          for f in `find target/release/deps -executable -type f -name 'bench_*' | sort`; do
+            if ! cmp $f /tmp/$f >/dev/null 2>&1
+            then
+              /tmp/$f --bench   
+              $f --bench | tee -a output.txt
+            fi
+          done
+          #cargo bench | tee output.txt
 
       - name: Compute PR message
         run: |
