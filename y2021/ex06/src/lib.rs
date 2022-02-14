@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[derive(Debug)]
 struct LanterFishSim {
     fish: [usize; 9],
@@ -34,25 +36,28 @@ impl Iterator for LanterFishSim {
     }
 }
 
-impl FromIterator<u8> for LanterFishSim {
-    fn from_iter<T: IntoIterator<Item = u8>>(iter: T) -> Self {
+impl FromStr for LanterFishSim {
+    type Err = ();
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let start_fish = input.split(',').map(|x| x.parse::<u8>().unwrap());
         let mut fishes = [0_usize; 9];
-        for fish in iter {
+        for fish in start_fish {
             fishes[fish as usize] += 1;
         }
 
-        LanterFishSim::new(fishes)
+        Ok(LanterFishSim::new(fishes))
     }
 }
 
 pub fn part1(input: &str) -> usize {
-    let mut sim: LanterFishSim = input.split(',').map(|x| x.parse::<u8>().unwrap()).collect();
+    let mut sim: LanterFishSim = input.parse().unwrap();
     sim.nth(79);
     sim.count_fishes()
 }
 
 pub fn part2(input: &str) -> usize {
-    let mut sim: LanterFishSim = input.split(',').map(|x| x.parse::<u8>().unwrap()).collect();
+    let mut sim: LanterFishSim = input.parse().unwrap();
     sim.nth(255);
     sim.count_fishes()
 }
@@ -76,14 +81,14 @@ mod tests {
     #[test]
     fn test_creates_sim() {
         let input = "3,4,3,1,2";
-        let sim: LanterFishSim = input.split(',').map(|x| x.parse::<u8>().unwrap()).collect();
+        let sim: LanterFishSim = input.parse().unwrap();
         assert_eq!(sim.count_fishes(), 5);
     }
 
     #[test]
     fn test_days_passing() {
         let input = "3,4,3,1,2";
-        let mut sim: LanterFishSim = input.split(',').map(|x| x.parse::<u8>().unwrap()).collect();
+        let mut sim: LanterFishSim = input.parse().unwrap();
         assert_eq!(sim.count_fishes(), 5); // Initial state: 3,4,3,1,2
         sim.next().unwrap();
         assert_eq!(sim.count_fishes(), 5); // After  1 day:  2,3,2,0,1
