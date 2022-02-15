@@ -49,7 +49,10 @@ jobs:
           for f in `find target/release/deps -executable -type f -name 'bench_*' | sort`; do
             if ! cmp $f /tmp/$f >/dev/null 2>&1
             then
-              /tmp/$f --bench   
+              if [ -f /tmp/f$ ]
+              then
+                /tmp/$f --bench
+              fi
               $f --bench | tee -a output.txt
             fi
           done
