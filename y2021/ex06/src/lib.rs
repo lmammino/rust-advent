@@ -1,4 +1,5 @@
-use std::str::FromStr;
+#![no_std]
+// use std::str::FromStr;
 
 #[derive(Debug)]
 struct LanternFishSim {
@@ -22,7 +23,7 @@ impl Iterator for LanternFishSim {
 
     fn next(&mut self) -> Option<Self::Item> {
         let new_young_fish = self.fish[0];
-        
+
         for i in 1..9 {
             self.fish[i - 1] = self.fish[i]
         }
@@ -45,6 +46,8 @@ impl FromStr for LanternFishSim {
 
         Ok(LanternFishSim::new(fishes))
     }
+
+    LanterFishSim::new(fishes)
 }
 
 pub fn part1(input: &str) -> usize {
