@@ -45,21 +45,28 @@ jobs:
 
       - name: valgrind bench
         run: |
-          cargo test --no-run --release
-          for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
-            echo "## $f" | tee -a this_pr.txt
-            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a this_pr.txt
-          done
+          mkdir -p /tmp/target/release/deps
 
+          cargo test --no-run --release
+          for f in `find target/release/deps -executable -type f -regextype posix-extended -regex '.*/(y2021)?ex.*' | sort`; do
+              cp $f /tmp/$f
+          done
+          
           cp ./tools/delta.py /tmp/delta.py  # when I change branch to main the file can disappear
 
           git checkout main
-          # rm -rf ./target/release/deps
           cargo test --no-run --release
-          for f in `find target/release/deps -executable -type f -name 'ex*' | sort`; do
-            echo "## $f" | tee -a main.txt
-            valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a main.txt
-          done          
+          touch main.txt
+          touch this_pr.txt
+          for f in `find target/release/deps -executable -type f -regextype posix-extended -regex '.*/(y2021)?ex.*' | sort`; do
+            if ! cmp $f /tmp/$f >/dev/null 2>&1
+            then
+              echo "## $f" | tee -a main.txt
+              valgrind --tool=cachegrind $f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a main.txt
+              echo "## $f" | tee -a this_pr.txt
+              valgrind --tool=cachegrind /tmp/$f --test-threads 1 2>&1 | grep 'I   refs:' | tee -a this_pr.txt
+            fi
+          done
 
       - name: compute delta
         run: |
