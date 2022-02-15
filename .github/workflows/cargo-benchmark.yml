@@ -45,6 +45,7 @@ jobs:
           git checkout here
           cargo bench --no-run
 
+          touch output.txt
           for f in `find target/release/deps -executable -type f -name 'bench_*' | sort`; do
             if ! cmp $f /tmp/$f >/dev/null 2>&1
             then

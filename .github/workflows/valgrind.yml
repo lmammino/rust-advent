@@ -46,6 +46,7 @@ jobs:
       - name: valgrind bench
         run: |
           mkdir -p /tmp/target/release/deps
+
           cargo test --no-run --release
           for f in `find target/release/deps -executable -type f -regextype posix-extended -regex '.*/(y2021)?ex.*' | sort`; do
               cp $f /tmp/$f
@@ -55,6 +56,8 @@ jobs:
 
           git checkout main
           cargo test --no-run --release
+          touch main.txt
+          touch this_pr.txt
           for f in `find target/release/deps -executable -type f -regextype posix-extended -regex '.*/(y2021)?ex.*' | sort`; do
             if ! cmp $f /tmp/$f >/dev/null 2>&1
             then
