@@ -11,7 +11,7 @@ impl LanternFishSim {
     }
 
     pub fn count_fishes(&self) -> u64 {
-        self.fish.iter().fold(0, |acc, x| acc + *x as u64)
+        self.fish.iter().sum()
     }
 }
 
