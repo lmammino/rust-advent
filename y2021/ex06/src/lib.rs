@@ -1,18 +1,18 @@
-use std::str::FromStr;
+#![no_std]
+
+use core::str::FromStr;
 
 #[derive(Debug)]
 struct LanternFishSim {
-    fish: [usize; 9]
+    fish: [u64; 9],
 }
 
 impl LanternFishSim {
-    pub fn new(fish: [usize; 9]) -> Self {
-        LanternFishSim {
-            fish
-        }
+    pub fn new(fish: [u64; 9]) -> Self {
+        LanternFishSim { fish }
     }
 
-    pub fn count_fishes(&self) -> usize {
+    pub fn count_fishes(&self) -> u64 {
         self.fish.iter().sum()
     }
 }
@@ -22,7 +22,7 @@ impl Iterator for LanternFishSim {
 
     fn next(&mut self) -> Option<Self::Item> {
         let new_young_fish = self.fish[0];
-        
+
         for i in 1..9 {
             self.fish[i - 1] = self.fish[i]
         }
@@ -36,9 +36,9 @@ impl Iterator for LanternFishSim {
 impl FromStr for LanternFishSim {
     type Err = ();
 
-    fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let start_fish = input.split(',').map(|x| x.parse::<u8>().unwrap());
-        let mut fishes = [0_usize; 9];
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let start_fish = s.split(',').map(|x| x.parse::<u8>().unwrap());
+        let mut fishes = [0_u64; 9];
         for fish in start_fish {
             fishes[fish as usize] += 1;
         }
@@ -47,13 +47,13 @@ impl FromStr for LanternFishSim {
     }
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> u64 {
     let mut sim: LanternFishSim = input.parse().unwrap();
     sim.nth(79);
     sim.count_fishes()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> u64 {
     let mut sim: LanternFishSim = input.parse().unwrap();
     sim.nth(255);
     sim.count_fishes()
