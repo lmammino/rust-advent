@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Cargo build",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "build"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "Build binary",
+      "dependsOn": "Cargo build",
+      "type": "shell",
+      "command": "arm-none-eabi-objcopy",
+      "args": [
+        "--output-target",
+        "binary",
+        "./target/thumbv6m-none-eabi/debug/rp2040-project-template",
+        "./target/thumbv6m-none-eabi/debug/rp2040-project-template.bin"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
