@@ -1,4 +1,4 @@
-use std::collections::{BTreeSet, HashSet};
+use std::collections::BTreeSet;
 
 pub fn part1(input: &str) -> usize {
     // just needs to count how many entries are in output sizes that have length of 2,3,4 or 7
