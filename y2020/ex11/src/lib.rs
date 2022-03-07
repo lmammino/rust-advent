@@ -129,12 +129,11 @@ impl Board {
         for (y, row) in self.0.iter().enumerate() {
             let mut new_row: Vec<Cell> = vec![];
             for (x, cell) in row.iter().enumerate() {
-                let neighbors;
-                if use_ray_cast {
-                    neighbors = self.ray_cast_neighbours(x, y);
+                let neighbors = if use_ray_cast {
+                    self.ray_cast_neighbours(x, y)
                 } else {
-                    neighbors = self.cell_neighbors(x, y);
-                }
+                    self.cell_neighbors(x, y)
+                };
 
                 match cell {
                     Cell::Floor => {
