@@ -2,15 +2,13 @@ use std::collections::BTreeSet;
 
 pub fn part1(input: &str) -> usize {
     // just needs to count how many entries are in output sizes that have length of 2,3,4 or 7
-    // Note: in this case a BTreeSet is faster than an HashSet
-    let unique_output_sizes: BTreeSet<usize> = BTreeSet::from([2, 3, 4, 7]);
     input
         .lines()
         .map(|line| line.split_once(" | ").unwrap())
         .map(|(_, raw_output_values)| {
             raw_output_values
                 .split_whitespace()
-                .filter(|s| unique_output_sizes.contains(&s.len()))
+                .filter(|s| matches!(s.len(), 2 | 3 | 4 | 7))
                 .count()
         })
         .sum::<usize>()
