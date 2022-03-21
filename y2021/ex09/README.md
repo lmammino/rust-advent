@@ -23,7 +23,7 @@ Your first goal is to find the low points - the locations that are lower than an
 
 In the above example, there are four low points, all highlighted: two are in the first row (a 1 and a 0), one is in the third row (a 5), and one is in the bottom row (also a 5). All other locations on the heightmap have some lower adjacent location, and so are not low points.
 
-The risk level of a low point is `1` plus its height. In the above example, the risk levels of the low points are `2`, `1`, `6`, and 6. The sum of the risk levels of all low points in the heightmap is therefore `15`.
+The risk level of a low point is `1` plus its height. In the above example, the risk levels of the low points are `2`, `1`, `6`, and `6`. The sum of the risk levels of all low points in the heightmap is therefore `15`.
 
 Find all of the low points on your heightmap. **What is the sum of the risk levels of all low points on your heightmap?**
 
