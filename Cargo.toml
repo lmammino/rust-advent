@@ -32,7 +32,8 @@ members = [
   "y2021/ex05",
   "y2021/ex06",
   "y2021/ex07",
-  "y2021/ex08"
+  "y2021/ex08",
+  "y2021/ex09"
 ]
 
 [profile.bench]
