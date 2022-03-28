@@ -11,6 +11,8 @@ enum ParseErr {
     Incomplete(VecDeque<Token>),
     #[error("Expression corrupted: expected {0}, but found {1} instead")]
     Corrupted(Token, Token),
+    #[error("Found invalid character: {0}")]
+    InvalidChar(char),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -41,19 +43,21 @@ impl Display for Token {
     }
 }
 
-impl From<char> for Token {
-    fn from(c: char) -> Self {
+impl TryFrom<char> for Token {
+    type Error = ParseErr;
+
+    fn try_from(c: char) -> Result<Self, Self::Error> {
         use Token::*;
         match c {
-            '(' => OPEN1,
-            ')' => CLOSE1,
-            '[' => OPEN2,
-            ']' => CLOSE2,
-            '{' => OPEN3,
-            '}' => CLOSE3,
-            '<' => OPEN4,
-            '>' => CLOSE4,
-            _ => unreachable!("Invalid char"),
+            '(' => Ok(OPEN1),
+            ')' => Ok(CLOSE1),
+            '[' => Ok(OPEN2),
+            ']' => Ok(CLOSE2),
+            '{' => Ok(OPEN3),
+            '}' => Ok(CLOSE3),
+            '<' => Ok(OPEN4),
+            '>' => Ok(CLOSE4),
+            c => Err(ParseErr::InvalidChar(c)),
         }
     }
 }
@@ -73,8 +77,8 @@ impl Token {
         }
     }
 
-    fn matches(&self, token: Token) -> bool {
-        self.matching() == token
+    fn matches(&self, token: &Token) -> bool {
+        self.matching() == *token
     }
 
     fn is_open(&self) -> bool {
@@ -114,19 +118,19 @@ fn parse_expr(line: &str) -> Result<Vec<Token>, ParseErr> {
     let mut tokens: Vec<Token> = vec![];
 
     for c in line.chars() {
-        let current_token: Token = c.into();
+        let current_token: Token = c.try_into()?;
 
         tokens.push(current_token);
-        if let Some(expected) = stack.pop_back() {
+        if let Some(expected) = stack.back() {
             if current_token.is_close() {
                 if !current_token.matches(expected) {
                     // closing token does not match previous token in the stack
                     return Err(ParseErr::Corrupted(expected.matching(), current_token));
                 }
                 // matching brackets, remove from the stack and don't add current one
+                stack.pop_back();
             } else {
-                // re-add token to the top of the stack and add new token as well
-                stack.push_back(expected);
+                // add new token to the stack
                 stack.push_back(current_token);
             }
         } else {
@@ -143,13 +147,7 @@ fn parse_expr(line: &str) -> Result<Vec<Token>, ParseErr> {
 }
 
 fn build_completion_seq(stack: &mut VecDeque<Token>) -> Vec<Token> {
-    let mut completion_seq: Vec<Token> = vec![];
-
-    while !stack.is_empty() {
-        completion_seq.push(stack.pop_back().unwrap().matching());
-    }
-
-    completion_seq
+    stack.iter().rev().map(Token::matching).collect()
 }
 
 pub fn part1(input: &str) -> usize {
@@ -250,7 +248,7 @@ mod tests {
     fn test_build_completion_seq() {
         // [({(<(())[]>[[{[]{<()<>> - Complete by adding }}]])})].
         let line = "[({(<(())[]>[[{[]{<()<>>";
-        let expected: Vec<Token> = "}}]])})]".chars().map(|t| t.into()).collect();
+        let expected: Vec<Token> = "}}]])})]".chars().map(|t| t.try_into().unwrap()).collect();
         let mut result = parse_expr(line);
         assert!(matches!(result, Err(ParseErr::Incomplete(_))));
         if let Err(ParseErr::Incomplete(ref mut stack)) = result {
@@ -259,7 +257,7 @@ mod tests {
 
         // [(()[<>])]({[<{<<[]>>( - Complete by adding )}>]}).
         let line = "[(()[<>])]({[<{<<[]>>(";
-        let expected: Vec<Token> = ")}>]})".chars().map(|t| t.into()).collect();
+        let expected: Vec<Token> = ")}>]})".chars().map(|t| t.try_into().unwrap()).collect();
         let mut result = parse_expr(line);
         assert!(matches!(result, Err(ParseErr::Incomplete(_))));
         if let Err(ParseErr::Incomplete(ref mut stack)) = result {
@@ -268,7 +266,7 @@ mod tests {
 
         // (((({<>}<{<{<>}{[]{[]{} - Complete by adding }}>}>)))).
         let line = "(((({<>}<{<{<>}{[]{[]{}";
-        let expected: Vec<Token> = "}}>}>))))".chars().map(|t| t.into()).collect();
+        let expected: Vec<Token> = "}}>}>))))".chars().map(|t| t.try_into().unwrap()).collect();
         let mut result = parse_expr(line);
         assert!(matches!(result, Err(ParseErr::Incomplete(_))));
         if let Err(ParseErr::Incomplete(ref mut stack)) = result {
@@ -277,7 +275,7 @@ mod tests {
 
         // {<[[]]>}<{[{[{[]{()[[[] - Complete by adding ]]}}]}]}>.
         let line = "{<[[]]>}<{[{[{[]{()[[[]";
-        let expected: Vec<Token> = "]]}}]}]}>".chars().map(|t| t.into()).collect();
+        let expected: Vec<Token> = "]]}}]}]}>".chars().map(|t| t.try_into().unwrap()).collect();
         let mut result = parse_expr(line);
         assert!(matches!(result, Err(ParseErr::Incomplete(_))));
         if let Err(ParseErr::Incomplete(ref mut stack)) = result {
@@ -286,12 +284,17 @@ mod tests {
 
         // <{([{{}}[<[[[<>{}]]]>[]] - Complete by adding ])}>.
         let line = "<{([{{}}[<[[[<>{}]]]>[]]";
-        let expected: Vec<Token> = "])}>".chars().map(|t| t.into()).collect();
+        let expected: Vec<Token> = "])}>".chars().map(|t| t.try_into().unwrap()).collect();
         let mut result = parse_expr(line);
         assert!(matches!(result, Err(ParseErr::Incomplete(_))));
         if let Err(ParseErr::Incomplete(ref mut stack)) = result {
             assert_eq!(build_completion_seq(stack), expected);
         }
+
+        // <X{([{{}}[<[[[<>{}]]]>[]] - Invalid char X ])}>.
+        let line = "<X{([{{}}[<[[[<>{}]]]>[]]";
+        let result = parse_expr(line);
+        assert!(matches!(result, Err(ParseErr::InvalidChar('X'))));
     }
 
     #[test]
