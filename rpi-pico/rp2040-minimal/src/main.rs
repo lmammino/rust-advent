@@ -1,7 +1,7 @@
 #![no_main]
 #![no_std]
 
-// use core::panic::PanicInfo;
+use core::panic::PanicInfo;
 
 // The reset handler
 /// # Safety
@@ -24,10 +24,10 @@ pub unsafe extern "C" fn Reset() -> ! {
 #[no_mangle]
 pub static RESET_VECTOR: unsafe extern "C" fn() -> ! = Reset;
 
-// #[panic_handler]
-// fn panic(_panic: &PanicInfo<'_>) -> ! {
-//     loop {}
-// }
+#[panic_handler]
+fn panic(_panic: &PanicInfo<'_>) -> ! {
+    loop {}
+}
 
 // #[lang = "eh_personality"]
 // extern "C" fn eh_personality() {}

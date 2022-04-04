@@ -63,7 +63,7 @@ jobs:
           echo "## Cargo Bench Execution" > message.txt
           echo "" >> message.txt
           echo '<details><summary>Cargo Bench</summary><pre>' >> message.txt
-          grep -B 4 -A 2 'time:' output.txt >> message.txt
+          grep -B 4 -A 2 'time:' output.txt >> message.txt | true
           echo "" >> message.txt
           echo "</pre></details>" >> message.txt
           sed -i 's/--/<hr>/' message.txt

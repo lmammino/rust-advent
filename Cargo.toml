@@ -1,7 +1,9 @@
 [workspace]
+exclude = [
+  "rpi-pico/rp2040-full",
+  "rpi-pico/rp2040-minimal"
+]
 members = [
-#   "rpi-pico/rp2040-minimal",
-#   "rpi-pico/rp2040-full",
   "y2020/ex01",
   "y2020/ex02",
   "y2020/ex03",
