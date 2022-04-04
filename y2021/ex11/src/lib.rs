@@ -61,8 +61,7 @@ impl<const N: usize> Iterator for OctoGrid<N> {
             }
         }
 
-        while !will_flash.is_empty() {
-            let (row_id, col_id) = will_flash.pop().unwrap();
+        while let Some((row_id, col_id)) = will_flash.pop() {
             if flashed.insert((row_id, col_id)) {
                 // if this cell did not flash already
                 for (delta_r, delta_c) in NEIGHBOURS {
