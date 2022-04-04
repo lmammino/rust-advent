@@ -101,10 +101,10 @@ pub fn part1(input: &str) -> usize {
 pub fn part2(input: &str) -> usize {
     let mut grid: OctoGrid<10> = input.parse().unwrap();
 
-    let mut rounds = 0_usize;
+    let mut rounds = 1_usize;
     // we check against 100 because we have a 10x10 grid (of 100 octopi)
     // each octopus can only flash once per round, and our grid returns how many octopi flashed
-    while grid.next().unwrap() != 100 {
+    while grid.next().unwrap() < 100 {
         rounds += 1
     }
 
