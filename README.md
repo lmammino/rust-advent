@@ -14,6 +14,20 @@ Learning Rust by implementing solutions for [Advent of Code](https://adventofcod
 
 And remember to follow and subscribe! 😎 😋
 
+## Requirements
+
+This repo contains some code that is bespoke to Raspberry Pi Pico, therefore you need to install some additional dependencies:
+
+```bash
+rustup target install thumbv6m-none-eabi
+```
+
+and
+
+```bash
+cargo install flip-link
+```
+
 
 ## How to run tests for all exercises
 
