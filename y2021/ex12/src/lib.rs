@@ -84,8 +84,7 @@ impl<'a> CavePaths<'a> {
         // keeps track of all the open paths and associates a set of the visited paths to them to avoid loops
         let mut open_paths: Vec<OpenPath> = vec![OpenPath::from("start")];
 
-        while !open_paths.is_empty() {
-            let current_path = open_paths.pop().unwrap();
+        while let Some(current_path) = open_paths.pop() {
             let current_cave = current_path.current_cave();
             if let Some(adj_caves) = self.adj.get(current_cave) {
                 for next_cave in adj_caves {
