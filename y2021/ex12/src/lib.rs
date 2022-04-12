@@ -1,73 +1,90 @@
 use std::collections::{HashMap, HashSet};
 
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+struct Node<'a> {
+    name: &'a str,
+    is_small: bool,
+    is_end: bool,
+    is_start: bool,
+}
+
+impl<'a> From<&'a str> for Node<'a> {
+    fn from(name: &'a str) -> Self {
+        Self {
+            name,
+            is_end: name == "end",
+            is_start: name == "start",
+            is_small: name.chars().all(|c| c.is_lowercase()),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 struct OpenPath<'a> {
-    steps: Vec<&'a str>,
-    visited_small_caves: HashSet<&'a str>,
+    steps: Vec<Node<'a>>,
+    visited_small_caves: HashSet<Node<'a>>,
     visited_a_small_cave_twice: bool,
 }
 
 impl<'a> OpenPath<'a> {
     fn from(first_cave: &'a str) -> Self {
+        let first_cave: Node<'a> = first_cave.into();
+
         OpenPath {
-            steps: vec![first_cave],
-            visited_small_caves: HashSet::from([first_cave]),
+            steps: vec![first_cave.clone()],
+            visited_small_caves: vec![first_cave].into_iter().collect(),
             visited_a_small_cave_twice: false,
         }
     }
 
-    fn current_cave(&self) -> &'a str {
+    fn current_cave(&self) -> &Node<'a> {
         self.steps.last().unwrap()
     }
 
-    fn can_visit(&self, next_cave: &'a str, can_visit_a_small_cave_twice: bool) -> bool {
-        if next_cave == "start" {
-            return false;
+    fn try_extend(&self, next_cave: &Node<'a>, can_visit_a_small_cave_twice: bool) -> Option<Self> {
+        if next_cave.is_start {
+            return None;
         }
 
-        let is_next_a_small_cave = next_cave.chars().all(|c| c.is_lowercase());
-        if is_next_a_small_cave && self.visited_small_caves.contains(&next_cave) {
-            if can_visit_a_small_cave_twice {
-                return !self.visited_a_small_cave_twice;
+        if next_cave.is_small && self.visited_small_caves.contains(next_cave) {
+            if !(can_visit_a_small_cave_twice && !self.visited_a_small_cave_twice) {
+                return None;
             }
-
-            return false;
         }
 
-        true
-    }
-
-    fn extend(&self, next_cave: &'a str) -> Self {
         let mut extended_open_path = self.clone();
-
         // if next_cave is small, add it to the list of visited ones
-        if next_cave.chars().all(|c| c.is_lowercase()) {
-            let is_first_visit = extended_open_path.visited_small_caves.insert(&next_cave);
+        if next_cave.is_small {
+            let is_first_visit = extended_open_path
+                .visited_small_caves
+                .insert(next_cave.clone());
 
             if !is_first_visit {
                 extended_open_path.visited_a_small_cave_twice = true;
             }
         }
+        extended_open_path.steps.push(next_cave.clone());
 
-        extended_open_path.steps.push(next_cave);
-
-        extended_open_path
+        Some(extended_open_path)
     }
 }
 
 #[derive(Debug)]
 struct CavePaths<'a> {
-    adj: HashMap<&'a str, HashSet<&'a str>>,
+    adj: HashMap<Node<'a>, HashSet<Node<'a>>>,
 }
 
 impl<'a> From<&'a str> for CavePaths<'a> {
     fn from(s: &'a str) -> Self {
-        let mut adj: HashMap<&'a str, HashSet<&'a str>> = Default::default();
+        let mut adj: HashMap<Node<'a>, HashSet<Node<'a>>> = Default::default();
 
         for line in s.lines() {
             let (source, dest) = line.split_once("-").unwrap();
-            let s = adj.entry(source).or_default();
-            s.insert(dest);
+            let source: Node<'a> = source.into();
+            let dest: Node<'a> = dest.into();
+
+            let s = adj.entry(source.clone()).or_default();
+            s.insert(dest.clone());
             // paths are biderectional so we need to add also the opposite connection
             let s = adj.entry(dest).or_default();
             s.insert(source);
@@ -78,8 +95,8 @@ impl<'a> From<&'a str> for CavePaths<'a> {
 }
 
 impl<'a> CavePaths<'a> {
-    fn visit_all(&self, can_visit_a_small_cave_twice: bool) -> Vec<Vec<&'a str>> {
-        let mut paths: Vec<Vec<&'a str>> = vec![];
+    fn visit_all(&self, can_visit_a_small_cave_twice: bool) -> Vec<Vec<Node<'a>>> {
+        let mut paths: Vec<Vec<Node<'a>>> = vec![];
 
         // keeps track of all the open paths and associates a set of the visited paths to them to avoid loops
         let mut open_paths: Vec<OpenPath> = vec![OpenPath::from("start")];
@@ -88,10 +105,10 @@ impl<'a> CavePaths<'a> {
             let current_cave = current_path.current_cave();
             if let Some(adj_caves) = self.adj.get(current_cave) {
                 for next_cave in adj_caves {
-                    if current_path.can_visit(next_cave, can_visit_a_small_cave_twice) {
-                        let new_path = current_path.extend(next_cave);
-
-                        if *next_cave == "end" {
+                    if let Some(new_path) =
+                        current_path.try_extend(next_cave, can_visit_a_small_cave_twice)
+                    {
+                        if next_cave.is_end {
                             paths.push(new_path.steps);
                         } else {
                             open_paths.push(new_path);
@@ -120,6 +137,16 @@ pub fn part2(input: &str) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    impl<'a> FromIterator<&'a str> for OpenPath<'a> {
+        fn from_iter<T: IntoIterator<Item = &'a str>>(iter: T) -> Self {
+            OpenPath {
+                steps: iter.into_iter().map(|s| s.into()).collect(),
+                visited_a_small_cave_twice: false,
+                visited_small_caves: Default::default(),
+            }
+        }
+    }
 
     #[test]
     fn test_readme_part1() {
@@ -201,13 +228,13 @@ start,b,d,b,A,end
 start,b,d,b,end
 start,b,end";
 
-        let expected: Vec<Vec<&str>> = expected
+        let expected: Vec<OpenPath<'_>> = expected
             .lines()
             .map(|line| line.split(',').collect())
             .collect();
 
         for path in &expected {
-            assert!(paths.contains(&path));
+            assert!(paths.contains(&path.steps));
         }
 
         assert_eq!(paths.len(), 36);
