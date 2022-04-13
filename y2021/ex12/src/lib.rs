@@ -41,14 +41,18 @@ impl<'a> OpenPath<'a> {
         self.steps.last().unwrap()
     }
 
-    fn try_extend(&self, next_cave: &Node<'a>, can_visit_a_small_cave_twice: bool) -> Option<Self> {
+    fn try_add_cave(
+        &self,
+        next_cave: &Node<'a>,
+        can_visit_a_small_cave_twice: bool,
+    ) -> Result<Self, &'static str> {
         if next_cave.is_start {
-            return None;
+            return Err("is start");
         }
 
         if next_cave.is_small && self.visited_small_caves.contains(next_cave) {
             if !(can_visit_a_small_cave_twice && !self.visited_a_small_cave_twice) {
-                return None;
+                return Err("already visited");
             }
         }
 
@@ -65,7 +69,7 @@ impl<'a> OpenPath<'a> {
         }
         extended_open_path.steps.push(next_cave.clone());
 
-        Some(extended_open_path)
+        Ok(extended_open_path)
     }
 }
 
@@ -103,17 +107,23 @@ impl<'a> CavePaths<'a> {
 
         while let Some(current_path) = open_paths.pop() {
             let current_cave = current_path.current_cave();
-            if let Some(adj_caves) = self.adj.get(current_cave) {
-                for next_cave in adj_caves {
-                    if let Some(new_path) =
-                        current_path.try_extend(next_cave, can_visit_a_small_cave_twice)
-                    {
-                        if next_cave.is_end {
-                            paths.push(new_path.steps);
-                        } else {
-                            open_paths.push(new_path);
-                        }
-                    }
+
+            let adj_caves = match self.adj.get(current_cave) {
+                None => continue,
+                Some(adj_caves) => adj_caves,
+            };
+
+            for next_cave in adj_caves {
+                let new_path =
+                    match current_path.try_add_cave(next_cave, can_visit_a_small_cave_twice) {
+                        Err(_) => continue,
+                        Ok(new_path) => new_path,
+                    };
+
+                if next_cave.is_end {
+                    paths.push(new_path.steps);
+                } else {
+                    open_paths.push(new_path);
                 }
             }
         }
