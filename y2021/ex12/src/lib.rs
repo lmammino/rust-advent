@@ -84,7 +84,7 @@ impl<'a> From<&'a str> for CavePaths<'a> {
         let mut adj: HashMap<Cave<'a>, HashSet<Cave<'a>>> = Default::default();
 
         for line in s.lines() {
-            let (source, dest) = line.split_once("-").unwrap();
+            let (source, dest) = line.split_once('-').unwrap();
             let source: Cave<'a> = source.into();
             let dest: Cave<'a> = dest.into();
 
