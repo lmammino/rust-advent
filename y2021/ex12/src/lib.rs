@@ -1,14 +1,14 @@
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-struct Node<'a> {
+struct Cave<'a> {
     name: &'a str,
     is_small: bool,
     is_end: bool,
     is_start: bool,
 }
 
-impl<'a> From<&'a str> for Node<'a> {
+impl<'a> From<&'a str> for Cave<'a> {
     fn from(name: &'a str) -> Self {
         Self {
             name,
@@ -21,14 +21,14 @@ impl<'a> From<&'a str> for Node<'a> {
 
 #[derive(Debug, Clone)]
 struct OpenPath<'a> {
-    steps: Vec<Node<'a>>,
-    visited_small_caves: HashSet<Node<'a>>,
+    steps: Vec<Cave<'a>>,
+    visited_small_caves: HashSet<Cave<'a>>,
     visited_a_small_cave_twice: bool,
 }
 
 impl<'a> OpenPath<'a> {
     fn from(first_cave: &'a str) -> Self {
-        let first_cave: Node<'a> = first_cave.into();
+        let first_cave: Cave<'a> = first_cave.into();
 
         OpenPath {
             steps: vec![first_cave.clone()],
@@ -37,23 +37,24 @@ impl<'a> OpenPath<'a> {
         }
     }
 
-    fn current_cave(&self) -> &Node<'a> {
+    fn current_cave(&self) -> &Cave<'a> {
         self.steps.last().unwrap()
     }
 
     fn try_add_cave(
         &self,
-        next_cave: &Node<'a>,
+        next_cave: &Cave<'a>,
         can_visit_a_small_cave_twice: bool,
     ) -> Result<Self, &'static str> {
         if next_cave.is_start {
             return Err("is start");
         }
 
-        if next_cave.is_small && self.visited_small_caves.contains(next_cave) {
-            if !(can_visit_a_small_cave_twice && !self.visited_a_small_cave_twice) {
-                return Err("already visited");
-            }
+        if (self.visited_a_small_cave_twice || !can_visit_a_small_cave_twice)
+            && self.visited_small_caves.contains(next_cave)
+            && next_cave.is_small
+        {
+            return Err("already visited");
         }
 
         let mut extended_open_path = self.clone();
@@ -75,17 +76,17 @@ impl<'a> OpenPath<'a> {
 
 #[derive(Debug)]
 struct CavePaths<'a> {
-    adj: HashMap<Node<'a>, HashSet<Node<'a>>>,
+    adj: HashMap<Cave<'a>, HashSet<Cave<'a>>>,
 }
 
 impl<'a> From<&'a str> for CavePaths<'a> {
     fn from(s: &'a str) -> Self {
-        let mut adj: HashMap<Node<'a>, HashSet<Node<'a>>> = Default::default();
+        let mut adj: HashMap<Cave<'a>, HashSet<Cave<'a>>> = Default::default();
 
         for line in s.lines() {
             let (source, dest) = line.split_once("-").unwrap();
-            let source: Node<'a> = source.into();
-            let dest: Node<'a> = dest.into();
+            let source: Cave<'a> = source.into();
+            let dest: Cave<'a> = dest.into();
 
             let s = adj.entry(source.clone()).or_default();
             s.insert(dest.clone());
@@ -99,8 +100,8 @@ impl<'a> From<&'a str> for CavePaths<'a> {
 }
 
 impl<'a> CavePaths<'a> {
-    fn visit_all(&self, can_visit_a_small_cave_twice: bool) -> Vec<Vec<Node<'a>>> {
-        let mut paths: Vec<Vec<Node<'a>>> = vec![];
+    fn visit_all(&self, can_visit_a_small_cave_twice: bool) -> Vec<Vec<Cave<'a>>> {
+        let mut paths: Vec<Vec<Cave<'a>>> = vec![];
 
         // keeps track of all the open paths and associates a set of the visited paths to them to avoid loops
         let mut open_paths: Vec<OpenPath> = vec![OpenPath::from("start")];
