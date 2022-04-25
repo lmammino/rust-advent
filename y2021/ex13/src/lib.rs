@@ -10,7 +10,7 @@ impl FromStr for Point {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (raw_x, raw_y) = s.split_once(",").unwrap();
+        let (raw_x, raw_y) = s.split_once(',').unwrap();
         Ok(Point {
             x: raw_x.parse().unwrap(),
             y: raw_y.parse().unwrap(),
@@ -61,7 +61,7 @@ impl FromStr for Fold {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (_, def) = s.split_once("fold along ").unwrap();
-        let (axis, raw_amount) = def.split_once("=").unwrap();
+        let (axis, raw_amount) = def.split_once('=').unwrap();
         let amount: usize = raw_amount.parse().unwrap();
         match axis {
             "x" => Ok(Fold::X(amount)),
