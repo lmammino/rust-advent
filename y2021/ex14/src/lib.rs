@@ -5,6 +5,7 @@ struct Polymer {
     rules: HashMap<(char, char), char>,
     chars_count: HashMap<char, usize>,
     segments_count: HashMap<(char, char), usize>,
+    next_segments_count: HashMap<(char, char), usize>,
 }
 
 impl FromStr for Polymer {
@@ -37,10 +38,13 @@ impl FromStr for Polymer {
             rules.insert((pair1, pair2), subst);
         }
 
+        let next_segments_count = Default::default();
+
         Ok(Polymer {
             rules,
             chars_count,
             segments_count,
+            next_segments_count,
         })
     }
 }
@@ -49,7 +53,7 @@ impl Iterator for Polymer {
     type Item = ();
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut new_segments_count: HashMap<(char, char), usize> = Default::default();
+        self.next_segments_count.clear();
 
         for (segment, count) in &self.segments_count {
             let new_element = self.rules.get(segment).unwrap();
@@ -60,53 +64,34 @@ impl Iterator for Polymer {
             let new_segment1 = (segment.0, *new_element);
             let new_segment2 = (*new_element, segment.1);
 
-            let entry1 = new_segments_count.entry(new_segment1).or_default();
+            let entry1 = self.next_segments_count.entry(new_segment1).or_default();
             *entry1 += count;
-            let entry2 = new_segments_count.entry(new_segment2).or_default();
+            let entry2 = self.next_segments_count.entry(new_segment2).or_default();
             *entry2 += count;
         }
 
-        self.segments_count = new_segments_count;
+        std::mem::swap(&mut self.segments_count, &mut self.next_segments_count);
 
         Some(())
     }
 }
 
 impl Polymer {
-    fn min_max_elements(&self) -> ((char, usize), (char, usize)) {
-        let mut min_el = '_';
-        let mut min_el_count = usize::MAX;
-        let mut max_el = '_';
-        let mut max_el_count = 0_usize;
-
-        for (c, count) in &self.chars_count {
-            if *count < min_el_count {
-                min_el_count = *count;
-                min_el = *c;
-            }
-
-            if *count > max_el_count {
-                max_el_count = *count;
-                max_el = *c;
-            }
-        }
-
-        ((min_el, min_el_count), (max_el, max_el_count))
+    fn solution(&self) -> usize {
+        self.chars_count.values().max().unwrap() - self.chars_count.values().min().unwrap()
     }
 }
 
 pub fn part1(input: &str) -> usize {
     let mut polymer: Polymer = input.parse().unwrap();
     polymer.nth(9);
-    let ((_, min), (_, max)) = polymer.min_max_elements();
-    max - min
+    polymer.solution()
 }
 
 pub fn part2(input: &str) -> usize {
     let mut polymer: Polymer = input.parse().unwrap();
     polymer.nth(39);
-    let ((_, min), (_, max)) = polymer.min_max_elements();
-    max - min
+    polymer.solution()
 }
 
 #[cfg(test)]
@@ -136,7 +121,7 @@ CN -> C";
 
         let mut polymer: Polymer = input.parse().unwrap();
         polymer.nth(9);
-        assert_eq!(polymer.min_max_elements(), (('H', 161), ('B', 1749)));
+        assert_eq!(polymer.solution(), 1749 - 161);
     }
 
     #[test]
