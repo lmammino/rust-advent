@@ -43,8 +43,8 @@ impl BinaryString {
 
     fn get_int(&mut self, bits: usize) -> i64 {
         let mut val = 0;
-        for i in (0..bits).rev() {
-            val += 2_i64.pow(i as u32) * self.bits.pop_front().unwrap_or_default() as i64;
+        for _ in 0..bits {
+            val = (val << 1) + (self.bits.pop_front().unwrap_or_default() as i64);
             self.consumed_bits += 1;
         }
 
@@ -159,8 +159,8 @@ impl PacketParser {
                 }
                 // calculates the value of n using the 4bit ints groups
                 let mut val = 0;
-                for i in (0..groups.len()).rev() {
-                    val += 16_i64.pow(i as u32) * groups.pop_back().unwrap() as i64;
+                for _ in 0..groups.len() {
+                    val = (val << 4) + (groups.pop_back().unwrap() as i64);
                 }
 
                 PacketData::Literal(val)
