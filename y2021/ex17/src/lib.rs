@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use std::{cmp::Ordering, str::FromStr};
 
 #[derive(Debug)]
@@ -58,15 +59,23 @@ impl TargetArea {
 }
 
 impl FromStr for TargetArea {
-    type Err = ();
+    type Err = anyhow::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (_, s) = s.split_once("target area: ").unwrap();
-        let (xrange, yrange) = s.split_once(", ").unwrap();
-        let (xstart, xend) = &xrange[2..].split_once("..").unwrap();
-        let (ystart, yend) = &yrange[2..].split_once("..").unwrap();
-        let (min_x, max_x) = (xstart.parse().unwrap(), xend.parse().unwrap());
-        let (min_y, max_y) = (ystart.parse().unwrap(), yend.parse().unwrap());
+    fn from_str(s: &str) -> Result<TargetArea> {
+        let error_msg = "Input string not conform to spec: `target area: x={min_x}..{max_x}, y={min_y}..{max_y}`";
+
+        let (_, s) = s.split_once("target area: ").context(error_msg)?;
+        let (xrange, yrange) = s.split_once(", ").context(error_msg)?;
+        let (xstart, xend) = &xrange[2..].split_once("..").context(error_msg)?;
+        let (ystart, yend) = &yrange[2..].split_once("..").context(error_msg)?;
+        let (min_x, max_x) = (
+            xstart.parse().context("cannot parse min_x to i32")?,
+            xend.parse().context("cannot parse max_x to i32")?,
+        );
+        let (min_y, max_y) = (
+            ystart.parse().context("cannot parse min_y to i32")?,
+            yend.parse().context("cannot parse max_y to i32")?,
+        );
 
         Ok(TargetArea {
             min_x,
