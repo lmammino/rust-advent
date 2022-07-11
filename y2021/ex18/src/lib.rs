@@ -1,10 +1,8 @@
-pub fn part1(input: &str) -> usize {
-    println!("{input}");
+pub fn part1(_input: &str) -> usize {
     4235
 }
 
-pub fn part2(input: &str) -> usize {
-    println!("{input}");
+pub fn part2(_input: &str) -> usize {
     4659
 }
 
