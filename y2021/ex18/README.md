@@ -11,7 +11,6 @@ Snailfish numbers aren't like regular numbers. Instead, every snailfish number i
 
 Pairs are written as [x,y], where x and y are the elements within the pair. Here are some example snailfish numbers, one snailfish number per line:
 
-Your puzzle answer was `???`.
 
 ```plain
 [1,2]
