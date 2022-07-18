@@ -4,6 +4,8 @@ enum Pos {
     R,
 }
 
+type SNumExpr = Vec<SNum>;
+
 #[derive(Default, Debug, Clone, PartialEq)]
 struct SNum {
     value: u32,
@@ -34,8 +36,8 @@ fn tokenizer<'a>(line: &'a str) -> impl Iterator<Item = Token> + 'a {
     })
 }
 
-fn parse(line: &str) -> Vec<SNum> {
-    let mut expr: Vec<SNum> = Vec::new();
+fn parse(line: &str) -> SNumExpr {
+    let mut expr: SNumExpr = Vec::new();
     let mut position: Vec<Pos> = Vec::new();
     for token in tokenizer(line) {
         match token {
@@ -115,12 +117,54 @@ fn reduce<'a>(input: &'a mut Vec<SNum>) -> bool {
     false
 }
 
-pub fn part1(_input: &str) -> usize {
-    4235
+fn sum(expr1: &SNumExpr, expr2: &SNumExpr) -> SNumExpr {
+    let mut result: SNumExpr = vec![];
+
+    // left treee
+    for num in expr1 {
+        let mut new_num = num.clone();
+        new_num.position.insert(0, Pos::L);
+        result.push(new_num);
+    }
+
+    // right tree
+    for num in expr2 {
+        let mut new_num = num.clone();
+        new_num.position.insert(0, Pos::R);
+        result.push(new_num);
+    }
+
+    while reduce(&mut result) {}
+
+    result
 }
 
-pub fn part2(_input: &str) -> usize {
-    4659
+pub fn part1(input: &str) -> u32 {
+    let mut expressions = input.lines().map(parse);
+    let first_expr = expressions.next().unwrap();
+    let resulting_sum = expressions.fold(first_expr, |acc, curr| sum(&acc, &curr));
+
+    magnitude(&resulting_sum)
+}
+
+pub fn part2(input: &str) -> u32 {
+    let expressions: Vec<SNumExpr> = input.lines().map(parse).collect();
+    let mut max = 0;
+
+    for i in 0..expressions.len() {
+        for j in 0..expressions.len() {
+            if i != j {
+                let expr1 = expressions.get(i).unwrap();
+                let expr2 = expressions.get(j).unwrap();
+                let val = magnitude(&sum(expr1, expr2));
+                if val > max {
+                    max = val
+                }
+            }
+        }
+    }
+
+    max
 }
 
 #[cfg(test)]
@@ -216,6 +260,36 @@ mod tests {
             let needs_work = reduce(&mut expr);
             assert_eq!(needs_work, expected_needs_work);
             assert_eq!(expr, parse(expected));
+        }
+    }
+
+    #[test]
+    fn test_sum() {
+        let cases = vec![
+            (
+                "[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]",
+                "[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]",
+                "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]",
+            ),
+            (
+                "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]",
+                "[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]",
+                "[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]",
+            ),
+            (
+                "[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]",
+                "[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]",
+                "[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]]",
+            ),
+            (
+                "[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]]",
+                "[7,[5,[[3,8],[1,4]]]]",
+                "[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]]",
+            ),
+        ];
+
+        for (expr1, expr2, expected) in cases {
+            assert_eq!(sum(&parse(expr1), &parse(expr2)), parse(expected));
         }
     }
 }
