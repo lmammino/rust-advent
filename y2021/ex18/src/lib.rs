@@ -1,4 +1,6 @@
 mod permutator;
+mod permutator_gen;
+
 use permutator::Permutator;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -177,6 +179,16 @@ pub fn part2_permutator(input: &str) -> u32 {
         .unwrap()
 }
 
+pub fn part2_permutator_gen(input: &str) -> u32 {
+    let expressions: Vec<SNumExpr> = input.lines().map(parse).collect();
+    let permutations = permutator_gen::permutations(&expressions);
+
+    permutations
+        .map(|(left, right)| magnitude(&sum(left, right)))
+        .max()
+        .unwrap()
+}
+
 pub fn part2_itertools(input: &str) -> u32 {
     use itertools::Itertools;
 
@@ -209,6 +221,12 @@ mod tests {
     fn test_part2_permutator() {
         let input = include_str!("../input.txt");
         assert_eq!(part2_permutator(input), 4659);
+    }
+
+    #[test]
+    fn test_part2_permutator_gen() {
+        let input = include_str!("../input.txt");
+        assert_eq!(part2_permutator_gen(input), 4659);
     }
 
     #[test]
