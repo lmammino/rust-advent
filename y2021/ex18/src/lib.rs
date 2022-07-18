@@ -1,43 +1,5 @@
-impl<'a, T> Permutator<'a, T> {
-    fn new(expressions: &'a Vec<T>) -> Self {
-        Permutator {
-            i: 0,
-            j: 0,
-            expressions,
-        }
-    }
-}
-
-impl<'a, T> Iterator for Permutator<'a, T> {
-    type Item = (&'a T, &'a T);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.i == self.j {
-            self.i += 1;
-
-            if self.i == self.expressions.len() {
-                self.i = 0;
-                self.j += 1;
-            }
-        }
-
-        if self.j == self.expressions.len() {
-            return None;
-        }
-
-        let left = self.expressions.get(self.i).unwrap();
-        let right = self.expressions.get(self.j).unwrap();
-
-        self.i += 1;
-
-        if self.i == self.expressions.len() {
-            self.i = 0;
-            self.j += 1;
-        }
-
-        Some((left, right))
-    }
-}
+mod permutator;
+use permutator::Permutator;
 
 #[derive(Debug, Clone, PartialEq)]
 enum Pos {
@@ -67,7 +29,7 @@ enum Token {
     Num(u32),
 }
 
-fn tokenizer<'a>(line: &'a str) -> impl Iterator<Item = Token> + 'a {
+fn tokenizer<'a>(line: &'a str) -> impl Iterator<Item = Token> + '_ {
     line.chars().map(|c| match c {
         '[' => Token::Open,
         ']' => Token::Close,
@@ -111,7 +73,7 @@ fn magnitude(expr: &[SNum]) -> u32 {
     })
 }
 
-fn reduce<'a>(input: &'a mut Vec<SNum>) -> bool {
+fn reduce(input: &'_ mut Vec<SNum>) -> bool {
     // explode
     let index_to_explode = input.iter().position(|sn| sn.position.len() == 5);
     if let Some(index) = index_to_explode {
@@ -225,12 +187,6 @@ pub fn part2_itertools(input: &str) -> u32 {
         .map(|items| magnitude(&sum(&items[0], &items[1])))
         .max()
         .unwrap()
-}
-
-struct Permutator<'a, T> {
-    i: usize,
-    j: usize,
-    expressions: &'a Vec<T>,
 }
 
 #[cfg(test)]
