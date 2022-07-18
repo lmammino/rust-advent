@@ -1,3 +1,44 @@
+impl<'a, T> Permutator<'a, T> {
+    fn new(expressions: &'a Vec<T>) -> Self {
+        Permutator {
+            i: 0,
+            j: 0,
+            expressions,
+        }
+    }
+}
+
+impl<'a, T> Iterator for Permutator<'a, T> {
+    type Item = (&'a T, &'a T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.i == self.j {
+            self.i += 1;
+
+            if self.i == self.expressions.len() {
+                self.i = 0;
+                self.j += 1;
+            }
+        }
+
+        if self.j == self.expressions.len() {
+            return None;
+        }
+
+        let left = self.expressions.get(self.i).unwrap();
+        let right = self.expressions.get(self.j).unwrap();
+
+        self.i += 1;
+
+        if self.i == self.expressions.len() {
+            self.i = 0;
+            self.j += 1;
+        }
+
+        Some((left, right))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 enum Pos {
     L,
@@ -32,7 +73,6 @@ fn tokenizer<'a>(line: &'a str) -> impl Iterator<Item = Token> + 'a {
         ']' => Token::Close,
         ',' => Token::Comma,
         _ => Token::Num(c.to_digit(10).unwrap()),
-        // TODO: handle possible errors
     })
 }
 
@@ -157,14 +197,40 @@ pub fn part2(input: &str) -> u32 {
                 let expr1 = expressions.get(i).unwrap();
                 let expr2 = expressions.get(j).unwrap();
                 let val = magnitude(&sum(expr1, expr2));
-                if val > max {
-                    max = val
-                }
+                max = val.max(max);
             }
         }
     }
 
     max
+}
+
+pub fn part2_permutator(input: &str) -> u32 {
+    let expressions: Vec<SNumExpr> = input.lines().map(parse).collect();
+    let permutator = Permutator::new(&expressions);
+
+    permutator
+        .map(|(left, right)| magnitude(&sum(left, right)))
+        .max()
+        .unwrap()
+}
+
+pub fn part2_itertools(input: &str) -> u32 {
+    use itertools::Itertools;
+
+    input
+        .lines()
+        .map(parse)
+        .permutations(2)
+        .map(|items| magnitude(&sum(&items[0], &items[1])))
+        .max()
+        .unwrap()
+}
+
+struct Permutator<'a, T> {
+    i: usize,
+    j: usize,
+    expressions: &'a Vec<T>,
 }
 
 #[cfg(test)]
@@ -181,6 +247,18 @@ mod tests {
     fn test_part2() {
         let input = include_str!("../input.txt");
         assert_eq!(part2(input), 4659);
+    }
+
+    #[test]
+    fn test_part2_permutator() {
+        let input = include_str!("../input.txt");
+        assert_eq!(part2_permutator(input), 4659);
+    }
+
+    #[test]
+    fn test_part2_itertools() {
+        let input = include_str!("../input.txt");
+        assert_eq!(part2_itertools(input), 4659);
     }
 
     #[test]
@@ -291,5 +369,28 @@ mod tests {
         for (expr1, expr2, expected) in cases {
             assert_eq!(sum(&parse(expr1), &parse(expr2)), parse(expected));
         }
+    }
+
+    #[test]
+    fn test_permutations() {
+        let sequence = vec![0, 1, 2, 3];
+        let expected = vec![
+            (&1, &0),
+            (&2, &0),
+            (&3, &0),
+            (&0, &1),
+            (&2, &1),
+            (&3, &1),
+            (&0, &2),
+            (&1, &2),
+            (&3, &2),
+            (&0, &3),
+            (&1, &3),
+            (&2, &3),
+        ];
+        let iter = Permutator::new(&sequence);
+        let permutations: Vec<(&i32, &i32)> = iter.collect();
+
+        assert_eq!(permutations, expected);
     }
 }
