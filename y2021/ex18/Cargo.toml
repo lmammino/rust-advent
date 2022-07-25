@@ -13,4 +13,5 @@ name = "bench_y2021ex18"
 harness = false
 
 [dependencies]
+generator = "0.7.1"
 itertools = "0.10.3"

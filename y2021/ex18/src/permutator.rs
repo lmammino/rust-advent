@@ -1,7 +1,7 @@
 pub struct Permutator<'a, T> {
     i: usize,
     j: usize,
-    expressions: &'a Vec<T>,
+    expressions: &'a [T],
 }
 
 impl<'a, T> Permutator<'a, T> {
