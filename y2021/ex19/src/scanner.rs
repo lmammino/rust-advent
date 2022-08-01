@@ -129,36 +129,21 @@ impl Scanner {
         scanners
     }
 
-    /*
-    def matches(scanner0, scanner1):
-        for i1, s1 in enumerate(rotations(scanner1)):
-            cnt = {}
-            for p0 in scanner0:
-                for p1 in s1:
-                    c = diff3(p0,p1)
-                    cnt[c] = cnt.get(c,0) + 1
-            m = [k for k,v in cnt.items() if v>=12]
-            if m:
-                return tuple(sum3(x, m[0]) for x in s1), m[0]
-        return None, None
-         */
-
     pub fn matches(&self, scanner: &Scanner) -> Option<Scanner> {
         for rotated_scanner in scanner.rotations() {
             let mut matching: HashMap<Point3D, usize> = Default::default();
             for point0 in &self.beacons {
                 for point1 in &rotated_scanner.beacons {
                     let key = point0 - point1;
-                    let x = matching.entry(key).or_default();
+                    // TODO: can we remove this clone? -.-
+                    let x = matching.entry(key.clone()).or_default();
                     *x += 1;
 
-                    // TODO: check if we can do the >= 12 check here
+                    if *x >= 12 {
+                        let normalised_scanner = rotated_scanner.moved(&key);
+                        return Some(normalised_scanner);
+                    }
                 }
-            }
-
-            if let Some((key, _)) = matching.iter().find(|(_, v)| **v >= 12) {
-                let normalised_scanner = rotated_scanner.moved(key);
-                return Some(normalised_scanner);
             }
         }
 
