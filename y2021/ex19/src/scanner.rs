@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-
+use generator::*;
 use crate::Point3D;
 
 #[derive(Debug, Clone)]
@@ -52,9 +52,8 @@ impl Scanner {
         }
     }
 
-    // TODO: optimization use the generator crate to do this lazily
-    pub fn rotations(&self) -> Vec<Scanner> {
-        let mut scanners = vec![];
+    pub fn rotations(&self) -> Generator<'_, (), Scanner> {
+        Gn::new_scoped(move |mut s| {
 
         let x: Vec<i32> = self.beacons.iter().map(|p| p.0).collect();
         let inv_x = inverse(&x);
@@ -63,70 +62,71 @@ impl Scanner {
         let z: Vec<i32> = self.beacons.iter().map(|p| p.2).collect();
         let inv_z = inverse(&z);
 
-        scanners.push(self.clone());
-        scanners.push(scanner_from_raw_coordinates(&x, &z, &y));
-        scanners.push(scanner_from_raw_coordinates(&y, &x, &z));
-        scanners.push(scanner_from_raw_coordinates(&y, &z, &x));
-        scanners.push(scanner_from_raw_coordinates(&z, &x, &y));
-        scanners.push(scanner_from_raw_coordinates(&z, &y, &x));
+        s.yield_with(self.clone());
+        s.yield_with(scanner_from_raw_coordinates(&x, &z, &y));
+        s.yield_with(scanner_from_raw_coordinates(&y, &x, &z));
+        s.yield_with(scanner_from_raw_coordinates(&y, &z, &x));
+        s.yield_with(scanner_from_raw_coordinates(&z, &x, &y));
+        s.yield_with(scanner_from_raw_coordinates(&z, &y, &x));
 
         // inverting z only
-        scanners.push(scanner_from_raw_coordinates(&x, &y, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&x, &inv_z, &y));
-        scanners.push(scanner_from_raw_coordinates(&y, &x, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&y, &inv_z, &x));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &x, &y));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &y, &x));
+        s.yield_with(scanner_from_raw_coordinates(&x, &y, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&x, &inv_z, &y));
+        s.yield_with(scanner_from_raw_coordinates(&y, &x, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&y, &inv_z, &x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &x, &y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &y, &x));
 
         // inverting y only
-        scanners.push(scanner_from_raw_coordinates(&x, &inv_y, &z));
-        scanners.push(scanner_from_raw_coordinates(&x, &z, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &x, &z));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &z, &x));
-        scanners.push(scanner_from_raw_coordinates(&z, &x, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&z, &inv_y, &x));
+        s.yield_with(scanner_from_raw_coordinates(&x, &inv_y, &z));
+        s.yield_with(scanner_from_raw_coordinates(&x, &z, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &x, &z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &z, &x));
+        s.yield_with(scanner_from_raw_coordinates(&z, &x, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&z, &inv_y, &x));
 
         // inverted z and y
-        scanners.push(scanner_from_raw_coordinates(&x, &inv_y, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&x, &inv_z, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &x, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &inv_z, &x));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &x, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &inv_y, &x));
+        s.yield_with(scanner_from_raw_coordinates(&x, &inv_y, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&x, &inv_z, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &x, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_z, &x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &x, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_y, &x));
 
         // inverted x, z & y
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &inv_y, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &inv_z, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &inv_x, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &inv_z, &inv_x));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &inv_x, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &inv_y, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_y, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_z, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_x, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_z, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_x, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_y, &inv_x));
 
         // inverted x & y
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &inv_y, &z));
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &z, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &inv_x, &z));
-        scanners.push(scanner_from_raw_coordinates(&inv_y, &z, &inv_x));
-        scanners.push(scanner_from_raw_coordinates(&z, &inv_x, &inv_y));
-        scanners.push(scanner_from_raw_coordinates(&z, &inv_y, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_y, &z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &z, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_x, &z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_y, &z, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&z, &inv_x, &inv_y));
+        s.yield_with(scanner_from_raw_coordinates(&z, &inv_y, &inv_x));
 
         // inverted x & z
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &y, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &inv_z, &y));
-        scanners.push(scanner_from_raw_coordinates(&y, &inv_x, &inv_z));
-        scanners.push(scanner_from_raw_coordinates(&y, &inv_z, &inv_x));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &inv_x, &y));
-        scanners.push(scanner_from_raw_coordinates(&inv_z, &y, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &y, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_z, &y));
+        s.yield_with(scanner_from_raw_coordinates(&y, &inv_x, &inv_z));
+        s.yield_with(scanner_from_raw_coordinates(&y, &inv_z, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_x, &y));
+        s.yield_with(scanner_from_raw_coordinates(&inv_z, &y, &inv_x));
 
         // inverted x
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &y, &z));
-        scanners.push(scanner_from_raw_coordinates(&inv_x, &z, &y));
-        scanners.push(scanner_from_raw_coordinates(&y, &inv_x, &z));
-        scanners.push(scanner_from_raw_coordinates(&y, &z, &inv_x));
-        scanners.push(scanner_from_raw_coordinates(&z, &inv_x, &y));
-        scanners.push(scanner_from_raw_coordinates(&z, &y, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &y, &z));
+        s.yield_with(scanner_from_raw_coordinates(&inv_x, &z, &y));
+        s.yield_with(scanner_from_raw_coordinates(&y, &inv_x, &z));
+        s.yield_with(scanner_from_raw_coordinates(&y, &z, &inv_x));
+        s.yield_with(scanner_from_raw_coordinates(&z, &inv_x, &y));
+        s.yield_with(scanner_from_raw_coordinates(&z, &y, &inv_x));
 
-        scanners
+        done!();
+        })
     }
 
     pub fn matches(&self, scanner: &Scanner) -> Option<Scanner> {

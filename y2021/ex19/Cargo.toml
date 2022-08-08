@@ -13,3 +13,4 @@ name = "bench_y2021ex19"
 harness = false
 
 [dependencies]
+generator = "0.7.1"
