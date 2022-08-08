@@ -1,6 +1,6 @@
 mod point3d;
 mod scanner;
-use std::{collections::{HashSet, HashMap}};
+use std::collections::HashSet;
 use point3d::*;
 use scanner::*;
 
@@ -39,12 +39,11 @@ pub fn part2(input: &str) -> i32 {
     let mut max_distance = 0;
     for s1 in &known_scanners {
         for s2 in &known_scanners {
-            let pos1 = s1.position.clone().unwrap();
-            let pos2 = s2.position.clone().unwrap();
+            let pos1 = s1.position.unwrap();
+            let pos2 = s2.position.unwrap();
             let distance = (pos1.0 - pos2.0).abs() + (pos1.1 - pos2.1).abs() + (pos1.2 - pos2.2).abs();
-            if distance > max_distance {
-                max_distance = distance;
-            }
+
+            max_distance = distance.max(max_distance);
         }
     }
 
