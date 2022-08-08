@@ -10,21 +10,14 @@ fn process_scanners (mut unknown_scanners: Vec<Scanner>) -> Vec<Scanner> {
     let mut known_scanners: Vec<Scanner> = vec![first_scanner];
 
     while !unknown_scanners.is_empty() {
-        let mut found_scanners: HashMap<usize, Scanner> = Default::default();
-        for k_scanner in &known_scanners {
-            for (i, u_scanner) in unknown_scanners.iter().enumerate() {
-                if let Some(matched_scanner) = k_scanner.matches(u_scanner) {
-                    found_scanners.insert(i, matched_scanner);
+        let known_scanner_length = known_scanners.len();
+        for i in 0..known_scanner_length {
+            for j in (0..unknown_scanners.len()).rev() {
+                if let Some(matched_scanner) = known_scanners[i].matches(&unknown_scanners[j]) {
+                    known_scanners.push(matched_scanner);
+                    unknown_scanners.remove(j);
                 }
             }
-        }
-
-        let mut sorted_items: Vec<(usize, Scanner)> = found_scanners.into_iter().collect();
-        sorted_items.sort_by_key(|s| -(s.0 as isize));
-
-        for (i, s) in sorted_items.into_iter() {
-            known_scanners.push(s);
-            unknown_scanners.remove(i);
         }
     }
 
