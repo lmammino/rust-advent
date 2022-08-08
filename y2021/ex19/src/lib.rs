@@ -23,8 +23,8 @@ fn process_scanners (mut unknown_scanners: Vec<Scanner>) -> Vec<Scanner> {
         sorted_items.sort_by_key(|s| -(s.0 as isize));
 
         for (i, s) in sorted_items.into_iter() {
-            known_scanners.push(s);
             unknown_scanners.remove(i);
+            known_scanners.push(s);
         }
     }
 
