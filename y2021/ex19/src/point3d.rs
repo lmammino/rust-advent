@@ -3,7 +3,7 @@ use std::{
     str::FromStr,
 };
 
-#[derive(Debug, Clone, Default, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash)]
 pub struct Point3D(pub i32, pub i32, pub i32);
 
 impl Add for Point3D {

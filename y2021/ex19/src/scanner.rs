@@ -40,92 +40,95 @@ fn scanner_from_raw_coordinates(x: &Vec<i32>, y: &Vec<i32>, z: &Vec<i32>) -> Sca
     }
 }
 
-fn inverse(list: &Vec<i32>) -> Vec<i32> {
-    list.iter().map(|x| -x).collect()
-}
-
 impl Scanner {
     pub fn moved(&self, point: &Point3D) -> Scanner {
         Scanner {
-            position: Some(point.clone()),
+            position: Some(*point),
             beacons: self.beacons.iter().map(|p| p + point).collect(),
         }
     }
 
     pub fn rotations(&self) -> Generator<'_, (), Scanner> {
         Gn::new_scoped(move |mut s| {
+            let (x, inv_x, y, inv_y, z, inv_z) = self.beacons.iter().fold(
+                // Now this is quite alot of arguments BUT, it only iterates through beacons once!
+                (vec![], vec![], vec![], vec![], vec![], vec![]),
+                |(mut x, mut xi, mut y, mut yi, mut z, mut zi), p| {
+                    x.push(p.0);
+                    xi.push(-p.0);
+                    y.push(p.1);
+                    yi.push(-p.1);
+                    z.push(p.2);
+                    zi.push(-p.2);
 
-        let x: Vec<i32> = self.beacons.iter().map(|p| p.0).collect();
-        let inv_x = inverse(&x);
-        let y: Vec<i32> = self.beacons.iter().map(|p| p.1).collect();
-        let inv_y = inverse(&y);
-        let z: Vec<i32> = self.beacons.iter().map(|p| p.2).collect();
-        let inv_z = inverse(&z);
+                    (x, xi, y, yi, z, zi)
+                },
+            );
 
-        s.yield_with(self.clone());
-        s.yield_with(scanner_from_raw_coordinates(&x, &z, &y));
-        s.yield_with(scanner_from_raw_coordinates(&y, &x, &z));
-        s.yield_with(scanner_from_raw_coordinates(&y, &z, &x));
-        s.yield_with(scanner_from_raw_coordinates(&z, &x, &y));
-        s.yield_with(scanner_from_raw_coordinates(&z, &y, &x));
+            s.yield_with(self.clone());
+            s.yield_with(scanner_from_raw_coordinates(&x, &z, &y));
+            s.yield_with(scanner_from_raw_coordinates(&y, &x, &z));
+            s.yield_with(scanner_from_raw_coordinates(&y, &z, &x));
+            s.yield_with(scanner_from_raw_coordinates(&z, &x, &y));
+            s.yield_with(scanner_from_raw_coordinates(&z, &y, &x));
 
-        // inverting z only
-        s.yield_with(scanner_from_raw_coordinates(&x, &y, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&x, &inv_z, &y));
-        s.yield_with(scanner_from_raw_coordinates(&y, &x, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&y, &inv_z, &x));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &x, &y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &y, &x));
+            // inverting z only
+            s.yield_with(scanner_from_raw_coordinates(&x, &y, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&x, &inv_z, &y));
+            s.yield_with(scanner_from_raw_coordinates(&y, &x, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&y, &inv_z, &x));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &x, &y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &y, &x));
 
-        // inverting y only
-        s.yield_with(scanner_from_raw_coordinates(&x, &inv_y, &z));
-        s.yield_with(scanner_from_raw_coordinates(&x, &z, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &x, &z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &z, &x));
-        s.yield_with(scanner_from_raw_coordinates(&z, &x, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&z, &inv_y, &x));
+            // inverting y only
+            s.yield_with(scanner_from_raw_coordinates(&x, &inv_y, &z));
+            s.yield_with(scanner_from_raw_coordinates(&x, &z, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &x, &z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &z, &x));
+            s.yield_with(scanner_from_raw_coordinates(&z, &x, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&z, &inv_y, &x));
 
-        // inverted z and y
-        s.yield_with(scanner_from_raw_coordinates(&x, &inv_y, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&x, &inv_z, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &x, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_z, &x));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &x, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_y, &x));
+            // inverted z and y
+            s.yield_with(scanner_from_raw_coordinates(&x, &inv_y, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&x, &inv_z, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &x, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_z, &x));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &x, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_y, &x));
 
-        // inverted x, z & y
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_y, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_z, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_x, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_z, &inv_x));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_x, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_y, &inv_x));
+            // inverted x, z & y
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_y, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_z, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_x, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_z, &inv_x));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_x, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_y, &inv_x));
 
-        // inverted x & y
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_y, &z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &z, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_x, &z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_y, &z, &inv_x));
-        s.yield_with(scanner_from_raw_coordinates(&z, &inv_x, &inv_y));
-        s.yield_with(scanner_from_raw_coordinates(&z, &inv_y, &inv_x));
+            // inverted x & y
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_y, &z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &z, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &inv_x, &z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_y, &z, &inv_x));
+            s.yield_with(scanner_from_raw_coordinates(&z, &inv_x, &inv_y));
+            s.yield_with(scanner_from_raw_coordinates(&z, &inv_y, &inv_x));
 
-        // inverted x & z
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &y, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_z, &y));
-        s.yield_with(scanner_from_raw_coordinates(&y, &inv_x, &inv_z));
-        s.yield_with(scanner_from_raw_coordinates(&y, &inv_z, &inv_x));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_x, &y));
-        s.yield_with(scanner_from_raw_coordinates(&inv_z, &y, &inv_x));
+            // inverted x & z
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &y, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &inv_z, &y));
+            s.yield_with(scanner_from_raw_coordinates(&y, &inv_x, &inv_z));
+            s.yield_with(scanner_from_raw_coordinates(&y, &inv_z, &inv_x));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &inv_x, &y));
+            s.yield_with(scanner_from_raw_coordinates(&inv_z, &y, &inv_x));
 
-        // inverted x
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &y, &z));
-        s.yield_with(scanner_from_raw_coordinates(&inv_x, &z, &y));
-        s.yield_with(scanner_from_raw_coordinates(&y, &inv_x, &z));
-        s.yield_with(scanner_from_raw_coordinates(&y, &z, &inv_x));
-        s.yield_with(scanner_from_raw_coordinates(&z, &inv_x, &y));
-        s.yield_with(scanner_from_raw_coordinates(&z, &y, &inv_x));
+            // inverted x
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &y, &z));
+            s.yield_with(scanner_from_raw_coordinates(&inv_x, &z, &y));
+            s.yield_with(scanner_from_raw_coordinates(&y, &inv_x, &z));
+            s.yield_with(scanner_from_raw_coordinates(&y, &z, &inv_x));
+            s.yield_with(scanner_from_raw_coordinates(&z, &inv_x, &y));
+            s.yield_with(scanner_from_raw_coordinates(&z, &y, &inv_x));
 
-        done!();
+            done!();
         })
     }
 
@@ -135,8 +138,7 @@ impl Scanner {
             for point0 in &self.beacons {
                 for point1 in &rotated_scanner.beacons {
                     let key = point0 - point1;
-                    // TODO: can we remove this clone? -.-
-                    let x = matching.entry(key.clone()).or_default();
+                    let x = matching.entry(key).or_default();
                     *x += 1;
 
                     if *x >= 12 {

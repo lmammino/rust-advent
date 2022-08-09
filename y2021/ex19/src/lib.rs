@@ -1,6 +1,6 @@
 mod point3d;
 mod scanner;
-use std::{collections::{HashSet, HashMap}};
+use std::collections::HashSet;
 use point3d::*;
 use scanner::*;
 
@@ -10,21 +10,14 @@ fn process_scanners (mut unknown_scanners: Vec<Scanner>) -> Vec<Scanner> {
     let mut known_scanners: Vec<Scanner> = vec![first_scanner];
 
     while !unknown_scanners.is_empty() {
-        let mut found_scanners: HashMap<usize, Scanner> = Default::default();
-        for k_scanner in &known_scanners {
-            for (i, u_scanner) in unknown_scanners.iter().enumerate() {
-                if let Some(matched_scanner) = k_scanner.matches(u_scanner) {
-                    found_scanners.insert(i, matched_scanner);
+        let known_scanner_length = known_scanners.len();
+        for i in 0..known_scanner_length {
+            for j in (0..unknown_scanners.len()).rev() {
+                if let Some(matched_scanner) = known_scanners[i].matches(&unknown_scanners[j]) {
+                    known_scanners.push(matched_scanner);
+                    unknown_scanners.remove(j);
                 }
             }
-        }
-
-        let mut sorted_items: Vec<(usize, Scanner)> = found_scanners.into_iter().collect();
-        sorted_items.sort_by_key(|s| -(s.0 as isize));
-
-        for (i, s) in sorted_items.into_iter() {
-            known_scanners.push(s);
-            unknown_scanners.remove(i);
         }
     }
 
@@ -46,12 +39,11 @@ pub fn part2(input: &str) -> i32 {
     let mut max_distance = 0;
     for s1 in &known_scanners {
         for s2 in &known_scanners {
-            let pos1 = s1.position.clone().unwrap();
-            let pos2 = s2.position.clone().unwrap();
+            let pos1 = s1.position.unwrap();
+            let pos2 = s2.position.unwrap();
             let distance = (pos1.0 - pos2.0).abs() + (pos1.1 - pos2.1).abs() + (pos1.2 - pos2.2).abs();
-            if distance > max_distance {
-                max_distance = distance;
-            }
+
+            max_distance = distance.max(max_distance);
         }
     }
 
