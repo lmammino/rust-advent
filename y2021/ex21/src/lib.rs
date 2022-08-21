@@ -164,7 +164,6 @@ pub fn part2(input: &str) -> usize {
         (9, 1),
     ];
 
-    // TODO: impl logic
     while !games.is_empty() {
         let (current_game, weight) = games.pop().unwrap();
 

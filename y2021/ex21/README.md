@@ -3,6 +3,7 @@
 
 [Check it out on adventofcode.com](https://adventofcode.com/2021/day/21)
 
+
 ## Part One
 
 There's not much to do as you slowly descend to the bottom of the ocean. The submarine computer challenges you to a nice game of Dirac Dice.
@@ -17,34 +18,36 @@ Since the first game is a practice game, the submarine opens a compartment label
 
 For example, given these starting positions:
 
-```
+
+```plain
 Player 1 starting position: 4
 Player 2 starting position: 8
 ```
 
 This is how the game would go:
 
-- Player 1 rolls 1+2+3 and moves to space 10 for a total score of 10.
-- Player 2 rolls 4+5+6 and moves to space 3 for a total score of 3.
-- Player 1 rolls 7+8+9 and moves to space 4 for a total score of 14.
-- Player 2 rolls 10+11+12 and moves to space 6 for a total score of 9.
-- Player 1 rolls 13+14+15 and moves to space 6 for a total score of 20.
-- Player 2 rolls 16+17+18 and moves to space 7 for a total score of 16.
-- Player 1 rolls 19+20+21 and moves to space 6 for a total score of 26.
-- Player 2 rolls 22+23+24 and moves to space 6 for a total score of 22.
+- Player `1` rolls `1+2+3` and moves to space `10` for a total score of `10`.
+- Player `2` rolls `4+5+6` and moves to space `3` for a total score of `3`.
+- Player `1` rolls `7+8+9` and moves to space `4` for a total score of `14`.
+- Player `2` rolls `10+11+12` and moves to space `6` for a total score of `9`.
+- Player `1` rolls `13+14+15` and moves to space `6` for a total score of `20`.
+- Player `2` rolls `16+17+18` and moves to space `7` for a total score of `16`.
+- Player `1` rolls `19+20+21` and moves to space `6` for a total score of `26`.
+- Player `2` rolls `22+23+24` and moves to space `6` for a total score of `22`.
 
 ...after many turns...
 
-- Player 2 rolls 82+83+84 and moves to space 6 for a total score of 742.
-- Player 1 rolls 85+86+87 and moves to space 4 for a total score of 990.
-- Player 2 rolls 88+89+90 and moves to space 3 for a total score of 745.
-- Player 1 rolls 91+92+93 and moves to space 10 for a final score, 1000.
+- Player `2` rolls `82+83+84` and moves to space `6` for a total score of `742`.
+- Player `1` rolls `85+86+87` and moves to space `4` for a total score of `990`.
+- Player `2` rolls `88+89+90` and moves to space `3` for a total score of `745`.
+- Player `1` rolls `91+92+93` and moves to space `10` for a final score, `1000`.
 
 Since player 1 has at least `1000` points, player 1 wins and the game ends. At this point, the losing player had `745` points and the die had been rolled a total of `993` times; `745 * 993 = 739785`.
 
 Play a practice game using the deterministic 100-sided die. The moment either player wins, **what do you get if you multiply the score of the losing player by the number of times the die was rolled during the game?**
 
 Your puzzle answer was `989352`.
+
 
 ## Part Two
 
