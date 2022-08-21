@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use generator::*;
 use crate::Point3D;
+use generator::*;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct Scanner {
@@ -26,7 +26,7 @@ pub fn scanners_from_input(input: &str) -> Vec<Scanner> {
         .collect()
 }
 
-fn scanner_from_raw_coordinates(x: &Vec<i32>, y: &Vec<i32>, z: &Vec<i32>) -> Scanner {
+fn scanner_from_raw_coordinates(x: &[i32], y: &[i32], z: &[i32]) -> Scanner {
     let beacons: Vec<Point3D> = x
         .iter()
         .zip(y.iter())

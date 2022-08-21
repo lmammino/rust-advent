@@ -15,7 +15,7 @@ pub fn part1(lines: Vec<&str>) -> u32 {
     let last_passports = lines.iter().fold(temp, |mut acc, x| {
         if x.trim() == "" {
             raw_passports.push(acc.join(" "));
-            return vec![];
+            vec![]
         } else {
             acc.push(x);
             acc
@@ -67,7 +67,7 @@ pub fn part2(lines: Vec<&str>) -> u32 {
     let last_passports = lines.iter().fold(temp, |mut acc, x| {
         if x.trim() == "" {
             raw_passports.push(acc.join(" "));
-            return vec![];
+            vec![]
         } else {
             acc.push(x);
             acc
