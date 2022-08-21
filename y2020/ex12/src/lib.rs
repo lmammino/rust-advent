@@ -97,7 +97,7 @@ impl Ship {
     }
 
     fn get_manhattan_distance(&self) -> u32 {
-        self.x.abs() as u32 + self.y.abs() as u32
+        self.x.unsigned_abs() + self.y.unsigned_abs()
     }
 }
 

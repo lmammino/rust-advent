@@ -74,7 +74,7 @@ pub fn part2(input: &str) -> usize {
 
     let mut tilemap: [[u16; 12]; 12] = [[0; 12]; 12];
     // we take an arbitrary corner (the first one) and we place it at 0,0 in the tilemap
-    let first_corner = *corners.get(0).unwrap();
+    let first_corner = *corners.first().unwrap();
     tilemap[0][0] = first_corner;
     // same for the 2 neighbours of the first corner
     let neighbours_of_first_corner = neighbours
