@@ -49,7 +49,7 @@ jobs:
         run: |
           export CARGO_PROFILE_RELEASE_DEBUG=true
           cargo bench --no-run
-          for f in `git diff --name-status main | grep -oP 'y\d+/ex\d+' | sort | uniq`; do
+          for f in `git diff --name-status -- main | grep -oP 'y\d+/ex\d+' | sort | uniq`; do
             ex="${f##*/}"
             year="${f%/*}"
             name="bench_${year}${ex}"
@@ -65,7 +65,7 @@ jobs:
 
       - name: flamegraph bench ONE
         id: fgb_one
-        if: ${{ github.event.inputs.benchName != 'all' }}
+        if: ${{ github.event.inputs.benchName != 'all' && github.event.inputs.benchName != '' }}
         run: |
           export CARGO_PROFILE_RELEASE_DEBUG=true
           name="${{ github.event.inputs.benchName }}"
