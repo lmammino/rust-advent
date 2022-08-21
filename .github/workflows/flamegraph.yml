@@ -2,9 +2,6 @@ name: Flamegraph Benchmarks
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  # push:
-#     branches: [ main ]
   pull_request:
     branches: [ main ]
     paths-ignore:
@@ -39,7 +36,6 @@ jobs:
       - name: install tools and libs
         run: |
           sudo apt install -y linux-tools-`uname -r`
-          # pip install pillow
 
       - name: install flamegraph
         run: |
@@ -53,16 +49,23 @@ jobs:
         run: |
           export CARGO_PROFILE_RELEASE_DEBUG=true
           cargo bench --no-run
-          for f in `find target/release/deps -executable -type f -name 'bench_*' | sort`; do
-              file_name="${f##*/}"
-              name="${file_name%-*}"
-              cargo flamegraph --bench $name -- --bench > /dev/null || true
-              cp flamegraph.svg flamegraphs/${name}.svg
+          for f in `git diff --name-status -- main | grep -oP 'y\d+/ex\d+' | sort | uniq`; do
+            ex="${f##*/}"
+            year="${f%/*}"
+            name="bench_${year}${ex}"
+            cargo flamegraph --bench $name -- --bench > /dev/null || true
+            cp flamegraph.svg flamegraphs/${name}.svg
           done
+          # for f in `find target/release/deps -executable -type f -name 'bench_*' | sort`; do
+          #     file_name="${f##*/}"
+          #     name="${file_name%-*}"
+          #     cargo flamegraph --bench $name -- --bench > /dev/null || true
+          #     cp flamegraph.svg flamegraphs/${name}.svg
+          # done
 
       - name: flamegraph bench ONE
         id: fgb_one
-        if: ${{ github.event.inputs.benchName != 'all' }}
+        if: ${{ github.event.inputs.benchName != 'all' && github.event.inputs.benchName != '' }}
         run: |
           export CARGO_PROFILE_RELEASE_DEBUG=true
           name="${{ github.event.inputs.benchName }}"
@@ -84,30 +87,3 @@ jobs:
             message.txt
             pid.txt
             flamegraphs/*      
-
-#       - name: Commit flamegraph
-#         uses: EndBug/add-and-commit@v7
-#         with:
-#           default_author: github_actions
-#           message: 'Update flamegraphs SVGs'
-#           add: 'flamegraphs/*'
-
-#       - name: "Create the PR comment message"
-#         id: pr_comment
-#         run: |
-#           PRCOMMENT="$(python tools/flamegraph_comment_template.py ${{ github.repository }} $(git rev-parse HEAD) flamegraphs/*)"        
-#           echo "::set-output name=pr_comment::${PRCOMMENT//$'\n'/%0A}" 
-
-#       - name: "Post to PR"
-#         if: ${{ github.event_name == 'pull_request' }}
-#         uses: unsplash/comment-on-pr@master
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           check_for_duplicate_msg: true
-#           msg: |
-#             ## Flamegraph
-
-#             http://github.com/${{ github.repository }}/runs/${{ github.run_id }}
-            
-#             ${{ steps.pr_comment.outputs.pr_comment }}
