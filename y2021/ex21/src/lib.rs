@@ -153,7 +153,7 @@ pub fn part2(input: &str) -> usize {
     // to happen (3 & 9 only once, 6 will happen 7 times per turn).
     // By doing this we can reduce the number of simulation to do, because we don't need
     // to run all the 27 simulations (per turn) but we can just run the 7 different cases.
-    // We will then have to multiple the outcome of every case to how many times that case will repeat.
+    // We will then have to multiply the outcome of every case to how many times that case will repeat.
     let universes = [
         (3_usize, 1_usize),
         (4, 3),
