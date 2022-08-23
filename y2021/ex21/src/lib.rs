@@ -68,7 +68,8 @@ impl FromStr for Player {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Player::new(s.split(": ").nth(1).unwrap().parse().unwrap()))
+        let pos: usize = s.split(": ").nth(1).unwrap().parse().unwrap();
+        Ok(Player::new(pos - 1))
     }
 }
 
@@ -95,10 +96,9 @@ impl Game {
 
 pub fn part1(input: &str) -> usize {
     let mut l = input.lines();
-    let player1_pos: usize = l.next().unwrap().parse().unwrap();
-    let player2_pos: usize = l.next().unwrap().parse().unwrap();
+    let mut player1: Player = l.next().unwrap().parse().unwrap();
+    let mut player2: Player = l.next().unwrap().parse().unwrap();
 
-    let (mut player1, mut player2) = (Player::new(player1_pos - 1), Player::new(player2_pos - 1));
     let mut current_player = &mut player1;
     let mut other_player = &mut player2;
     let mut die = DeterministicDie::new();
@@ -114,10 +114,10 @@ pub fn part1(input: &str) -> usize {
 
 pub fn part2(input: &str) -> usize {
     let mut l = input.lines();
-    let player1_pos: usize = l.next().unwrap().parse().unwrap();
-    let player2_pos: usize = l.next().unwrap().parse().unwrap();
-
-    let (player1, player2) = (Player::new(player1_pos - 1), Player::new(player2_pos - 1));
+    let (player1, player2) = (
+        l.next().unwrap().parse().unwrap(),
+        l.next().unwrap().parse().unwrap(),
+    );
 
     let game = Game::new(player1, player2);
 
