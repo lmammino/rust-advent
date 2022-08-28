@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[derive(Debug)]
 struct DeterministicDie {
     current: usize,
@@ -47,7 +49,6 @@ impl Player {
         self.pos = new_pos;
     }
 
-    // TODO: unify with previous method
     fn play_with_roll(&mut self, roll: usize) {
         let new_pos = (self.pos + roll) % 10;
         self.score += new_pos + 1;
@@ -60,6 +61,15 @@ impl Player {
 
     fn has_won_part2(&self) -> bool {
         self.score >= 21
+    }
+}
+
+impl FromStr for Player {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let pos: usize = s.split(": ").nth(1).unwrap().parse().unwrap();
+        Ok(Player::new(pos - 1))
     }
 }
 
@@ -86,24 +96,9 @@ impl Game {
 
 pub fn part1(input: &str) -> usize {
     let mut l = input.lines();
-    let player1_pos: usize = l
-        .next()
-        .unwrap()
-        .split(": ")
-        .nth(1)
-        .unwrap()
-        .parse()
-        .unwrap();
-    let player2_pos: usize = l
-        .next()
-        .unwrap()
-        .split(": ")
-        .nth(1)
-        .unwrap()
-        .parse()
-        .unwrap();
+    let mut player1: Player = l.next().unwrap().parse().unwrap();
+    let mut player2: Player = l.next().unwrap().parse().unwrap();
 
-    let (mut player1, mut player2) = (Player::new(player1_pos - 1), Player::new(player2_pos - 1));
     let mut current_player = &mut player1;
     let mut other_player = &mut player2;
     let mut die = DeterministicDie::new();
@@ -119,24 +114,10 @@ pub fn part1(input: &str) -> usize {
 
 pub fn part2(input: &str) -> usize {
     let mut l = input.lines();
-    let player1_pos: usize = l
-        .next()
-        .unwrap()
-        .split(": ")
-        .nth(1)
-        .unwrap()
-        .parse()
-        .unwrap();
-    let player2_pos: usize = l
-        .next()
-        .unwrap()
-        .split(": ")
-        .nth(1)
-        .unwrap()
-        .parse()
-        .unwrap();
-
-    let (player1, player2) = (Player::new(player1_pos - 1), Player::new(player2_pos - 1));
+    let (player1, player2) = (
+        l.next().unwrap().parse().unwrap(),
+        l.next().unwrap().parse().unwrap(),
+    );
 
     let game = Game::new(player1, player2);
 
