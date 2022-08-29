@@ -1,4 +1,10 @@
-use std::{collections::HashSet, str::FromStr};
+use itertools::Itertools;
+use std::{
+    collections::{HashMap, HashSet},
+    str::FromStr,
+};
+
+pub mod rectangle;
 
 #[derive(Debug)]
 struct Command {
@@ -25,7 +31,7 @@ impl FromStr for Command {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (on_raw, ranges_raw) = s.split_once(" ").unwrap();
+        let (on_raw, ranges_raw) = s.split_once(' ').unwrap();
         let on = on_raw == "on";
         let mut range_parts = ranges_raw.split(',');
         let (x_range_raw, y_range_raw, z_range_raw) = (
@@ -82,11 +88,28 @@ pub fn part1(input: &str) -> usize {
     space.len()
 }
 
-pub fn part2(_input: &str) -> usize {
+pub fn part2(input: &str) -> usize {
+    let commands = input.lines().map(|l| l.parse::<Command>().unwrap());
+    let commands2 = commands.clone();
+
+    let mut z_ranges: HashSet<isize> = Default::default();
+    for command in commands {
+        z_ranges.insert(command.z_range.0);
+        z_ranges.insert(command.z_range.1 + 1);
+    }
+    let mut z_ranges_sorted: Vec<isize> = z_ranges.into_iter().collect();
+    z_ranges_sorted.sort();
+
+    let mut z_tickness: HashMap<isize, usize> = Default::default();
+
+    for (a, b) in z_ranges_sorted.into_iter().tuple_windows() {
+        z_tickness.insert(a, (b - a) as usize);
+    }
+
+    for command in commands2 {}
+
     // TODO: This is too slow, find another approach
     // let mut space: HashSet<(isize, isize, isize)> = Default::default();
-
-    // let commands = input.lines().map(|l| l.parse::<Command>().unwrap());
 
     // for command in commands {
     //     for x in command.x_range.0..=command.x_range.1 {
