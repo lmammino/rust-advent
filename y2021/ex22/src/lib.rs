@@ -5,6 +5,7 @@ use std::{
 };
 
 pub mod rectangle;
+use rectangle::*;
 
 #[derive(Debug)]
 struct Command {
@@ -102,30 +103,42 @@ pub fn part2(input: &str) -> usize {
 
     let mut z_tickness: HashMap<isize, usize> = Default::default();
 
-    for (a, b) in z_ranges_sorted.into_iter().tuple_windows() {
-        z_tickness.insert(a, (b - a) as usize);
+    for (a, b) in z_ranges_sorted.iter().tuple_windows() {
+        z_tickness.insert(*a, (b - a) as usize);
     }
 
-    for command in commands2 {}
+    let mut planes: HashMap<isize, RectangleList> =
+        HashMap::from_iter(z_tickness.iter().map(|(z, _)| (*z, RectangleList::new())));
 
-    // TODO: This is too slow, find another approach
-    // let mut space: HashSet<(isize, isize, isize)> = Default::default();
+    for command in commands2 {
+        for z in z_ranges_sorted.iter() {
+            if command.z_range.0 <= *z && command.z_range.1 >= *z {
+                let rectangles = planes.get(z).unwrap();
+                let rectangle_to_subtract = Rectangle::new(
+                    command.x_range.0,
+                    command.y_range.0,
+                    command.x_range.1 + 1,
+                    command.y_range.1 + 1,
+                );
+                let mut diffed = diff(rectangles, &rectangle_to_subtract);
+                if command.on {
+                    diffed.push(rectangle_to_subtract);
+                }
+                planes.insert(*z, diffed);
+            }
+        }
+    }
 
-    // for command in commands {
-    //     for x in command.x_range.0..=command.x_range.1 {
-    //         for y in command.y_range.0..=command.y_range.1 {
-    //             for z in command.z_range.0..=command.z_range.1 {
-    //                 match command.on {
-    //                     true => space.insert((x, y, z)),
-    //                     false => space.remove(&(x, y, z)),
-    //                 };
-    //             }
-    //         }
-    //     }
-    // }
+    let mut num_cubes = 0;
 
-    // space.len()
-    1322825263376414
+    for (z, rectangles) in planes {
+        let tickness = z_tickness.get(&z).unwrap();
+        for rectangle in rectangles {
+            num_cubes += rectangle.area() * tickness;
+        }
+    }
+
+    num_cubes
 }
 
 #[cfg(test)]

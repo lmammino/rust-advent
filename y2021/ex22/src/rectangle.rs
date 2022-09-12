@@ -11,24 +11,30 @@ pub(crate) struct Rectangle {
 }
 
 impl Rectangle {
-    fn new(x0: isize, y0: isize, x1: isize, y1: isize) -> Self {
+    pub fn new(x0: isize, y0: isize, x1: isize, y1: isize) -> Self {
         Rectangle {
             p0: Point { x: x0, y: y0 },
             p1: Point { x: x1, y: y1 },
         }
     }
+
+    pub fn area(&self) -> usize {
+        let x = (self.p1.x - self.p0.x).abs() as usize;
+        let y = (self.p1.y - self.p0.y).abs() as usize;
+        x * y
+    }
 }
 
-type RectangleList = Vec<Rectangle>;
+pub(crate) type RectangleList = Vec<Rectangle>;
 
-pub(crate) fn diff(rectangles: RectangleList, rectangle: Rectangle) -> RectangleList {
+pub(crate) fn diff(rectangles: &RectangleList, rectangle: &Rectangle) -> RectangleList {
     let r = cut(rectangles, &rectangle.p0);
-    let mut r = cut(r, &rectangle.p1);
+    let mut r = cut(&r, &rectangle.p1);
     r.retain(|r| !is_inside(r, &rectangle));
     r
 }
 
-pub(crate) fn cut(rectangles: RectangleList, point: &Point) -> RectangleList {
+pub(crate) fn cut(rectangles: &RectangleList, point: &Point) -> RectangleList {
     let mut partial_result = vec![];
     for r in rectangles {
         if r.p0.x < point.x && point.x < r.p1.x {
@@ -53,7 +59,7 @@ pub(crate) fn cut(rectangles: RectangleList, point: &Point) -> RectangleList {
                 },
             });
         } else {
-            partial_result.push(r);
+            partial_result.push(r.clone());
         }
     }
 
@@ -124,7 +130,7 @@ mod tests {
             },
         ];
         let point = Point { x: 1, y: 1 };
-        let result = cut(rectangles, &point);
+        let result = cut(&rectangles, &point);
         assert_eq!(result.len(), 5);
         let expected_rectangles = vec![
             Rectangle::new(0, 0, 1, 1),
