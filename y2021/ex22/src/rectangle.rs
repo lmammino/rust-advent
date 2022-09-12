@@ -19,9 +19,9 @@ impl Rectangle {
     }
 
     pub fn area(&self) -> usize {
-        let x = (self.p1.x - self.p0.x).abs() as usize;
-        let y = (self.p1.y - self.p0.y).abs() as usize;
-        x * y
+        let x = (self.p1.x - self.p0.x).abs();
+        let y = (self.p1.y - self.p0.y).abs();
+        (x * y) as usize
     }
 }
 
@@ -30,7 +30,24 @@ pub(crate) type RectangleList = Vec<Rectangle>;
 pub(crate) fn diff(rectangles: &RectangleList, rectangle: &Rectangle) -> RectangleList {
     let r = cut(rectangles, &rectangle.p0);
     let mut r = cut(&r, &rectangle.p1);
-    r.retain(|r| !is_inside(r, &rectangle));
+    r.retain(|r| !is_inside(r, rectangle));
+    r.sort_by_key(|r| (r.p0.x, r.p0.y, r.p1.x, r.p1.y));
+
+    let mut i = 0;
+
+    while r.len() > 2 && i < r.len() - 1 {
+        let r0 = &r[i];
+        let r1 = &r[i + 1];
+        if (r0.p0.x == r1.p0.x && r0.p1.y == r1.p0.y && r0.p1.x == r1.p1.x)
+            || (r0.p1.x == r1.p0.x && r0.p0.y == r1.p1.y && r0.p0.y == r1.p0.y)
+        {
+            r[i] = Rectangle::new(r0.p0.x, r0.p0.y, r1.p1.x, r1.p1.y);
+            r.remove(i + 1);
+        } else {
+            i += 1;
+        }
+    }
+
     r
 }
 
