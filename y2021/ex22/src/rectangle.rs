@@ -28,8 +28,8 @@ impl Rectangle {
 pub(crate) type RectangleList = Vec<Rectangle>;
 
 pub(crate) fn diff(rectangles: &RectangleList, rectangle: &Rectangle) -> RectangleList {
-    let r = cut(rectangles, &rectangle.p0);
-    let mut r = cut(&r, &rectangle.p1);
+    let r = cut(rectangles, rectangle, &rectangle.p0);
+    let mut r = cut(&r, rectangle, &rectangle.p1);
     r.retain(|r| !is_inside(r, rectangle));
     r.sort_by_key(|r| (r.p0.x, r.p0.y, r.p1.x, r.p1.y));
 
@@ -51,10 +51,26 @@ pub(crate) fn diff(rectangles: &RectangleList, rectangle: &Rectangle) -> Rectang
     r
 }
 
-pub(crate) fn cut(rectangles: &RectangleList, point: &Point) -> RectangleList {
+fn touch(r1: &Rectangle, r2: &Rectangle) -> bool {
+    let (x1, y1, x2, y2) = (r1.p0.x, r1.p0.y, r1.p1.x, r1.p1.y);
+    let (x3, y3, x4, y4) = (r2.p0.x, r2.p0.y, r2.p1.x, r2.p1.y);
+
+    (x1 <= x3 && x3 <= x2 && y1 <= y3 && y3 <= y2)
+        || (x1 <= x4 && x4 <= x2 && y1 <= y3 && y3 <= y2)
+        || (x1 <= x3 && x3 <= x2 && y1 <= y4 && y4 <= y2)
+        || (x1 <= x4 && x4 <= x2 && y1 <= y4 && y4 <= y2)
+        || (x3 <= x1 && x1 <= x4 && y3 <= y1 && y1 <= y4)
+        || (x3 <= x2 && x2 <= x4 && y3 <= y1 && y1 <= y4)
+        || (x3 <= x1 && x1 <= x4 && y3 <= y2 && y2 <= y4)
+        || (x3 <= x2 && x2 <= x4 && y3 <= y2 && y2 <= y4)
+        || (x1 <= x4 && x4 <= x2 && y3 <= y1 && y4 >= y2)
+        || (y1 <= y4 && y4 <= y2 && x3 <= x1 && x4 >= x2)
+}
+
+fn cut(rectangles: &RectangleList, rectangle: &Rectangle, point: &Point) -> RectangleList {
     let mut partial_result = vec![];
     for r in rectangles {
-        if r.p0.x < point.x && point.x < r.p1.x {
+        if touch(r, rectangle) && r.p0.x < point.x && point.x < r.p1.x {
             partial_result.push(Rectangle {
                 p0: Point {
                     x: r.p0.x,
@@ -83,7 +99,7 @@ pub(crate) fn cut(rectangles: &RectangleList, point: &Point) -> RectangleList {
     let mut result = vec![];
 
     for r in partial_result {
-        if r.p0.y < point.y && point.y < r.p1.y {
+        if touch(&r, rectangle) && r.p0.y < point.y && point.y < r.p1.y {
             result.push(Rectangle {
                 p0: Point {
                     x: r.p0.x,
@@ -147,7 +163,7 @@ mod tests {
             },
         ];
         let point = Point { x: 1, y: 1 };
-        let result = cut(&rectangles, &point);
+        let result = cut(&rectangles, &Rectangle::new(1, 1, 2, 2), &point);
         assert_eq!(result.len(), 5);
         let expected_rectangles = vec![
             Rectangle::new(0, 0, 1, 1),
