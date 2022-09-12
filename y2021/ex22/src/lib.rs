@@ -65,36 +65,9 @@ impl FromStr for Command {
     }
 }
 
-pub fn part1(input: &str) -> usize {
-    let mut space: HashSet<(isize, isize, isize)> = Default::default();
-
-    let commands = input
-        .lines()
-        .map(|l| l.parse::<Command>().unwrap())
-        .filter(|c| c.in_cube(50));
-
-    for command in commands {
-        for x in command.x_range.0..=command.x_range.1 {
-            for y in command.y_range.0..=command.y_range.1 {
-                for z in command.z_range.0..=command.z_range.1 {
-                    match command.on {
-                        true => space.insert((x, y, z)),
-                        false => space.remove(&(x, y, z)),
-                    };
-                }
-            }
-        }
-    }
-
-    space.len()
-}
-
-pub fn part2(input: &str) -> usize {
-    let commands = input.lines().map(|l| l.parse::<Command>().unwrap());
-    let commands2 = commands.clone();
-
+fn solve(commands: Vec<Command>) -> usize {
     let mut z_ranges: HashSet<isize> = Default::default();
-    for command in commands {
+    for command in commands.iter() {
         z_ranges.insert(command.z_range.0);
         z_ranges.insert(command.z_range.1 + 1);
     }
@@ -110,7 +83,7 @@ pub fn part2(input: &str) -> usize {
     let mut planes: HashMap<isize, RectangleList> =
         HashMap::from_iter(z_tickness.iter().map(|(z, _)| (*z, RectangleList::new())));
 
-    for command in commands2 {
+    for command in commands.iter() {
         for z in z_ranges_sorted.iter() {
             if command.z_range.0 <= *z && command.z_range.1 >= *z {
                 let rectangles = planes.get(z).unwrap();
@@ -139,6 +112,24 @@ pub fn part2(input: &str) -> usize {
     }
 
     num_cubes
+}
+
+pub fn part1(input: &str) -> usize {
+    let commands: Vec<Command> = input
+        .lines()
+        .map(|l| l.parse::<Command>().unwrap())
+        .filter(|c| c.in_cube(50))
+        .collect();
+
+    solve(commands)
+}
+
+pub fn part2(input: &str) -> usize {
+    let commands: Vec<Command> = input
+        .lines()
+        .map(|l| l.parse::<Command>().unwrap())
+        .collect();
+    solve(commands)
 }
 
 #[cfg(test)]
