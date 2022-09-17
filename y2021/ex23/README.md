@@ -5,6 +5,7 @@
 
 
 ## Part One
+
 A group of [amphipods](https://en.wikipedia.org/wiki/Amphipoda) notice your fancy submarine and flag you down. "With such an impressive shell," one amphipod [says](https://en.wikipedia.org/wiki/Amphipoda "What? You didn't know amphipods can talk?"), "surely you can help us with a question that has stumped our best scientists."
 
 They go on to explain that a group of timid, stubborn amphipods live in a nearby burrow. Four types of amphipods live there: **Amber** (A), **Bronze** (B), **Copper** (C), and **Desert** (D). They live in a burrow that consists of a **hallway** and four **side rooms**. The side rooms are initially full of amphipods, and the hallway is initially empty.
@@ -13,7 +14,7 @@ They give you a **diagram of the situation** (your puzzle input), including loca
 
 For example:
 
-```
+```plain
 #############
 #...........#
 ###B#C#B#D###
@@ -23,7 +24,7 @@ For example:
 
 The amphipods would like a method to organize every amphipod into side rooms so that each side room contains one type of amphipod and the types are sorted A-D going left to right, like this:
 
-```
+```plain
 #############
 #...........#
 ###A#B#C#D###
@@ -43,7 +44,7 @@ In the above example, the amphipods can be organized using a minimum of `12521` 
 
 Starting configuration:
 
-```
+```plain
 #############
 #...........#
 ###B#C#B#D###
@@ -53,7 +54,7 @@ Starting configuration:
 
 One Bronze amphipod moves into the hallway, taking 4 steps and using 40 energy:
 
-```
+```plain
 #############
 #...B.......#
 ###B#C#.#D###
@@ -63,7 +64,7 @@ One Bronze amphipod moves into the hallway, taking 4 steps and using 40 energy:
 
 The only Copper amphipod not in its side room moves there, taking 4 steps and using 400 energy:
 
-```
+```plain
 #############
 #...B.......#
 ###B#.#C#D###
@@ -73,7 +74,7 @@ The only Copper amphipod not in its side room moves there, taking 4 steps and us
 
 A Desert amphipod moves out of the way, taking 3 steps and using 3000 energy, and then the Bronze amphipod takes its place, taking 3 steps and using 30 energy:
 
-```
+```plain
 #############
 #.....D.....#
 ###B#.#C#D###
@@ -83,7 +84,7 @@ A Desert amphipod moves out of the way, taking 3 steps and using 3000 energy, an
 
 The leftmost Bronze amphipod moves to its room using 40 energy:
 
-```
+```plain
 #############
 #.....D.....#
 ###.#B#C#D###
@@ -93,7 +94,7 @@ The leftmost Bronze amphipod moves to its room using 40 energy:
 
 Both amphipods in the rightmost room move into the hallway, using 2003 energy in total:
 
-```
+```plain
 #############
 #.....D.D.A.#
 ###.#B#C#.###
@@ -103,7 +104,7 @@ Both amphipods in the rightmost room move into the hallway, using 2003 energy in
 
 Both Desert amphipods move into the rightmost room using 7000 energy:
 
-```
+```plain
 #############
 #.........A.#
 ###.#B#C#D###
@@ -113,7 +114,7 @@ Both Desert amphipods move into the rightmost room using 7000 energy:
 
 Finally, the last Amber amphipod moves into its room, using 8 energy:
 
-```
+```plain
 #############
 #...........#
 ###A#B#C#D###
@@ -125,7 +126,9 @@ Finally, the last Amber amphipod moves into its room, using 8 energy:
 
 Your puzzle answer was `18195`.
 
+
 ## Part Two
+
 As you prepare to give the amphipods your solution, you notice that the diagram they handed you was actually folded up. As you unfold it, you discover an extra part of the diagram.
 
 Between the first and second lines of text that contain amphipod starting positions, insert the following lines:
@@ -137,7 +140,7 @@ Between the first and second lines of text that contain amphipod starting positi
 
 So, the above example now becomes:
 
-```
+```plain
 #############
 #...........#
 ###B#C#B#D###
@@ -149,7 +152,7 @@ So, the above example now becomes:
 
 The amphipods still want to be organized into rooms similar to before:
 
-```
+```plain
 #############
 #...........#
 ###A#B#C#D###
@@ -161,7 +164,7 @@ The amphipods still want to be organized into rooms similar to before:
 
 In this updated example, the least energy required to organize these amphipods is `44169`:
 
-```
+```plain
 #############
 #...........#
 ###B#C#B#D###
@@ -172,7 +175,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #..........D#
 ###B#C#B#.###
@@ -183,7 +186,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #A.........D#
 ###B#C#B#.###
@@ -194,7 +197,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #A........BD#
 ###B#C#.#.###
@@ -205,7 +208,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #A......B.BD#
 ###B#C#.#.###
@@ -216,7 +219,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.....B.BD#
 ###B#C#.#.###
@@ -227,7 +230,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.....B.BD#
 ###B#.#.#.###
@@ -238,7 +241,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.....B.BD#
 ###B#.#.#.###
@@ -249,7 +252,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA...B.B.BD#
 ###B#.#.#.###
@@ -260,7 +263,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.D.B.B.BD#
 ###B#.#.#.###
@@ -271,7 +274,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.D...B.BD#
 ###B#.#.#.###
@@ -282,7 +285,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.D.....BD#
 ###B#.#.#.###
@@ -293,7 +296,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.D......D#
 ###B#.#.#.###
@@ -304,7 +307,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.D......D#
 ###B#.#C#.###
@@ -315,7 +318,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.D.....AD#
 ###B#.#C#.###
@@ -326,7 +329,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.......AD#
 ###B#.#C#.###
@@ -337,7 +340,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.......AD#
 ###.#B#C#.###
@@ -348,7 +351,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.......AD#
 ###.#B#C#.###
@@ -359,7 +362,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #AA.D.....AD#
 ###.#B#C#.###
@@ -370,7 +373,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #A..D.....AD#
 ###.#B#C#.###
@@ -381,7 +384,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #...D.....AD#
 ###.#B#C#.###
@@ -392,7 +395,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #.........AD#
 ###.#B#C#.###
@@ -403,7 +406,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #..........D#
 ###A#B#C#.###
@@ -414,7 +417,7 @@ In this updated example, the least energy required to organize these amphipods i
 ```
 
 
-```
+```plain
 #############
 #...........#
 ###A#B#C#D###
