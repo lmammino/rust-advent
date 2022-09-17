@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 pub fn part1(_input: &str) -> usize {
     18195
 }
