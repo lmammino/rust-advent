@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq)]
 pub(crate) enum Amphipod {
     A,
     B,
@@ -23,6 +23,10 @@ impl Amphipod {
             Amphipod::C => 2,
             Amphipod::D => 3,
         }
+    }
+
+    pub(crate) fn all() -> [Amphipod; 4] {
+        [Amphipod::A, Amphipod::B, Amphipod::C, Amphipod::D]
     }
 }
 
