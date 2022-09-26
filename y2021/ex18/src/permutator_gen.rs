@@ -1,6 +1,6 @@
 use generator::*;
 
-pub fn permutations<'a, T>(elements: &'a [T]) -> Generator<'_, (), (&'a T, &'a T)>
+pub fn permutations<T>(elements: &[T]) -> Generator<'_, (), (&T, &T)>
 where
     T: Send + Sync,
 {
