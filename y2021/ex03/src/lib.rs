@@ -50,11 +50,7 @@ pub fn part2<const T: usize>(input: &str) -> usize {
         // The following could be eventually done this way:
         // oxy_gen_candidates.drain_filter(|digits| digits[i] == most_common_digit);
         // once `drain_filter` gets stable
-        oxy_gen_candidates = oxy_gen_candidates
-            .iter()
-            .filter(|digits| digits[i] == most_common_digit)
-            .cloned()
-            .collect();
+        oxy_gen_candidates.retain(|digits| digits[i] == most_common_digit);
 
         i += 1;
     }
@@ -68,11 +64,7 @@ pub fn part2<const T: usize>(input: &str) -> usize {
         } else {
             0
         };
-        co2_scrubber_candidates = co2_scrubber_candidates
-            .iter()
-            .filter(|digits| digits[i] == least_common_digit)
-            .cloned()
-            .collect();
+        co2_scrubber_candidates.retain(|digits| digits[i] == least_common_digit);
 
         i += 1;
     }

@@ -25,7 +25,7 @@ impl Deck {
         // The hashing function is similar to the calculate_score one
         // this hash is not perfect, it can lead to some collisions, but it is "good enough" for our tests
         // The speedup compared to use the whole cards VecDeque is huge (90% faster), still using the default rust HashSet
-        (&self.cards)
+        self.cards
             .iter()
             .enumerate()
             .map(|(i, n)| (i * 29 + 1) * n)
@@ -152,7 +152,7 @@ mod ex22_tests {
         let input = include_str!("../input.txt");
         assert_eq!(part2(input), 33651);
     }
-    
+
     #[test]
     fn test_hash_set_tuple_eq() {
         let deck1 = Deck::from_str("Player1:\n1").unwrap();

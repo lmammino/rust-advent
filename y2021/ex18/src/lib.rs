@@ -31,7 +31,7 @@ enum Token {
     Num(u32),
 }
 
-fn tokenizer<'a>(line: &'a str) -> impl Iterator<Item = Token> + '_ {
+fn tokenizer(line: &str) -> impl Iterator<Item = Token> + '_ {
     line.chars().map(|c| match c {
         '[' => Token::Open,
         ']' => Token::Close,
