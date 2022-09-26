@@ -1,10 +1,10 @@
-use crate::{amphipod::Amphipod, command::Command};
-use std::{str::FromStr, collections::VecDeque};
+use crate::{amphipod::Amphipod, command::Command, hole::Hole};
+use std::{str::FromStr};
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub(crate) struct Burrow<const DEPTH:usize> {
     hallway: [Option<Amphipod>; 11],
-    holes: [VecDeque<Amphipod>; 4],
+    holes: [Hole<DEPTH>; 4],
     pub cost: usize,
 }
 
@@ -26,7 +26,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
                 continue;
             }
 
-            if hole.iter().all(|a| a.desired_home_idx() == idx) {
+            if hole.iter_filled().all(|a| a.desired_home_idx() == idx) {
                 continue;
             }
 
@@ -77,7 +77,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
             let desired_home_x = desired_home_idx * 2 + 2;
             let desired_home = &self.holes[desired_home_idx];
 
-            if (desired_home.is_empty() || desired_home.iter().all(|a| a == &amphipod))
+            if (desired_home.is_empty() || desired_home.iter_filled().all(|a| a == amphipod))
                 && (self
                     .between(idx, desired_home_x)
                     .iter()
@@ -109,14 +109,14 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
                     * (DEPTH - new_state.holes[*home_x / 2 - 1].len() 
                     // horiz cost
                         + (*home_x as isize - *pos_hallway as isize).unsigned_abs());
-                new_state.holes[*home_x / 2 - 1].push_front(amphipod);
+                new_state.holes[*home_x / 2 - 1].push(amphipod);
                 
             }
             Command::Out {
                 home_x,
                 pos_hallway,
             } => {
-                let amphipod = new_state.holes[*home_x / 2 - 1].pop_front().unwrap();
+                let amphipod = new_state.holes[*home_x / 2 - 1].pop().unwrap();
                 new_state.hallway[*pos_hallway] = Some(amphipod);
                 cost = amphipod.move_cost()
                     // vert cost
@@ -137,7 +137,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
                 return false;
             }
 
-            if hole.iter().any(|a| a != &amphipod) {
+            if hole.iter_filled().any(|a| a != amphipod) {
                 return false;
             }
         }
@@ -151,18 +151,18 @@ impl <const DEPTH: usize> FromStr for Burrow<DEPTH> {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let hallway: [Option<Amphipod>; 11] = [None; 11];
-        let mut holes: [VecDeque<Amphipod>; 4] = [VecDeque::new(), VecDeque::new(), VecDeque::new(), VecDeque::new()];
+        let mut holes = [Hole::<DEPTH>::new(), Hole::<DEPTH>::new(), Hole::<DEPTH>::new(), Hole::<DEPTH>::new()];
 
         let hole_pos = [3, 5, 7, 9];
 
-        'outer: for line in s.lines().skip(2) {
+        'outer: for line in s.lines().rev().skip(1) {
             for pos in hole_pos {
                 let char = line.chars().nth(pos).unwrap();
-                if char == '#' {
+                if char == '.' {
                     break 'outer;
                 }
                 let amphipod: Amphipod = char.into();
-                holes[(pos - 3) / 2].push_back(amphipod);
+                holes[(pos - 3) / 2].push(amphipod);
             }
         }
 

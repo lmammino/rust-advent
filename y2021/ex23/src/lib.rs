@@ -1,6 +1,7 @@
 pub(crate) mod amphipod;
 pub(crate) mod burrow;
 pub(crate) mod command;
+pub(crate) mod hole;
 
 use std::collections::{HashMap, VecDeque};
 
