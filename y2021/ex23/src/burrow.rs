@@ -1,5 +1,5 @@
 use crate::{amphipod::Amphipod, command::Command, hole::Hole};
-use std::{str::FromStr};
+use std::{str::FromStr, collections::BinaryHeap};
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub(crate) struct Burrow<const DEPTH:usize> {
@@ -17,8 +17,8 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
         }
     }
 
-    pub(crate) fn moves(&self) -> Vec<Command> {
-        let mut moves = Vec::new();
+    pub(crate) fn moves(&self) -> BinaryHeap<Command> {
+        let mut moves = BinaryHeap::new();
 
         // simulates amphipods going outside
         for (idx, hole) in self.holes.iter().enumerate() {
@@ -29,6 +29,8 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
             if hole.iter_filled().all(|a| a.desired_home_idx() == idx) {
                 continue;
             }
+
+            let amphipod = hole.iter_filled().next().unwrap();
 
             let start = idx * 2 + 2;
 
@@ -42,6 +44,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
                     moves.push(Command::Out {
                         home_x: start,
                         pos_hallway: pos as usize,
+                        amphipod
                     });
                 }
 
@@ -58,6 +61,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
                     moves.push(Command::Out {
                         home_x: start,
                         pos_hallway: pos,
+                        amphipod,
                     });
                 }
 
@@ -86,6 +90,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
                 moves.push(Command::In {
                     home_x: desired_home_x,
                     pos_hallway: idx,
+                    amphipod,
                 });
             }
         }
@@ -101,6 +106,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
             Command::In {
                 home_x,
                 pos_hallway,
+                amphipod:_,
             } => {
                 let amphipod = new_state.hallway[*pos_hallway].unwrap();
                 new_state.hallway[*pos_hallway] = None;
@@ -115,6 +121,7 @@ impl <const DEPTH:usize> Burrow<DEPTH> {
             Command::Out {
                 home_x,
                 pos_hallway,
+                amphipod:_,
             } => {
                 let amphipod = new_state.holes[*home_x / 2 - 1].pop().unwrap();
                 new_state.hallway[*pos_hallway] = Some(amphipod);
@@ -174,6 +181,19 @@ impl <const DEPTH: usize> FromStr for Burrow<DEPTH> {
     }
 }
 
+impl <const DEPTH: usize> Ord for Burrow<DEPTH> {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.cost.cmp(&other.cost).reverse()
+    }
+}
+
+impl <const DEPTH: usize> PartialOrd for Burrow<DEPTH> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -188,6 +208,7 @@ mod tests {
     let new_burrow = burrow.apply(&Command::Out {
         home_x: 2,
         pos_hallway: 1,
+        amphipod: Amphipod::A
     });
 
     // A moved 1 up and 1 left
@@ -196,6 +217,7 @@ mod tests {
     let new_burrow = new_burrow.apply(&Command::Out {
         home_x: 2,
         pos_hallway: 3,
+        amphipod: Amphipod::D,
     });
 
     // D moved 2 up and 1 right (+3000)
@@ -204,6 +226,7 @@ mod tests {
     let new_burrow = new_burrow.apply(&Command::In {
         home_x: 2,
         pos_hallway: 1,
+        amphipod: Amphipod::A
     });
 
     // A moved 1 right and 2 down (+3)
