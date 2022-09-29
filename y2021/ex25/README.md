@@ -73,232 +73,232 @@ After a single step, of the sea cucumbers on the left, only the south-facing sea
 Due to **strong water currents** in the area, sea cucumbers that move off the right edge of the map appear on the left edge, and sea cucumbers that move off the bottom edge of the map appear on the top edge. Sea cucumbers always check whether their destination location is empty before moving, even if that destination is on the opposite side of the map:
 
 ```plain
-Initial state:
-...>...
-.......
-......>
-v.....>
-......>
-.......
-..vvv..
+    Initial state:
+    ...>...
+    .......
+    ......>
+    v.....>
+    ......>
+    .......
+    ..vvv..
 
-After 1 step:
-..vv>..
-.......
->......
-v.....>
->......
-.......
-....v..
+    After 1 step:
+    ..vv>..
+    .......
+    >......
+    v.....>
+    >......
+    .......
+    ....v..
 
-After 2 steps:
-....v>.
-..vv...
-.>.....
-......>
-v>.....
-.......
-.......
-```
+    After 2 steps:
+    ....v>.
+    ..vv...
+    .>.....
+    ......>
+    v>.....
+    .......
+    .......
+    ```
 
-After 3 steps:
-......>
-..v.v..
-..>v...
->......
-..>....
-v......
-.......
+    After 3 steps:
+    ......>
+    ..v.v..
+    ..>v...
+    >......
+    ..>....
+    v......
+    .......
 
-After 4 steps:
->......
-..v....
-..>.v..
-.>.v...
-...>...
-.......
-v......
+    After 4 steps:
+    >......
+    ..v....
+    ..>.v..
+    .>.v...
+    ...>...
+    .......
+    v......
 ```
 
 To find a safe place to land your submarine, the sea cucumbers need to stop moving. Again consider the first example:
 
 ```plain
-Initial state:
-v...>>.vv>
-.vv>>.vv..
->>.>v>...v
->>v>>.>.v.
-v>v.vv.v..
->.>>..v...
-.vv..>.>v.
-v.v..>>v.v
-....v..v.>
+    Initial state:
+    v...>>.vv>
+    .vv>>.vv..
+    >>.>v>...v
+    >>v>>.>.v.
+    v>v.vv.v..
+    >.>>..v...
+    .vv..>.>v.
+    v.v..>>v.v
+    ....v..v.>
 
-After 1 step:
-....>.>v.>
-v.v>.>v.v.
->v>>..>v..
->>v>v>.>.v
-.>v.v...v.
-v>>.>vvv..
-..v...>>..
-vv...>>vv.
->.v.v..v.v
+    After 1 step:
+    ....>.>v.>
+    v.v>.>v.v.
+    >v>>..>v..
+    >>v>v>.>.v
+    .>v.v...v.
+    v>>.>vvv..
+    ..v...>>..
+    vv...>>vv.
+    >.v.v..v.v
 
-After 2 steps:
->.v.v>>..v
-v.v.>>vv..
->v>.>.>.v.
->>v>v.>v>.
-.>..v....v
-.>v>>.v.v.
-v....v>v>.
-.vv..>>v..
-v>.....vv.
+    After 2 steps:
+    >.v.v>>..v
+    v.v.>>vv..
+    >v>.>.>.v.
+    >>v>v.>v>.
+    .>..v....v
+    .>v>>.v.v.
+    v....v>v>.
+    .vv..>>v..
+    v>.....vv.
 
-After 3 steps:
-v>v.v>.>v.
-v...>>.v.v
->vv>.>v>..
->>v>v.>.v>
-..>....v..
-.>.>v>v..v
-..v..v>vv>
-v.v..>>v..
-.v>....v..
+    After 3 steps:
+    v>v.v>.>v.
+    v...>>.v.v
+    >vv>.>v>..
+    >>v>v.>.v>
+    ..>....v..
+    .>.>v>v..v
+    ..v..v>vv>
+    v.v..>>v..
+    .v>....v..
 
-After 4 steps:
-v>..v.>>..
-v.v.>.>.v.
->vv.>>.v>v
->>.>..v>.>
-..v>v...v.
-..>>.>vv..
->.v.vv>v.v
-.....>>vv.
-vvv>...v..
+    After 4 steps:
+    v>..v.>>..
+    v.v.>.>.v.
+    >vv.>>.v>v
+    >>.>..v>.>
+    ..v>v...v.
+    ..>>.>vv..
+    >.v.vv>v.v
+    .....>>vv.
+    vvv>...v..
 
-After 5 steps:
-vv>...>v>.
-v.v.v>.>v.
->.v.>.>.>v
->v>.>..v>>
-..v>v.v...
-..>.>>vvv.
-.>...v>v..
-..v.v>>v.v
-v.v.>...v.
+    After 5 steps:
+    vv>...>v>.
+    v.v.v>.>v.
+    >.v.>.>.>v
+    >v>.>..v>>
+    ..v>v.v...
+    ..>.>>vvv.
+    .>...v>v..
+    ..v.v>>v.v
+    v.v.>...v.
 
-...
+    ...
 
-After 10 steps:
-..>..>>vv.
-v.....>>.v
-..v.v>>>v>
-v>.>v.>>>.
-..v>v.vv.v
-.v.>>>.v..
-v.v..>v>..
-..v...>v.>
-.vv..v>vv.
+    After 10 steps:
+    ..>..>>vv.
+    v.....>>.v
+    ..v.v>>>v>
+    v>.>v.>>>.
+    ..v>v.vv.v
+    .v.>>>.v..
+    v.v..>v>..
+    ..v...>v.>
+    .vv..v>vv.
 
-...
+    ...
 
-After 20 steps:
-v>.....>>.
->vv>.....v
-.>v>v.vv>>
-v>>>v.>v.>
-....vv>v..
-.v.>>>vvv.
-..v..>>vv.
-v.v...>>.v
-..v.....v>
+    After 20 steps:
+    v>.....>>.
+    >vv>.....v
+    .>v>v.vv>>
+    v>>>v.>v.>
+    ....vv>v..
+    .v.>>>vvv.
+    ..v..>>vv.
+    v.v...>>.v
+    ..v.....v>
 
-...
+    ...
 
-After 30 steps:
-.vv.v..>>>
-v>...v...>
->.v>.>vv.>
->v>.>.>v.>
-.>..v.vv..
-..v>..>>v.
-....v>..>v
-v.v...>vv>
-v.v...>vvv
+    After 30 steps:
+    .vv.v..>>>
+    v>...v...>
+    >.v>.>vv.>
+    >v>.>.>v.>
+    .>..v.vv..
+    ..v>..>>v.
+    ....v>..>v
+    v.v...>vv>
+    v.v...>vvv
 
-...
+    ...
 
-After 40 steps:
->>v>v..v..
-..>>v..vv.
-..>>>v.>.v
-..>>>>vvv>
-v.....>...
-v.v...>v>>
->vv.....v>
-.>v...v.>v
-vvv.v..v.>
+    After 40 steps:
+    >>v>v..v..
+    ..>>v..vv.
+    ..>>>v.>.v
+    ..>>>>vvv>
+    v.....>...
+    v.v...>v>>
+    >vv.....v>
+    .>v...v.>v
+    vvv.v..v.>
 
-...
+    ...
 
-After 50 steps:
-..>>v>vv.v
-..v.>>vv..
-v.>>v>>v..
-..>>>>>vv.
-vvv....>vv
-..v....>>>
-v>.......>
-.vv>....v>
-.>v.vv.v..
+    After 50 steps:
+    ..>>v>vv.v
+    ..v.>>vv..
+    v.>>v>>v..
+    ..>>>>>vv.
+    vvv....>vv
+    ..v....>>>
+    v>.......>
+    .vv>....v>
+    .>v.vv.v..
 
-...
+    ...
 
-After 55 steps:
-..>>v>vv..
-..v.>>vv..
-..>>v>>vv.
-..>>>>>vv.
-v......>vv
-v>v....>>v
-vvv...>..>
->vv.....>.
-.>v.vv.v..
+    After 55 steps:
+    ..>>v>vv..
+    ..v.>>vv..
+    ..>>v>>vv.
+    ..>>>>>vv.
+    v......>vv
+    v>v....>>v
+    vvv...>..>
+    >vv.....>.
+    .>v.vv.v..
 
-After 56 steps:
-..>>v>vv..
-..v.>>vv..
-..>>v>>vv.
-..>>>>>vv.
-v......>vv
-v>v....>>v
-vvv....>.>
->vv......>
-.>v.vv.v..
+    After 56 steps:
+    ..>>v>vv..
+    ..v.>>vv..
+    ..>>v>>vv.
+    ..>>>>>vv.
+    v......>vv
+    v>v....>>v
+    vvv....>.>
+    >vv......>
+    .>v.vv.v..
 
-After 57 steps:
-..>>v>vv..
-..v.>>vv..
-..>>v>>vv.
-..>>>>>vv.
-v......>vv
-v>v....>>v
-vvv.....>>
->vv......>
-.>v.vv.v..
+    After 57 steps:
+    ..>>v>vv..
+    ..v.>>vv..
+    ..>>v>>vv.
+    ..>>>>>vv.
+    v......>vv
+    v>v....>>v
+    vvv.....>>
+    >vv......>
+    .>v.vv.v..
 
-After 58 steps:
-..>>v>vv..
-..v.>>vv..
-..>>v>>vv.
-..>>>>>vv.
-v......>vv
-v>v....>>v
-vvv.....>>
->vv......>
-.>v.vv.v..
+    After 58 steps:
+    ..>>v>vv..
+    ..v.>>vv..
+    ..>>v>>vv.
+    ..>>>>>vv.
+    v......>vv
+    v>v....>>v
+    vvv.....>>
+    >vv......>
+    .>v.vv.v..
 ```
 
 In this example, the sea cucumbers stop moving after `58` steps.
