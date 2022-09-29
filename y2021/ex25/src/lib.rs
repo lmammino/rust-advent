@@ -1,8 +1,6 @@
-
 pub fn part1(_input: &str) -> usize {
     507
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -13,5 +11,4 @@ mod tests {
         let input = include_str!("../input.txt");
         assert_eq!(part1(input), 507);
     }
-
 }
