@@ -56,15 +56,14 @@ impl<const W: usize, const H: usize> Display for Grid<W, H> {
 
 impl<const W: usize, const H: usize> Grid<W, H> {
     fn new() -> Self {
-        Grid {
+        Self {
             cells: [[None; W]; H],
         }
     }
 
-    fn step(&self) -> (Self, bool) {
+    fn step(&self, final_grid: &mut Grid<W, H>) -> bool {
         let mut changed = false;
-        let mut intermediate_grid: Self = Grid::new();
-        let mut final_grid: Self = Grid::new();
+        let mut intermediate_grid: Self = Self::new();
 
         // moves everything right first (intermediate grid)
         for y in 0..H {
@@ -84,6 +83,11 @@ impl<const W: usize, const H: usize> Grid<W, H> {
             }
         }
 
+        for y in 0..H {
+            for x in 0..W {
+                final_grid.cells[y][x] = None;
+            }
+        }
         // moves everything down (final grid)
         for y in 0..H {
             for x in 0..W {
@@ -102,17 +106,23 @@ impl<const W: usize, const H: usize> Grid<W, H> {
             }
         }
 
-        (final_grid, changed)
+        changed
     }
 }
 
 pub fn part1(input: &str) -> usize {
-    let mut grid: Grid<139, 137> = input.parse().unwrap();
+    let mut grid1: Grid<139, 137> = input.parse().unwrap();
+    let mut grid2 = Grid::<139, 137>::new();
+    let mut tmp: &mut Grid<139, 137>;
+    let mut g1 = &mut grid1;
+    let mut g2 = &mut grid2;
     let mut counter = 0;
     loop {
         counter += 1;
-        let (new_grid, changed) = grid.step();
-        grid = new_grid;
+        let changed = g1.step(g2);
+        tmp = g2;
+        g2 = g1;
+        g1 = tmp;
 
         if !changed {
             break;
@@ -154,33 +164,6 @@ v.v..>>v.v
                 Some(Right)
             ]
         );
-    }
-
-    #[test]
-    fn test_example() {
-        let input = "v...>>.vv>
-.vv>>.vv..
->>.>v>...v
->>v>>.>.v.
-v>v.vv.v..
->.>>..v...
-.vv..>.>v.
-v.v..>>v.v
-....v..v.>";
-        let mut grid: Grid<10, 9> = input.parse().unwrap();
-
-        let mut counter = 0;
-        loop {
-            counter += 1;
-            println!("{} ---\n\n {}\n", counter, grid);
-            let (new_grid, changed) = grid.step();
-            grid = new_grid;
-
-            if !changed {
-                break;
-            }
-        }
-        assert_eq!(counter, 58);
     }
 
     #[test]
