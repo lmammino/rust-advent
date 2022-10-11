@@ -61,14 +61,10 @@ impl<const W: usize, const H: usize> Grid<W, H> {
         }
     }
 
-    fn step(&self, intermediate_grid: &mut Grid<W,H>, final_grid: &mut Grid<W, H>) -> bool {
+    fn step(&self, final_grid: &mut Grid<W, H>) -> bool {
         let mut changed = false;
+        let mut intermediate_grid: Self = Self::new();
 
-        for y in 0..H {
-            for x in 0..W {
-                intermediate_grid.cells[y][x] = None;
-            }
-        }
         // moves everything right first (intermediate grid)
         for y in 0..H {
             for x in 0..W {
@@ -116,15 +112,14 @@ impl<const W: usize, const H: usize> Grid<W, H> {
 
 pub fn part1(input: &str) -> usize {
     let mut grid1: Grid<139, 137> = input.parse().unwrap();
-    let mut intermediate_grid = Grid::<139, 137>::new();    
     let mut grid2 = Grid::<139, 137>::new();
     let mut tmp: &mut Grid<139, 137>;
     let mut g1 = &mut grid1;
-    let mut g2 = &mut grid2;    
+    let mut g2 = &mut grid2;
     let mut counter = 0;
     loop {
         counter += 1;
-        let changed = g1.step(&mut intermediate_grid, g2);
+        let changed = g1.step(g2);
         tmp = g2;
         g2 = g1;
         g1 = tmp;
