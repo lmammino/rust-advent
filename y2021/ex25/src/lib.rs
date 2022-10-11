@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, mem, str::FromStr};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Cell {
@@ -109,16 +109,13 @@ impl<const W: usize, const H: usize> Grid<W, H> {
 pub fn part1(input: &str) -> usize {
     let mut grid1: Grid<139, 137> = input.parse().unwrap();
     let mut grid2 = Grid::<139, 137>::new();
-    let mut tmp: &mut Grid<139, 137>;
     let mut g1 = &mut grid1;
     let mut g2 = &mut grid2;
     let mut counter = 0;
     loop {
         counter += 1;
         let changed = g1.step(g2);
-        tmp = g2;
-        g2 = g1;
-        g1 = tmp;
+        mem::swap(&mut g1, &mut g2);
 
         if !changed {
             break;
