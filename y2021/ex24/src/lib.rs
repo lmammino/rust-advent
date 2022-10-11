@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 fn parse_input(input: &str) -> [(i8, i8, i8); 14] {
     let mut res: [(i8, i8, i8); 14] = Default::default();
     let mut lines = input.lines();
-    for i in 0..14 {
+    for entry in res.iter_mut() {
         for _ in 0..4 {
             lines.next(); // skip 4 lines without moving the iterator
         }
@@ -24,7 +24,7 @@ fn parse_input(input: &str) -> [(i8, i8, i8); 14] {
             lines.next(); // skip 2 lines without moving the iterator
         }
 
-        res[i] = (a, b, c);
+        *entry = (a, b, c);
     }
 
     res
