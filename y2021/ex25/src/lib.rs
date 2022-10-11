@@ -68,6 +68,7 @@ impl<const W: usize, const H: usize> Grid<W, H> {
         // moves everything right first (intermediate grid)
         for y in 0..H {
             for x in 0..W {
+                final_grid.cells[y][x] = None;
                 if let Some(Cell::Right) = self.cells[y][x] {
                     let next_cell = self.cells[y][(x + 1) % W];
                     if next_cell.is_none() {
@@ -83,11 +84,6 @@ impl<const W: usize, const H: usize> Grid<W, H> {
             }
         }
 
-        for y in 0..H {
-            for x in 0..W {
-                final_grid.cells[y][x] = None;
-            }
-        }
         // moves everything down (final grid)
         for y in 0..H {
             for x in 0..W {
@@ -164,6 +160,39 @@ v.v..>>v.v
                 Some(Right)
             ]
         );
+    }
+
+    #[test]
+    fn test_example() {
+        let input = "v...>>.vv>
+.vv>>.vv..
+>>.>v>...v
+>>v>>.>.v.
+v>v.vv.v..
+>.>>..v...
+.vv..>.>v.
+v.v..>>v.v
+....v..v.>";
+        let mut grid1: Grid<10, 9> = input.parse().unwrap();
+        let mut grid2 = Grid::<10, 9>::new();
+        let mut tmp: &mut Grid<10, 9>;
+        let mut g1 = &mut grid1;
+        let mut g2 = &mut grid2;
+
+        let mut counter = 0;
+        loop {
+            counter += 1;
+            println!("{} ---\n\n {}\n", counter, g1);
+            let changed = g1.step(g2);
+            tmp = g2;
+            g2 = g1;
+            g1 = tmp;
+
+            if !changed {
+                break;
+            }
+        }
+        assert_eq!(counter, 58);
     }
 
     #[test]
