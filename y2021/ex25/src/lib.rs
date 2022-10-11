@@ -172,7 +172,6 @@ v.v..>>v.v
 ....v..v.>";
         let mut grid1: Grid<10, 9> = input.parse().unwrap();
         let mut grid2 = Grid::<10, 9>::new();
-        let mut tmp: &mut Grid<10, 9>;
         let mut g1 = &mut grid1;
         let mut g2 = &mut grid2;
 
@@ -181,9 +180,7 @@ v.v..>>v.v
             counter += 1;
             println!("{} ---\n\n {}\n", counter, g1);
             let changed = g1.step(g2);
-            tmp = g2;
-            g2 = g1;
-            g1 = tmp;
+            mem::swap(&mut g1, &mut g2);
 
             if !changed {
                 break;
