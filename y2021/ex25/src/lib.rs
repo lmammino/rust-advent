@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, mem, str::FromStr};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Cell {
@@ -56,19 +56,19 @@ impl<const W: usize, const H: usize> Display for Grid<W, H> {
 
 impl<const W: usize, const H: usize> Grid<W, H> {
     fn new() -> Self {
-        Grid {
+        Self {
             cells: [[None; W]; H],
         }
     }
 
-    fn step(&self) -> (Self, bool) {
+    fn step(&self, final_grid: &mut Grid<W, H>) -> bool {
         let mut changed = false;
-        let mut intermediate_grid: Self = Grid::new();
-        let mut final_grid: Self = Grid::new();
+        let mut intermediate_grid: Self = Self::new();
 
         // moves everything right first (intermediate grid)
         for y in 0..H {
             for x in 0..W {
+                final_grid.cells[y][x] = None;
                 if let Some(Cell::Right) = self.cells[y][x] {
                     let next_cell = self.cells[y][(x + 1) % W];
                     if next_cell.is_none() {
@@ -102,17 +102,20 @@ impl<const W: usize, const H: usize> Grid<W, H> {
             }
         }
 
-        (final_grid, changed)
+        changed
     }
 }
 
 pub fn part1(input: &str) -> usize {
-    let mut grid: Grid<139, 137> = input.parse().unwrap();
+    let mut grid1: Grid<139, 137> = input.parse().unwrap();
+    let mut grid2 = Grid::<139, 137>::new();
+    let mut g1 = &mut grid1;
+    let mut g2 = &mut grid2;
     let mut counter = 0;
     loop {
         counter += 1;
-        let (new_grid, changed) = grid.step();
-        grid = new_grid;
+        let changed = g1.step(g2);
+        mem::swap(&mut g1, &mut g2);
 
         if !changed {
             break;
@@ -167,14 +170,17 @@ v>v.vv.v..
 .vv..>.>v.
 v.v..>>v.v
 ....v..v.>";
-        let mut grid: Grid<10, 9> = input.parse().unwrap();
+        let mut grid1: Grid<10, 9> = input.parse().unwrap();
+        let mut grid2 = Grid::<10, 9>::new();
+        let mut g1 = &mut grid1;
+        let mut g2 = &mut grid2;
 
         let mut counter = 0;
         loop {
             counter += 1;
-            println!("{} ---\n\n {}\n", counter, grid);
-            let (new_grid, changed) = grid.step();
-            grid = new_grid;
+            println!("{} ---\n\n {}\n", counter, g1);
+            let changed = g1.step(g2);
+            mem::swap(&mut g1, &mut g2);
 
             if !changed {
                 break;
