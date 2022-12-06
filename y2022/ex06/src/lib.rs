@@ -28,8 +28,33 @@ pub fn part1(input: &str) -> usize {
     panic!("Did not find start-of-packet marker");
 }
 
-pub fn part2(_input: &str) -> usize {
-    0
+pub fn part2(input: &str) -> usize {
+    let mut chars = input.chars();
+    let last14: &mut [char] = &mut [
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+        chars.next().unwrap(),
+    ];
+    for (i, c) in chars.enumerate() {
+        last14.rotate_left(1);
+        last14[13] = c;
+
+        if are_unique(last14) {
+            return i + 15; // 14 already scanned + 1 for 1-based indexing;
+        }
+    }
+    panic!("Did not find start-of-packet marker");
 }
 
 #[cfg(test)]
@@ -60,6 +85,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 0);
+        assert_eq!(part2(INPUT), 3965);
     }
 }
