@@ -102,26 +102,14 @@ impl Packet {
                 2 => subpackets.iter().map(|p| p.eval()).min().unwrap(),
                 3 => subpackets.iter().map(|p| p.eval()).max().unwrap(),
                 5 => {
-                    if subpackets.get(0).unwrap().eval() > subpackets.get(1).unwrap().eval() {
-                        1
-                    } else {
-                        0
-                    }
+                    i64::from(subpackets.get(0).unwrap().eval() > subpackets.get(1).unwrap().eval())
                 }
                 6 => {
-                    if subpackets.get(0).unwrap().eval() < subpackets.get(1).unwrap().eval() {
-                        1
-                    } else {
-                        0
-                    }
+                    i64::from(subpackets.get(0).unwrap().eval() < subpackets.get(1).unwrap().eval())
                 }
-                7 => {
-                    if subpackets.get(0).unwrap().eval() == subpackets.get(1).unwrap().eval() {
-                        1
-                    } else {
-                        0
-                    }
-                }
+                7 => i64::from(
+                    subpackets.get(0).unwrap().eval() == subpackets.get(1).unwrap().eval(),
+                ),
                 _ => unreachable!(),
             },
         }
