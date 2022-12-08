@@ -1,121 +1,40 @@
-use std::{
-    collections::HashMap,
-    ops::{Deref, DerefMut},
-    path::{Path, PathBuf},
-};
+mod fs;
 mod parser;
+use fs::*;
 use parser::*;
 
-#[derive(Debug, PartialEq, Clone)]
-struct File {
-    name: String,
-    size: usize,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-struct Fs(HashMap<PathBuf, Vec<File>>);
-
-impl Deref for Fs {
-    type Target = HashMap<PathBuf, Vec<File>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for Fs {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl Fs {
-    fn new() -> Self {
-        Fs(HashMap::new())
-    }
-
-    fn update_file_size(&mut self, path: &Path, size: usize) {
-        let folder_name = path.file_name().unwrap().to_str().unwrap();
-        if let Some(parent_path) = path.parent() {
-            let mut file_in_parent = self
-                .get_mut(parent_path)
-                .unwrap()
-                .iter_mut()
-                .find(|f| f.name == folder_name)
-                .unwrap();
-            file_in_parent.size = size;
-        }
-    }
-}
-
 pub fn part1(input: &str) -> usize {
-    let mut fs = Fs::new();
-    let cmds = parse_input(input);
-    let mut curr_path = PathBuf::from("/");
-    for cmd in cmds {
-        match cmd {
-            Line::CmdLine(Cmd::Cd(dir)) => {
-                match dir {
-                    "/" => {}
-                    ".." => {
-                        curr_path.pop();
-                    }
-                    folder_name => curr_path.push(folder_name),
-                };
-            }
-            Line::CmdLine(Cmd::Ls) => {
-                // we can ignore ls commands and just process the output lines
-            }
-            Line::OutLine(Out::Dir(name)) => {
-                // A foldered is considered like a file of size 0 (size will be calculated later)
-                let files = fs.entry(curr_path.clone()).or_default();
-                files.push(File {
-                    name: name.to_string(),
-                    size: 0,
-                });
-            }
-            Line::OutLine(Out::File(size, name)) => {
-                let files = fs.entry(curr_path.clone()).or_default();
-                files.push(File {
-                    name: name.to_string(),
-                    size,
-                });
-            }
-        }
-    }
+    let fs: Fs = parse_input(input).collect();
 
-    let mut summed = fs.clone();
-    for (path, files) in fs.iter_mut() {
-        if path.to_str().unwrap() != "/" {
-            let size: usize = files.iter().map(|f| f.size).sum();
-            summed.update_file_size(path, size);
-        }
-    }
-
-    let mut folders_size: HashMap<PathBuf, usize> = HashMap::new();
-    for (path, files) in summed.iter() {
-        folders_size.insert(path.clone(), files.iter().map(|f| f.size).sum());
-    }
-
-    folders_size
+    fs.get_folders_size()
         .iter()
         .map(|(_, size)| *size)
         .filter(|s| *s < 100000)
         .sum()
 }
 
-pub fn part2(_input: &str) -> u64 {
-    208180
+pub fn part2(input: &str) -> usize {
+    let fs: Fs = parse_input(input).collect();
+
+    let max_space = 70000000_usize;
+    let needed_space = 30000000_usize;
+    let used_space = fs.used_space();
+    let free_space = max_space - used_space;
+    let space_to_free = needed_space - free_space;
+
+    fs.get_folders_size()
+        .iter()
+        .map(|(_, size)| *size)
+        .filter(|s| *s >= space_to_free)
+        .min()
+        .unwrap()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     const INPUT: &str = include_str!("../input.txt");
-
-    #[test]
-    fn test_part1_example() {
-        let input = "$ cd /
+    const TEST_INPUT: &str = "$ cd /
 $ ls
 dir a
 14848514 b.txt
@@ -138,7 +57,10 @@ $ ls
 8033020 d.log
 5626152 d.ext
 7214296 k";
-        let result = part1(input);
+
+    #[test]
+    fn test_part1_example() {
+        let result = part1(TEST_INPUT);
         assert_eq!(result, 95437);
     }
 
@@ -148,7 +70,12 @@ $ ls
     }
 
     #[test]
+    fn test_part2_example() {
+        assert_eq!(part2(TEST_INPUT), 24933642);
+    }
+
+    #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 208180);
+        assert_eq!(part2(INPUT), 1623571);
     }
 }
