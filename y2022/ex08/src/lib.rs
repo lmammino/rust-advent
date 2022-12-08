@@ -1,95 +1,29 @@
-pub fn part1(input: &str) -> usize {
-    let trees: Vec<Vec<u8>> = input
-        .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| c.to_digit(10).unwrap() as u8)
-                .collect()
-        })
-        .collect();
+mod cell_iter;
+mod dir_iter;
+mod map;
+use map::*;
 
-    let mut visible_trees: Vec<Vec<bool>> = trees
+pub fn part1(input: &str) -> usize {
+    let map: Map = input.parse().unwrap();
+
+    let mut visible_trees: Vec<Vec<bool>> = map
         .iter()
         .map(|l| l.iter().map(|_| false).collect())
         .collect();
 
-    let rows = trees.len();
-    let cols = trees[0].len();
+    let lines_of_sight = map.all_outer_lines_of_sight();
 
-    // from top to bottom (column by column)
-    for col in 0..cols {
+    for line in lines_of_sight {
         let mut prev: Option<u8> = None;
-        for row in 0..rows {
-            let curr_tree_height = trees[row][col];
+        for (row, col, curr_tree_height) in line {
             match prev {
-                Some(prev_tree_height) if prev_tree_height >= curr_tree_height => {
-                    if curr_tree_height == 9 {
+                Some(prev_tree_height) if prev_tree_height >= *curr_tree_height => {
+                    if *curr_tree_height == 9 {
                         break; // won't be able to see any other tree in this line of sight
                     }
-                    continue; // can't see the next tree so skip to the next one
                 }
                 _ => {
-                    prev = Some(curr_tree_height);
-                    visible_trees[row][col] = true;
-                }
-            };
-        }
-    }
-
-    // from bottom to top (column by column)
-    for col in 0..cols {
-        let mut prev: Option<u8> = None;
-        for row in (0..rows).rev() {
-            let curr_tree_height = trees[row][col];
-            match prev {
-                Some(prev_tree_height) if prev_tree_height >= curr_tree_height => {
-                    if curr_tree_height == 9 {
-                        break; // won't be able to see any other tree in this line of sight
-                    }
-                    continue; // can't see the next tree so skip to the next one
-                }
-                _ => {
-                    prev = Some(curr_tree_height);
-                    visible_trees[row][col] = true;
-                }
-            };
-        }
-    }
-
-    // from left to right (row by row)
-    for row in 0..rows {
-        let mut prev: Option<u8> = None;
-        for col in 0..cols {
-            let curr_tree_height = trees[row][col];
-            match prev {
-                Some(prev_tree_height) if prev_tree_height >= curr_tree_height => {
-                    if curr_tree_height == 9 {
-                        break; // won't be able to see any other tree in this line of sight
-                    }
-                    continue; // can't see the next tree so skip to the next one
-                }
-                _ => {
-                    prev = Some(curr_tree_height);
-                    visible_trees[row][col] = true;
-                }
-            };
-        }
-    }
-
-    // from right to left (row by row)
-    for row in 0..rows {
-        let mut prev: Option<u8> = None;
-        for col in (0..cols).rev() {
-            let curr_tree_height = trees[row][col];
-            match prev {
-                Some(prev_tree_height) if prev_tree_height >= curr_tree_height => {
-                    if curr_tree_height == 9 {
-                        break; // won't be able to see any other tree in this line of sight
-                    }
-                    continue; // can't see the next tree so skip to the next one
-                }
-                _ => {
-                    prev = Some(curr_tree_height);
+                    prev = Some(*curr_tree_height);
                     visible_trees[row][col] = true;
                 }
             };
@@ -103,89 +37,24 @@ pub fn part1(input: &str) -> usize {
 }
 
 pub fn part2(input: &str) -> u64 {
-    let trees: Vec<Vec<u8>> = input
-        .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| c.to_digit(10).unwrap() as u8)
-                .collect()
-        })
-        .collect();
+    let map: Map = input.parse().unwrap();
 
-    let mut scenic_score: Vec<Vec<u64>> = trees
-        .iter()
-        .map(|l| l.iter().map(|_| 0).collect())
-        .collect();
+    let mut scenic_score: Vec<Vec<u64>> =
+        map.iter().map(|l| l.iter().map(|_| 0).collect()).collect();
 
-    let rows = trees.len();
-    let cols = trees[0].len();
-
-    for row in 0..rows {
-        for col in 0..cols {
-            let tree_height = trees[row][col];
-
-            // up score
-            let mut y = row;
-            let mut up_score = 0;
-            while y > 0 {
-                y -= 1;
-                up_score += 1;
-                let other_tree_height = trees[y][col];
-                if other_tree_height >= tree_height {
+    for (row, col, tree_house_height) in map.iter_cells() {
+        let scores: [u64; 4] = map.iters_from_cell(row, col).map(|mut line| {
+            line.next(); // skips the current tree itself
+            let mut score = 0;
+            for (_, _, watched_tree_height) in line {
+                score += 1;
+                if watched_tree_height >= tree_house_height {
                     break;
                 }
             }
-            if up_score == 0 {
-                continue;
-            }
-
-            // down score
-            let mut y = row;
-            let mut down_score = 0;
-            while y < rows - 1 {
-                y += 1;
-                down_score += 1;
-                let other_tree_height = trees[y][col];
-                if other_tree_height >= tree_height {
-                    break;
-                }
-            }
-            if down_score == 0 {
-                continue;
-            }
-
-            // left score
-            let mut x = col;
-            let mut left_score = 0;
-            while x > 0 {
-                x -= 1;
-                left_score += 1;
-                let other_tree_height = trees[row][x];
-                if other_tree_height >= tree_height {
-                    break;
-                }
-            }
-            if left_score == 0 {
-                continue;
-            }
-
-            // right score
-            let mut x = col;
-            let mut right_score = 0;
-            while x < cols - 1 {
-                x += 1;
-                right_score += 1;
-                let other_tree_height = trees[row][x];
-                if other_tree_height >= tree_height {
-                    break;
-                }
-            }
-            if right_score == 0 {
-                continue;
-            }
-
-            scenic_score[row][col] = up_score * down_score * left_score * right_score;
-        }
+            score
+        });
+        scenic_score[row][col] = scores.iter().product();
     }
 
     *(scenic_score
