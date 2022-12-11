@@ -56,10 +56,6 @@ impl<const N: usize> Rope<N> {
         Self([Knot::default(); N])
     }
 
-    fn head(&self) -> &Knot {
-        &(self[0])
-    }
-
     fn tail(&self) -> &Knot {
         &(self[self.len() - 1])
     }
@@ -164,56 +160,56 @@ mod tests {
         let mut rope = Rope::<2>::new();
         // R 4
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(1, 0));
+        assert_eq!(rope[0], Knot::new(1, 0));
         assert_eq!(rope.tail(), &Knot::new(0, 0));
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(2, 0));
+        assert_eq!(rope[0], Knot::new(2, 0));
         assert_eq!(rope.tail(), &Knot::new(1, 0));
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(3, 0));
+        assert_eq!(rope[0], Knot::new(3, 0));
         assert_eq!(rope.tail(), &Knot::new(2, 0));
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(4, 0));
+        assert_eq!(rope[0], Knot::new(4, 0));
         assert_eq!(rope.tail(), &Knot::new(3, 0));
         // U 4
         rope.do_move(&Move::Up);
-        assert_eq!(rope.head(), &Knot::new(4, -1));
+        assert_eq!(rope[0], Knot::new(4, -1));
         assert_eq!(rope.tail(), &Knot::new(3, 0));
         rope.do_move(&Move::Up);
-        assert_eq!(rope.head(), &Knot::new(4, -2));
+        assert_eq!(rope[0], Knot::new(4, -2));
         assert_eq!(rope.tail(), &Knot::new(4, -1));
         rope.do_move(&Move::Up);
-        assert_eq!(rope.head(), &Knot::new(4, -3));
+        assert_eq!(rope[0], Knot::new(4, -3));
         assert_eq!(rope.tail(), &Knot::new(4, -2));
         rope.do_move(&Move::Up);
-        assert_eq!(rope.head(), &Knot::new(4, -4));
+        assert_eq!(rope[0], Knot::new(4, -4));
         assert_eq!(rope.tail(), &Knot::new(4, -3));
         // L 3
         rope.do_move(&Move::Left);
-        assert_eq!(rope.head(), &Knot::new(3, -4));
+        assert_eq!(rope[0], Knot::new(3, -4));
         assert_eq!(rope.tail(), &Knot::new(4, -3));
         rope.do_move(&Move::Left);
-        assert_eq!(rope.head(), &Knot::new(2, -4));
+        assert_eq!(rope[0], Knot::new(2, -4));
         assert_eq!(rope.tail(), &Knot::new(3, -4));
         rope.do_move(&Move::Left);
-        assert_eq!(rope.head(), &Knot::new(1, -4));
+        assert_eq!(rope[0], Knot::new(1, -4));
         assert_eq!(rope.tail(), &Knot::new(2, -4));
         // D 1
         rope.do_move(&Move::Down);
-        assert_eq!(rope.head(), &Knot::new(1, -3));
+        assert_eq!(rope[0], Knot::new(1, -3));
         assert_eq!(rope.tail(), &Knot::new(2, -4));
         // R 4
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(2, -3));
+        assert_eq!(rope[0], Knot::new(2, -3));
         assert_eq!(rope.tail(), &Knot::new(2, -4));
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(3, -3));
+        assert_eq!(rope[0], Knot::new(3, -3));
         assert_eq!(rope.tail(), &Knot::new(2, -4));
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(4, -3));
+        assert_eq!(rope[0], Knot::new(4, -3));
         assert_eq!(rope.tail(), &Knot::new(3, -3));
         rope.do_move(&Move::Right);
-        assert_eq!(rope.head(), &Knot::new(5, -3));
+        assert_eq!(rope[0], Knot::new(5, -3));
         assert_eq!(rope.tail(), &Knot::new(4, -3));
     }
 
