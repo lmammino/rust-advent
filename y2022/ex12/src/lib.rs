@@ -3,21 +3,18 @@ use map::*;
 
 pub fn part1(input: &str) -> usize {
     let map: Map<144, 41> = input.parse().unwrap();
-    let paths_from_start = map.dijkstra(&map.start);
+    let paths_from_start = map.find_paths(&map.start, false);
     let end_edge = paths_from_start[&map.end];
     end_edge.0
 }
 
 pub fn part2(input: &str) -> usize {
-    // this could probably be optimised by making a reverse dijkstra from the end and then analysing all the scenic points
-    // this way we would run dijkstra only once
     let map: Map<144, 41> = input.parse().unwrap();
+    let walkable_paths = map.find_paths(&map.end, true);
+
     map.scenic_points
         .iter()
-        .filter_map(|&p| {
-            let paths = map.dijkstra(&p);
-            paths.get(&map.end).map(|(dist, _)| *dist)
-        })
+        .filter_map(|&p| walkable_paths.get(&p).map(|(dist, _)| *dist))
         .min()
         .unwrap()
 }

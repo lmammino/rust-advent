@@ -1,6 +1,6 @@
 use std::{
     cmp::Ordering,
-    collections::{BinaryHeap, HashMap, VecDeque},
+    collections::{BinaryHeap, HashMap},
     ops::Deref,
     str::FromStr,
 };
@@ -9,14 +9,6 @@ use std::{
 pub(crate) struct Pos {
     x: usize,
     y: usize,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub(crate) struct Map<const W: usize, const H: usize> {
-    pub(crate) grid: [[usize; W]; H],
-    pub(crate) scenic_points: Vec<Pos>,
-    pub(crate) start: Pos,
-    pub(crate) end: Pos,
 }
 
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
@@ -38,10 +30,14 @@ impl PartialOrd for Edge {
     }
 }
 
+/// An index of the walkable paths in a grid for a given starting position.
+/// For every position that is reachable from the starting point it associates:
+/// - the mimum cost to get to that position (from the starting point)
+/// - the previous position in the optimal path (if any)
 #[derive(Debug)]
-pub(crate) struct DijkstraResult(HashMap<Pos, (usize, Option<Pos>)>);
+pub(crate) struct WalkablePaths(HashMap<Pos, (usize, Option<Pos>)>);
 
-impl DijkstraResult {
+impl WalkablePaths {
     fn new() -> Self {
         Self(HashMap::new())
     }
@@ -56,24 +52,9 @@ impl DijkstraResult {
         }
         false
     }
-
-    pub(crate) fn path_to(&self, end: &Pos) -> VecDeque<Pos> {
-        let mut path: VecDeque<Pos> = VecDeque::new();
-        if !self.0.contains_key(end) {
-            return path;
-        }
-
-        path.push_back(*end);
-        let mut current = end;
-        while let Some((_, Some(prev))) = self.0.get(current) {
-            path.push_front(*prev);
-            current = prev;
-        }
-        path
-    }
 }
 
-impl Deref for DijkstraResult {
+impl Deref for WalkablePaths {
     type Target = HashMap<Pos, (usize, Option<Pos>)>;
 
     fn deref(&self) -> &Self::Target {
@@ -81,33 +62,44 @@ impl Deref for DijkstraResult {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub(crate) struct Map<const W: usize, const H: usize> {
+    pub(crate) grid: [[usize; W]; H],
+    pub(crate) scenic_points: Vec<Pos>,
+    pub(crate) start: Pos,
+    pub(crate) end: Pos,
+}
+
 impl<const W: usize, const H: usize> Map<W, H> {
-    fn walkable_neighbours(&self, pos: &Pos) -> Vec<Pos> {
+    fn walkable_neighbours<F>(&self, pos: &Pos, can_walk: F) -> Vec<Pos>
+    where
+        F: Fn(usize, usize) -> bool,
+    {
         let mut possible_steps = Vec::new();
         let current_height = self.grid[pos.y][pos.x];
         // left
-        if pos.x > 0 && self.grid[pos.y][pos.x - 1] <= current_height + 1 {
+        if pos.x > 0 && can_walk(current_height, self.grid[pos.y][pos.x - 1]) {
             possible_steps.push(Pos {
                 x: pos.x - 1,
                 y: pos.y,
             });
         }
         // right
-        if pos.x < W - 1 && self.grid[pos.y][pos.x + 1] <= current_height + 1 {
+        if pos.x < W - 1 && can_walk(current_height, self.grid[pos.y][pos.x + 1]) {
             possible_steps.push(Pos {
                 x: pos.x + 1,
                 y: pos.y,
             });
         }
         // up
-        if pos.y > 0 && self.grid[pos.y - 1][pos.x] <= current_height + 1 {
+        if pos.y > 0 && can_walk(current_height, self.grid[pos.y - 1][pos.x]) {
             possible_steps.push(Pos {
                 x: pos.x,
                 y: pos.y - 1,
             });
         }
         // down
-        if pos.y < H - 1 && self.grid[pos.y + 1][pos.x] <= current_height + 1 {
+        if pos.y < H - 1 && can_walk(current_height, self.grid[pos.y + 1][pos.x]) {
             possible_steps.push(Pos {
                 x: pos.x,
                 y: pos.y + 1,
@@ -116,8 +108,9 @@ impl<const W: usize, const H: usize> Map<W, H> {
         possible_steps
     }
 
-    pub(crate) fn dijkstra(&self, from: &Pos) -> DijkstraResult {
-        let mut result = DijkstraResult::new();
+    pub(crate) fn find_paths(&self, from: &Pos, from_end: bool) -> WalkablePaths {
+        // dijkstra algorithm
+        let mut result = WalkablePaths::new();
         let mut active_nodes: BinaryHeap<Edge> = Default::default();
 
         let initial_path = Edge {
@@ -127,11 +120,19 @@ impl<const W: usize, const H: usize> Map<W, H> {
         };
         active_nodes.push(initial_path);
 
+        let can_walk = |current_height: usize, next_height: usize| {
+            if from_end {
+                next_height + 1 >= current_height
+            } else {
+                current_height + 1 >= next_height
+            }
+        };
+
         while let Some(Edge { pos, cost, prev }) = active_nodes.pop() {
             // check if we already found a better path
             if result.should_explore(&pos, cost, prev) {
                 // check the neighbours
-                for new_pos in self.walkable_neighbours(&pos) {
+                for new_pos in self.walkable_neighbours(&pos, can_walk) {
                     let next = Edge {
                         cost: cost + 1,
                         pos: new_pos,
@@ -235,12 +236,8 @@ abdefghi";
     #[test]
     fn test_dijkstra() {
         let map: Map<8, 5> = SAMPLE_INPUT.parse().unwrap();
-        let result = map.dijkstra(&map.start);
+        let result = map.find_paths(&map.start, false);
         let end_edge = result.get(&(map.end)).expect("End not found");
         assert_eq!(end_edge.0, 31); // checks the cost
-        let full_path = result.path_to(&(map.end));
-        // checks the entire path back to the start
-        assert_eq!(full_path.len(), 32); // <- includes the start node
-        assert_eq!(full_path[0], map.start);
     }
 }
