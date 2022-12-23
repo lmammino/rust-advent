@@ -7,8 +7,8 @@ fn solve_part1(
     y: i64,
 ) -> usize {
     /*
-     * Using the formula for Manhattan distance: d = |x1 - x2| + |y1 - y2|
-     * We can determine a range of x values that are within the distance of the sensor:
+     *   Using the formula for Manhattan distance: d = |x1 - x2| + |y1 - y2|
+     *   We can determine a range of x values that are within the distance of the sensor:
      *
      *   d = |x - x1| + |y - y1|
      *
