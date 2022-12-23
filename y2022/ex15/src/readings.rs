@@ -59,7 +59,7 @@ mod test {
                 x: -245599,
                 y: 778791,
             },
-            (9323_i64 - 245599_i64).abs() + (979154_i64 - 778791_i64).abs(),
+            455285,
         );
         assert_eq!(parse_line(input), Ok(("", expected)));
     }
