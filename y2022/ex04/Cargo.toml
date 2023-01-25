@@ -1,0 +1,16 @@
+[package]
+name = "y2022ex04"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nom = "7.1.1"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "bench_y2022ex04"
+harness = false
