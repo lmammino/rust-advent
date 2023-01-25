@@ -2,7 +2,7 @@ pub fn part1<const T: usize>(input: &str) -> usize {
     let mut num_ones_per_digit: [usize; T] = [0; T];
     let mut lines_count: usize = 0;
     for s in input.lines() {
-        let digits = s.chars().map(|c| if c == '1' { 1 } else { 0 });
+        let digits = s.chars().map(|c| usize::from(c == '1'));
         for (i, n) in digits.enumerate() {
             num_ones_per_digit[i] += n;
         }
@@ -30,7 +30,7 @@ pub fn part1<const T: usize>(input: &str) -> usize {
 pub fn part2<const T: usize>(input: &str) -> usize {
     let mut nums: Vec<[usize; T]> = Vec::with_capacity(1000);
     for s in input.lines() {
-        let digits = s.chars().map(|c| if c == '1' { 1 } else { 0 });
+        let digits = s.chars().map(|c| usize::from(c == '1'));
         let mut num: [usize; T] = [0; T];
         for (i, n) in digits.enumerate() {
             num[i] = n;
@@ -42,11 +42,7 @@ pub fn part2<const T: usize>(input: &str) -> usize {
     let mut i = 0_usize;
     while oxy_gen_candidates.len() > 1 {
         let num_ones = oxy_gen_candidates.iter().filter(|n| n[i] == 1).count();
-        let most_common_digit = if num_ones >= (oxy_gen_candidates.len() - num_ones) {
-            1
-        } else {
-            0
-        };
+        let most_common_digit = usize::from(num_ones >= (oxy_gen_candidates.len() - num_ones));
         // The following could be eventually done this way:
         // oxy_gen_candidates.drain_filter(|digits| digits[i] == most_common_digit);
         // once `drain_filter` gets stable
@@ -59,11 +55,7 @@ pub fn part2<const T: usize>(input: &str) -> usize {
     let mut i = 0_usize;
     while co2_scrubber_candidates.len() > 1 {
         let num_ones = co2_scrubber_candidates.iter().filter(|n| n[i] == 1).count();
-        let least_common_digit = if num_ones < (co2_scrubber_candidates.len() - num_ones) {
-            1
-        } else {
-            0
-        };
+        let least_common_digit = usize::from(num_ones < (co2_scrubber_candidates.len() - num_ones));
         co2_scrubber_candidates.retain(|digits| digits[i] == least_common_digit);
 
         i += 1;
