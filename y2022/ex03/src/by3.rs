@@ -14,10 +14,9 @@ impl<I: Iterator> Iterator for By3Iter<I> {
         let i2 = self.0.next();
         let i3 = self.0.next();
 
-        if i1.is_some() && i2.is_some() && i3.is_some() {
-            return Some((i1.unwrap(), i2.unwrap(), i3.unwrap()));
+        match (i1, i2, i3) {
+            (Some(i1), Some(i2), Some(i3)) => Some((i1, i2, i3)),
+            _ => None,
         }
-
-        None
     }
 }

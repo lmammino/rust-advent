@@ -148,7 +148,7 @@ impl PacketParser {
                 // calculates the value of n using the 4bit ints groups
                 let mut val = 0;
                 for _ in 0..groups.len() {
-                    val = (val << 4) + (groups.pop_back().unwrap() as i64);
+                    val = (val << 4) + groups.pop_back().unwrap();
                 }
 
                 PacketData::Literal(val)

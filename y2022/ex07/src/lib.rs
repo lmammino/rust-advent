@@ -7,8 +7,8 @@ pub fn part1(input: &str) -> usize {
     let fs: Fs = parse_input(input).collect();
 
     fs.get_folders_size()
-        .iter()
-        .map(|(_, size)| *size)
+        .values()
+        .copied()
         .filter(|s| *s < 100000)
         .sum()
 }
@@ -23,8 +23,8 @@ pub fn part2(input: &str) -> usize {
     let space_to_free = needed_space - free_space;
 
     fs.get_folders_size()
-        .iter()
-        .map(|(_, size)| *size)
+        .values()
+        .copied()
         .filter(|s| *s >= space_to_free)
         .min()
         .unwrap()
