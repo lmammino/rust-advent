@@ -6,10 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-<<<<<<< HEAD
-nom = "7.1.1"
-=======
->>>>>>> 8109d9b (Solve y2022 day 1 (#85))
 
 [dev-dependencies]
 criterion = "0.3"
