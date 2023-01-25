@@ -55,8 +55,11 @@ members = [
   "y2021/ex24",
   "y2021/ex25",
   "y2022/ex01",
+<<<<<<< HEAD
   "y2022/ex02",
   "y2022/ex03",
+=======
+>>>>>>> 1303b89 (Added scaffold y2022ex01)
 ]
 
 [profile.bench]
