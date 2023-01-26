@@ -81,7 +81,7 @@ fn solve(commands: Vec<Command>) -> usize {
     }
 
     let mut planes: HashMap<isize, RectangleList> =
-        HashMap::from_iter(z_tickness.iter().map(|(z, _)| (*z, RectangleList::new())));
+        HashMap::from_iter(z_tickness.keys().map(|z| (*z, RectangleList::new())));
 
     for command in commands.iter() {
         for z in z_ranges_sorted.iter() {

@@ -47,7 +47,7 @@ fn execute_code(code: &[Instr]) -> (i32, bool) {
 
         let instr = code
             .get(i)
-            .expect(&*format!("Cannot find instruction at index {}", i));
+            .unwrap_or_else(|| panic!("Cannot find instruction at index {}", i));
 
         visited.insert(i);
 

@@ -143,7 +143,7 @@ impl<'a> Iterator for GrainMoves<'a> {
 }
 
 impl Cave {
-    pub(crate) fn next_grain<'a>(&'a self) -> GrainMoves<'a> {
+    pub(crate) fn next_grain(&self) -> GrainMoves {
         let pos = self.sand_emitter.clone();
         GrainMoves { pos, cave: self }
     }

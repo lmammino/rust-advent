@@ -60,11 +60,11 @@ mod tests {
         ];
 
         for (input, output) in expectations_2020.iter() {
-            assert_eq!(game::<2020>(*input), *output);
+            assert_eq!(game::<2020>(input), *output);
         }
 
         for (input, output) in expectations_30_000_000.iter() {
-            assert_eq!(game::<30_000_000>(*input), *output);
+            assert_eq!(game::<30_000_000>(input), *output);
         }
     }
 
