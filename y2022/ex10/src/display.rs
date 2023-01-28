@@ -41,7 +41,7 @@ impl std::fmt::Display for Display {
         let mut chars = self.pixels.chars();
         for _ in 0..6 {
             let line = chars.by_ref().take(40).collect::<String>();
-            writeln!(f, "{}", line)?;
+            writeln!(f, "{line}")?;
         }
         Ok(())
     }

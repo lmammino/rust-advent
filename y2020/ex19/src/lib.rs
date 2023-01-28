@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 type RuleId = usize;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 enum Rule {
     Seq(Vec<RuleId>),
     Fork(Vec<RuleId>, Vec<RuleId>),
     Leaf(char),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 struct RuleSet(HashMap<RuleId, Rule>);
 
 fn create_ruleset(raw_rules: &str) -> RuleSet {
@@ -131,7 +131,19 @@ mod ex17_tests {
 
         let ruleset = create_ruleset(rules);
 
-        println!("{:#?}", ruleset);
+        assert_eq!(
+            ruleset,
+            RuleSet(
+                vec![
+                    (0, Rule::Seq(vec![1, 2])),
+                    (1, Rule::Leaf('a')),
+                    (2, Rule::Fork(vec![1, 3], vec![3, 1])),
+                    (3, Rule::Leaf('b'))
+                ]
+                .into_iter()
+                .collect()
+            )
+        );
     }
 
     #[test]
@@ -146,8 +158,21 @@ mod ex17_tests {
         ";
 
         let ruleset = create_ruleset(rules);
-
-        println!("{:#?}", ruleset);
+        assert_eq!(
+            ruleset,
+            RuleSet(
+                vec![
+                    (0, Rule::Seq(vec![4, 1, 5])),
+                    (1, Rule::Fork(vec![2, 3], vec![3, 2])),
+                    (2, Rule::Fork(vec![4, 4], vec![5, 5])),
+                    (3, Rule::Fork(vec![4, 5], vec![5, 4])),
+                    (4, Rule::Leaf('a')),
+                    (5, Rule::Leaf('b'))
+                ]
+                .into_iter()
+                .collect()
+            )
+        );
     }
 
     #[test]

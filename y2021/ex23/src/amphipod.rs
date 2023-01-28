@@ -37,7 +37,7 @@ impl From<char> for Amphipod {
             'B' => Amphipod::B,
             'C' => Amphipod::C,
             'D' => Amphipod::D,
-            _ => panic!("Invalid amphipod: {}", c),
+            _ => panic!("Invalid amphipod: {c}"),
         }
     }
 }

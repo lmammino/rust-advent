@@ -229,7 +229,7 @@ mod test {
         for (left, right, expected) in cases.iter() {
             let left = parse_packet(left).unwrap().1;
             let right = parse_packet(right).unwrap().1;
-            assert_eq!(left.cmp(&right), *expected, "{:?} vs {:?}", left, right);
+            assert_eq!(left.cmp(&right), *expected, "{left:?} vs {right:?}");
         }
     }
 }
