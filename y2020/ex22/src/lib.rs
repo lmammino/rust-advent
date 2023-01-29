@@ -1,19 +1,31 @@
 use std::{
     collections::{HashSet, VecDeque},
+    ops::{Deref, DerefMut},
     str::FromStr,
 };
 
 type Card = usize;
-// type Deck = VecDeque<Card>;
 
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
-struct Deck {
-    cards: VecDeque<Card>,
+struct Deck(VecDeque<Card>);
+
+impl Deref for Deck {
+    type Target = VecDeque<Card>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Deck {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
 }
 
 impl Deck {
     fn calculate_score(self) -> usize {
-        self.cards
+        self.0
             .into_iter()
             .rev()
             .enumerate()
@@ -25,11 +37,7 @@ impl Deck {
         // The hashing function is similar to the calculate_score one
         // this hash is not perfect, it can lead to some collisions, but it is "good enough" for our tests
         // The speedup compared to use the whole cards VecDeque is huge (90% faster), still using the default rust HashSet
-        self.cards
-            .iter()
-            .enumerate()
-            .map(|(i, n)| (i * 29 + 1) * n)
-            .sum()
+        self.iter().enumerate().map(|(i, n)| (i * 29 + 1) * n).sum()
     }
 }
 
@@ -43,7 +51,7 @@ impl FromStr for Deck {
             .map(|i| i.parse::<Card>().unwrap())
             .collect();
 
-        Ok(Deck { cards })
+        Ok(Deck(cards))
     }
 }
 
@@ -63,39 +71,39 @@ fn game(mut deck1: Deck, mut deck2: Deck) -> (Player, Deck) {
             return (Player::One, deck1);
         }
 
-        if deck1.cards.is_empty() {
+        if deck1.is_empty() {
             return (Player::Two, deck2);
         }
-        if deck2.cards.is_empty() {
+        if deck2.is_empty() {
             return (Player::One, deck1);
         }
 
-        let p1_card = deck1.cards.pop_front().unwrap();
-        let p2_card = deck2.cards.pop_front().unwrap();
-        if p1_card <= deck1.cards.len() && p2_card <= deck2.cards.len() {
+        let p1_card = deck1.pop_front().unwrap();
+        let p2_card = deck2.pop_front().unwrap();
+        if p1_card <= deck1.len() && p2_card <= deck2.len() {
             // recursive combat game initiated here
-            let new_deck1: VecDeque<Card> = deck1.cards.iter().take(p1_card).cloned().collect();
-            let new_deck2: VecDeque<Card> = deck2.cards.iter().take(p2_card).cloned().collect();
+            let new_deck1: VecDeque<Card> = deck1.iter().take(p1_card).cloned().collect();
+            let new_deck2: VecDeque<Card> = deck2.iter().take(p2_card).cloned().collect();
 
             assert_eq!(new_deck1.len(), p1_card);
             assert_eq!(new_deck2.len(), p2_card);
 
-            match game(Deck { cards: new_deck1 }, Deck { cards: new_deck2 }) {
+            match game(Deck(new_deck1), Deck(new_deck2)) {
                 (Player::One, _) => {
-                    deck1.cards.push_back(p1_card);
-                    deck1.cards.push_back(p2_card);
+                    deck1.push_back(p1_card);
+                    deck1.push_back(p2_card);
                 }
                 (Player::Two, _) => {
-                    deck2.cards.push_back(p2_card);
-                    deck2.cards.push_back(p1_card);
+                    deck2.push_back(p2_card);
+                    deck2.push_back(p1_card);
                 }
             }
         } else if p1_card > p2_card {
-            deck1.cards.push_back(p1_card);
-            deck1.cards.push_back(p2_card);
+            deck1.push_back(p1_card);
+            deck1.push_back(p2_card);
         } else {
-            deck2.cards.push_back(p2_card);
-            deck2.cards.push_back(p1_card);
+            deck2.push_back(p2_card);
+            deck2.push_back(p1_card);
         }
     }
 }
@@ -106,21 +114,21 @@ pub fn part1(input: &str) -> usize {
     let mut p2q: Deck = p2.parse().unwrap();
 
     let winner: Deck = loop {
-        if p1q.cards.is_empty() {
+        if p1q.is_empty() {
             break p2q;
         }
-        if p2q.cards.is_empty() {
+        if p2q.is_empty() {
             break p1q;
         }
-        let p1_card = p1q.cards.pop_front().unwrap();
-        let p2_card = p2q.cards.pop_front().unwrap();
+        let p1_card = p1q.pop_front().unwrap();
+        let p2_card = p2q.pop_front().unwrap();
 
         if p1_card > p2_card {
-            p1q.cards.push_back(p1_card);
-            p1q.cards.push_back(p2_card);
+            p1q.push_back(p1_card);
+            p1q.push_back(p2_card);
         } else {
-            p2q.cards.push_back(p2_card);
-            p2q.cards.push_back(p1_card);
+            p2q.push_back(p2_card);
+            p2q.push_back(p1_card);
         }
     };
 
@@ -140,17 +148,16 @@ pub fn part2(input: &str) -> usize {
 #[cfg(test)]
 mod ex22_tests {
     use super::*;
+    const INPUT: &str = include_str!("../input.txt");
 
     #[test]
     fn part_1() {
-        let input = include_str!("../input.txt");
-        assert_eq!(part1(input), 33421);
+        assert_eq!(part1(INPUT), 33421);
     }
 
     #[test]
     fn part_2() {
-        let input = include_str!("../input.txt");
-        assert_eq!(part2(input), 33651);
+        assert_eq!(part2(INPUT), 33651);
     }
 
     #[test]
