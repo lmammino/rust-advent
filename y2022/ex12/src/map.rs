@@ -174,7 +174,7 @@ impl<const W: usize, const H: usize> FromStr for Map<W, H> {
                         0
                     }
                     'b'..='z' => c as usize - 'a' as usize,
-                    _ => return Err(format!("Unexpected character '{}'", c)),
+                    _ => return Err(format!("Unexpected character '{c}'")),
                 };
                 grid[y][x] = elevation;
             }

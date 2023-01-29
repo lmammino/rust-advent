@@ -19,7 +19,7 @@ impl FromStr for Snafu {
                 '0' | '1' | '2' => c.to_string().parse().unwrap(),
                 '-' => -1,
                 '=' => -2,
-                _ => return Err(format!("Invalid character: {}", c)),
+                _ => return Err(format!("Invalid character: {c}")),
             };
 
             val += n * 5_i64.pow(i as u32);
@@ -52,7 +52,7 @@ impl Display for Snafu {
         }
 
         let s = chars.iter().rev().collect::<String>();
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 
@@ -95,7 +95,7 @@ mod tests {
         for (num, expected) in cases {
             let snafu: Snafu = num.into();
             let result = snafu.to_string();
-            assert_eq!(result, expected, "Failed for {}", num);
+            assert_eq!(result, expected, "Failed for {num}");
             // reverse the operation
             let snafu2: Snafu = result.parse().unwrap();
             assert_eq!(snafu, snafu2);

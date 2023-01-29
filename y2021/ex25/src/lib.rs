@@ -11,7 +11,7 @@ impl From<char> for Cell {
         match c {
             'v' => Cell::Down,
             '>' => Cell::Right,
-            _ => panic!("Invalid cell: {}", c),
+            _ => panic!("Invalid cell: {c}"),
         }
     }
 }
@@ -178,7 +178,7 @@ v.v..>>v.v
         let mut counter = 0;
         loop {
             counter += 1;
-            println!("{} ---\n\n {}\n", counter, g1);
+            println!("{counter} ---\n\n {g1}\n");
             let changed = g1.step(g2);
             mem::swap(&mut g1, &mut g2);
 

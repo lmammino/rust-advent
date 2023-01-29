@@ -18,7 +18,7 @@ impl<const N: usize> Display for OctoGrid<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for row in self.0 {
             for cell in row {
-                write!(f, "{}", cell)?;
+                write!(f, "{cell}")?;
             }
             writeln!(f)?;
         }

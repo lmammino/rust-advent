@@ -49,7 +49,7 @@ impl<const N: usize> Display for CaveMap<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for row in self.cave {
             let line: String = row.iter().map(|v| v.to_string()).collect();
-            writeln!(f, "{}", line)?;
+            writeln!(f, "{line}")?;
         }
 
         Ok(())
