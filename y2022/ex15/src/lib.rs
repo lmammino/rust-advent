@@ -1,6 +1,9 @@
+#[macro_use]
+extern crate lazy_static;
+
 use readings::Pos;
 use std::collections::HashSet;
-mod readings;
+pub mod readings;
 
 fn solve_part1(
     readings: impl Iterator<Item = (readings::Pos, readings::Pos, i64)>,
