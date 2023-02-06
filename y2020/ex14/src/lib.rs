@@ -1,23 +1,26 @@
 use std::collections::HashMap;
+use std::convert::{TryFrom, TryInto};
 use std::str::FromStr;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Instr<'a> {
     Mask(&'a str),
     Mem(u64, u64),
 }
 
-impl<'a> From<&'a str> for Instr<'a> {
-    fn from(s: &'a str) -> Self {
+impl<'a> TryFrom<&'a str> for Instr<'a> {
+    type Error = String;
+
+    fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         if s.starts_with("mask") {
-            Instr::Mask(&s[7..])
+            Ok(Instr::Mask(&s[7..]))
         } else if s.starts_with("mem") {
             let addr_value = &mut s[4..].split("] = ");
             let addr: u64 = addr_value.next().unwrap().parse().unwrap();
             let value: u64 = addr_value.next().unwrap().parse().unwrap();
-            Instr::Mem(addr, value)
+            Ok(Instr::Mem(addr, value))
         } else {
-            panic!("Invalid line found: {}", s)
+            Err(format!("Invalid line found: {s}"))
         }
     }
 }
@@ -59,7 +62,7 @@ impl FromStr for MaskParts {
 }
 
 pub fn part1(input: &str) -> u64 {
-    let instr = input.lines().map(|x| x.into());
+    let instr = input.lines().map(|x| x.try_into().unwrap());
 
     let mut mem: HashMap<u64, u64> = HashMap::new();
 
@@ -79,7 +82,7 @@ pub fn part1(input: &str) -> u64 {
 }
 
 pub fn part2(input: &str) -> u64 {
-    let instr = input.lines().map(|x| x.into());
+    let instr = input.lines().map(|x| x.try_into().unwrap());
 
     let mut mem: HashMap<u64, u64> = HashMap::new();
     let mut mask_parts: MaskParts = "X".repeat(36).parse().unwrap();
@@ -114,6 +117,18 @@ pub fn part2(input: &str) -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn test_parse() {
+        let mask: Instr = "mask = 000000000000000000000000000000X1001X"
+            .try_into()
+            .unwrap();
+
+        assert_eq!(mask, Instr::Mask("000000000000000000000000000000X1001X"));
+
+        let mem: Instr = "mem[42] = 100".try_into().unwrap();
+        assert_eq!(mem, Instr::Mem(42, 100));
+    }
+
     #[test]
     fn part_1() {
         let input = include_str!("../input.txt");
