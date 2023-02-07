@@ -61,10 +61,10 @@ trait TopN<T> {
     fn top_n(self, n: usize) -> Vec<T>;
 }
 
-impl<T: PartialOrd, U: IntoIterator<Item = T>> TopN<T> for U {
+impl<T: PartialOrd, U: Iterator<Item = T>> TopN<T> for U {
     fn top_n(self, n: usize) -> Vec<T> {
         let mut top = Vec::with_capacity(n);
-        for value in self.into_iter() {
+        for value in self {
             for i in 0..n {
                 if let Some(top_value) = top.get(i) {
                     if value > *top_value {
