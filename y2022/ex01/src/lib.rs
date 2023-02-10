@@ -86,15 +86,16 @@ trait Top<T> {
     fn top<const N: usize>(self) -> [T; N];
 }
 
-impl<T: Default + Copy + PartialOrd, U: IntoIterator<Item = T>> Top<T> for U {
+impl<T: Default + Copy + PartialOrd, U: Iterator<Item = T>> Top<T> for U {
     fn top<const N: usize>(self) -> [T; N] {
         // Note: This implementation is not perfect:
         // - What if there are less than N items in the iterator?
         // - What if there are only negative numbers?
         // A more resilient implementation could have been done with [Option<T>; N]
         // but it would have been less ergonomic for our current use case...
+        // See the `working_top` method for a possible implementation of this idea.
         let mut top = [Default::default(); N];
-        for value in self.into_iter() {
+        for value in self {
             for i in 0..N {
                 let top_value = top[i];
                 if value > top_value {
@@ -105,6 +106,55 @@ impl<T: Default + Copy + PartialOrd, U: IntoIterator<Item = T>> Top<T> for U {
             }
         }
         top
+    }
+}
+
+struct TopIter<T, const N: usize> {
+    data: [Option<T>; N],
+    current: usize,
+}
+
+impl<T, const N: usize> TopIter<T, N> {
+    fn new(data: [Option<T>; N]) -> Self {
+        Self { data, current: 0 }
+    }
+}
+
+impl<T: Clone, const N: usize> Iterator for TopIter<T, N> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current >= N {
+            return None;
+        }
+        let value = self.data.get(self.current).cloned()?;
+        self.current += 1;
+        Some(value.unwrap())
+    }
+}
+
+trait WorkingTop<T> {
+    fn working_top<const N: usize>(self) -> TopIter<T, N>;
+}
+
+impl<T: PartialOrd, U: IntoIterator<Item = T>> WorkingTop<T> for U {
+    fn working_top<const N: usize>(self) -> TopIter<T, N> {
+        let mut top: [Option<T>; N] = core::array::from_fn(|_| None);
+        for value in self {
+            for i in 0..N {
+                if let Some(top_value) = &top[i] {
+                    if &value > top_value {
+                        top[i..].rotate_right(1);
+                        top[i] = Some(value);
+                        break;
+                    }
+                } else {
+                    top[i] = Some(value);
+                    break;
+                }
+            }
+        }
+        TopIter::new(top)
     }
 }
 
@@ -187,6 +237,19 @@ pub fn part2_combinators_no_sort_const(input: &str) -> u64 {
         .sum()
 }
 
+pub fn part2_combinators_no_sort_const_custom_iter(input: &str) -> u64 {
+    input
+        .split("\n\n")
+        .map(|batch| {
+            batch
+                .lines()
+                .map(|line| line.parse::<u64>().unwrap())
+                .sum::<u64>()
+        })
+        .working_top::<3>()
+        .sum()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -225,5 +288,10 @@ mod tests {
     #[test]
     fn test_part2_combinators_no_sort_const() {
         assert_eq!(part2_combinators_no_sort_const(INPUT), 208180);
+    }
+
+    #[test]
+    fn test_part2_combinators_no_sort_const_custom_iter() {
+        assert_eq!(part2_combinators_no_sort_const_custom_iter(INPUT), 208180);
     }
 }

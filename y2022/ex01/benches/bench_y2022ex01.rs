@@ -2,6 +2,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use y2022ex01::{
     part1, part1_classic, part1_combinators, part2, part2_combinators_itertools,
     part2_combinators_no_sort, part2_combinators_no_sort_const,
+    part2_combinators_no_sort_const_custom_iter,
 };
 
 fn criterion_benchmark(c: &mut Criterion) {
@@ -23,6 +24,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("y2022ex01::part2_combinators_no_sort_const", |b| {
         b.iter(|| part2_combinators_no_sort_const(black_box(input)))
     });
+    c.bench_function(
+        "y2022ex01::part2_combinators_no_sort_const_custom_iter",
+        |b| b.iter(|| part2_combinators_no_sort_const_custom_iter(black_box(input))),
+    );
 }
 
 criterion_group!(benches, criterion_benchmark);
