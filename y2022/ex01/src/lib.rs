@@ -86,7 +86,7 @@ trait Top<T> {
     fn top<const N: usize>(self) -> [T; N];
 }
 
-impl<T: Default + Copy + PartialOrd, U: Iterator<Item = T>> Top<T> for U {
+impl<T: Default + PartialOrd, U: Iterator<Item = T>> Top<T> for U {
     fn top<const N: usize>(self) -> [T; N] {
         // Note: This implementation is not perfect:
         // - What if there are less than N items in the iterator?
@@ -94,11 +94,11 @@ impl<T: Default + Copy + PartialOrd, U: Iterator<Item = T>> Top<T> for U {
         // A more resilient implementation could have been done with [Option<T>; N]
         // but it would have been less ergonomic for our current use case...
         // See the `working_top` method for a possible implementation of this idea.
-        let mut top = [Default::default(); N];
+        let mut top = core::array::from_fn(|_| Default::default());
         for value in self {
             for i in 0..N {
-                let top_value = top[i];
-                if value > top_value {
+                let top_value = &top[i];
+                if &value > top_value {
                     top[i..].rotate_right(1);
                     top[i] = value;
                     break;
