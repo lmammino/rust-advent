@@ -1,4 +1,3 @@
-
 # Day 13: Distress Signal
 
 [Check it out on adventofcode.com](https://adventofcode.com/2022/day/13)
