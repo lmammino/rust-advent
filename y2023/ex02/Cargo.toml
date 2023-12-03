@@ -1,0 +1,14 @@
+[package]
+name = "y2023ex02"
+version = "0.1.0"
+edition = "2021"
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "bench_y2023ex02"
+harness = false
+
+[dependencies]
+nom = "7.1.3"
