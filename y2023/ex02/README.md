@@ -1,6 +1,6 @@
 # Day 2: Cube Conundrum
 
-[Check it out on adventofcode.com](https://adventofcode.com/2023/day/1)
+[Check it out on adventofcode.com](https://adventofcode.com/2023/day/2)
 
 ## Part One
 
