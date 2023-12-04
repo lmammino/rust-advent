@@ -92,11 +92,6 @@ impl SchematicParser {
 
     pub fn parse(mut self, input: &str) -> Schematic {
         for (y, line) in input.lines().enumerate() {
-            // line resets
-            if !self.num_buffer.is_empty() {
-                self.add_new_part(y - 1);
-            }
-
             for (x, char) in line.char_indices() {
                 match char {
                     '0'..='9' => {
@@ -117,6 +112,11 @@ impl SchematicParser {
                         self.add_new_symbol(symbol, x, y);
                     }
                 }
+            }
+
+            // line resets
+            if !self.num_buffer.is_empty() {
+                self.add_new_part(y);
             }
         }
 

@@ -1,9 +1,8 @@
-use std::str::FromStr;
-
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::u32, combinator::complete,
     multi::separated_list1, IResult,
 };
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq)]
 struct Game {
@@ -135,9 +134,8 @@ pub fn part1(input: &str) -> u32 {
                 }
             }
 
-            Some(game)
+            Some(game.id)
         })
-        .map(|game| game.id)
         .sum()
 }
 
