@@ -16,7 +16,7 @@ const dayDir = `ex${day.padStart(2, '0')}`
 await $`mkdir -p ./${yearDir}`
 
 // Create rust project
-// await $`cd ./y${year} && cargo new --lib ${dayDir}`
+await $`cd ./y${year} && cargo new --lib ${dayDir}`
 
 // update Cargo.toml
 const cargoToml = `[package]
