@@ -46,6 +46,20 @@ cargo test --package ex01 --lib --all-features -- tests::part_2
 
 ## Create a new exercise
 
+**New**: You can now use the `scaffold.mjs` script to create a new exercise. Simply run:
+
+```bash
+./scaffold.mjs <year> <day>
+```
+
+(Note: it requires [`zx`](https://github.com/google/zx) to be installed).
+
+---
+
+
+Alternatively, you can create a new exercise manually by following these steps:
+
+
 Cd into the specific **year folder** (e.g. `y2020`) and run:
 
 ```bash
