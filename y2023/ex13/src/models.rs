@@ -1,147 +1,75 @@
-use std::{
-    cmp::min,
-    collections::{HashMap, HashSet},
-    str::FromStr,
-};
+use std::{cmp::min, fmt::Display, str::FromStr};
 
 #[derive(Debug, Clone)]
 pub struct Map {
-    width: usize,
-    height: usize,
-    rows: HashMap<usize, HashSet<usize>>,
-    cols: HashMap<usize, HashSet<usize>>,
+    data: Vec<String>,
+}
+
+impl Display for Map {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for line in &self.data {
+            writeln!(f, "{}", line)?;
+        }
+        Ok(())
+    }
 }
 
 impl FromStr for Map {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let width = s.lines().next().unwrap().len();
-        let height = s.lines().count();
-        let mut rows: HashMap<usize, HashSet<usize>> = HashMap::new();
-        let mut cols: HashMap<usize, HashSet<usize>> = HashMap::new();
-
-        for (row, line) in s.lines().enumerate() {
-            for (col, tile) in line.chars().enumerate() {
-                if tile == '#' {
-                    rows.entry(row).or_default().insert(col);
-                    cols.entry(col).or_default().insert(row);
-                }
-            }
-        }
-
-        Ok(Map {
-            width,
-            height,
-            rows,
-            cols,
-        })
+        let data: Vec<String> = s.lines().map(|line| line.to_owned()).collect();
+        Ok(Map { data })
     }
 }
 
 impl Map {
-    fn has_reflection_at(
-        &self,
-        idx: usize,
-        len: usize,
-        ref_index: &HashMap<usize, HashSet<usize>>,
-    ) -> bool {
-        let min_distance_to_edge = min(idx, len - idx);
-        for delta in 0..=(min_distance_to_edge + 1) {
-            if idx + delta >= len {
-                continue;
-            }
-            let points_a = ref_index.get(&(idx + delta));
-            let points_b = ref_index.get(&(idx + 1 - delta));
-            let matching = points_a == points_b;
-            if !matching {
-                return false;
+    pub fn transpose(self) -> Map {
+        let mut transposed = vec![Vec::new(); self.data[0].len()];
+        for row in self.data {
+            for (col, c) in row.chars().enumerate() {
+                transposed[col].push(c);
             }
         }
-
-        true
+        let data: Vec<String> = transposed
+            .iter()
+            .map(|row| row.iter().collect::<String>())
+            .collect();
+        Map { data }
     }
 
-    fn has_reflection_with_smudge_at(
-        &self,
-        idx: usize,
-        len: usize,
-        ref_index: &HashMap<usize, HashSet<usize>>,
-    ) -> bool {
-        let min_distance_to_edge = min(idx, len - idx);
-        let mut found_smudge = false;
+    pub fn find_reflection(&self, exact_num_errors: usize) -> Option<usize> {
+        'outer: for (line_idx, _line) in self.data.iter().enumerate().skip(1) {
+            let mut errors_found = 0;
 
-        let mut compared = HashSet::new();
+            // find the two halves to compare by splitting between line_idx - 1 and line_idx
+            let edge_dist = min(self.data.len() - line_idx, line_idx);
+            let upper_half_range = line_idx - edge_dist..line_idx;
+            let lower_half_range = (line_idx..(line_idx + edge_dist)).rev();
 
-        for delta in 0..=(min_distance_to_edge + 1) {
-            if idx + delta >= len || idx + 1 - delta >= len {
-                continue;
+            // compare the data in the 2 halves
+            let to_compare = upper_half_range.zip(lower_half_range);
+
+            for (line_a_idx, line_b_idx) in to_compare {
+                let line_a = &self.data[line_a_idx];
+                let line_b = &self.data[line_b_idx];
+                let mut line_a_chars = line_a.chars();
+                let mut line_b_chars = line_b.chars();
+
+                while let (Some(c_a), Some(c_b)) = (line_a_chars.next(), line_b_chars.next()) {
+                    if c_a != c_b {
+                        errors_found += 1;
+                        if errors_found > exact_num_errors {
+                            continue 'outer;
+                        }
+                    }
+                }
             }
-
-            let points_a_idx = idx + delta;
-            let points_b_idx = idx + 1 - delta;
-            if compared.contains(&(points_a_idx, points_b_idx)) {
-                continue;
-            }
-
-            let points_a = ref_index.get(&points_a_idx).unwrap();
-            let points_b = ref_index.get(&points_b_idx).unwrap();
-            compared.insert((points_a_idx, points_b_idx));
-            compared.insert((points_b_idx, points_a_idx));
-            let matching = points_a == points_b;
-
-            let mut a = points_a.iter().collect::<Vec<_>>();
-            a.sort();
-            let mut b = points_b.iter().collect::<Vec<_>>();
-            b.sort();
-            println!(
-                "idx: {}, delta: {}, matching: {}, a ({}): {:?}, b ({}): {:?}",
-                idx,
-                delta,
-                matching,
-                idx + delta,
-                a,
-                idx + 1 - delta,
-                b
-            );
-
-            if !matching && found_smudge {
-                println!("idx: {}, delta: {} --- found smudge twice!", idx, delta);
-                // cannot have more than 1 smudge
-                return false;
-            }
-            // Check if there's a smudge.
-            // There must be only 1 difference between the sets, which means that the instersection
-            // should contain the same number of elements of the set with the least amount of elements.
-            let len_diff = (points_a.len() as isize - points_b.len() as isize).abs();
-            if points_a.intersection(points_b).count() == min(points_a.len(), points_b.len())
-                && len_diff == 1
-            {
-                println!("idx: {}, delta: {} --- found smudge!", idx, delta);
-                found_smudge = true;
+            if errors_found == exact_num_errors {
+                return Some(line_idx);
             }
         }
-
-        println!("idx: {} --- EXITING WITH {}", idx, found_smudge);
-
-        found_smudge
-    }
-
-    pub fn find_vertical_reflection(&self) -> Option<usize> {
-        (0..self.width).find(|&col| self.has_reflection_at(col, self.width, &self.cols))
-    }
-
-    pub fn find_horizontal_reflection(&self) -> Option<usize> {
-        (0..self.height).find(|&row| self.has_reflection_at(row, self.height, &self.rows))
-    }
-
-    pub fn find_vertical_reflection_with_smudge(&self) -> Option<usize> {
-        (0..self.width).find(|&col| self.has_reflection_with_smudge_at(col, self.width, &self.cols))
-    }
-
-    pub fn find_horizontal_reflection_with_smudge(&self) -> Option<usize> {
-        (0..self.height)
-            .find(|&row| self.has_reflection_with_smudge_at(row, self.height, &self.rows))
+        None
     }
 }
 
@@ -150,7 +78,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_find_vertical_reflection() {
+    fn test_find_reflection() {
         let raw_map = "#.##..##.
 ..#.##.#.
 ##......#
@@ -159,14 +87,14 @@ mod tests {
 ..##..##.
 #.#.##.#.";
         let map: Map = raw_map.parse().unwrap();
-        let vertical_reflection = map.find_vertical_reflection().unwrap();
-        assert_eq!(vertical_reflection, 4);
-        let horizontal_reflection = map.find_horizontal_reflection();
+        let horizontal_reflection = map.find_reflection(0);
+        let vertical_reflection = map.transpose().find_reflection(0);
+        assert_eq!(vertical_reflection.unwrap(), 5);
         assert!(horizontal_reflection.is_none());
     }
 
     #[test]
-    fn test_find_vertical_reflection2() {
+    fn test_find_reflection2() {
         let raw_map = "####.##.#######
 .####..####....
 ####.##.#######
@@ -181,14 +109,15 @@ mod tests {
 ####....#######
 .##......##.##.";
         let map: Map = raw_map.parse().unwrap();
-        let vertical_reflection = map.find_vertical_reflection().unwrap();
-        assert_eq!(vertical_reflection, 12);
-        let horizontal_reflection = map.find_horizontal_reflection();
+        let horizontal_reflection = map.find_reflection(0);
+        let transposed = map.transpose();
+        let vertical_reflection = transposed.find_reflection(0);
+        assert_eq!(vertical_reflection.unwrap(), 13);
         assert!(horizontal_reflection.is_none());
     }
 
     #[test]
-    fn test_find_horizontal_reflection() {
+    fn test_find_reflection3() {
         let raw_map = "#...##..#
 #....#..#
 ..##..###
@@ -197,14 +126,14 @@ mod tests {
 ..##..###
 #....#..#";
         let map: Map = raw_map.parse().unwrap();
-        let horizontal_reflection = map.find_horizontal_reflection().unwrap();
-        assert_eq!(horizontal_reflection, 3);
-        let vertical_reflection = map.find_vertical_reflection();
+        let horizontal_reflection = map.find_reflection(0);
+        let vertical_reflection = map.transpose().find_reflection(0);
+        assert_eq!(horizontal_reflection.unwrap(), 4);
         assert!(vertical_reflection.is_none());
     }
 
     #[test]
-    fn test_find_horizontal_reflection2() {
+    fn test_find_reflection4() {
         let raw_map = "#.###.#..
 #.###.#..
 ..##.#.##
@@ -217,12 +146,14 @@ mod tests {
 #..#...##
 #..#.#.##";
         let map: Map = raw_map.parse().unwrap();
-        let horizontal_reflection = map.find_horizontal_reflection().unwrap();
-        assert_eq!(horizontal_reflection, 0);
+        let horizontal_reflection = map.find_reflection(0);
+        let vertical_reflection = map.transpose().find_reflection(0);
+        assert_eq!(horizontal_reflection.unwrap(), 1);
+        assert!(vertical_reflection.is_none());
     }
 
     #[test]
-    fn test_find_horizontal_reflection_with_smudge() {
+    fn test_find_reflection_with_smudge() {
         let raw_map = "#.##..##.
 ..#.##.#.
 ##......#
@@ -231,12 +162,14 @@ mod tests {
 ..##..##.
 #.#.##.#.";
         let map: Map = raw_map.parse().unwrap();
-        let horizontal_reflection = map.find_horizontal_reflection_with_smudge().unwrap();
-        assert_eq!(horizontal_reflection, 2);
+        let horizontal_reflection = map.find_reflection(1);
+        let vertical_reflection = map.transpose().find_reflection(1);
+        assert_eq!(horizontal_reflection.unwrap(), 3);
+        assert!(vertical_reflection.is_none());
     }
 
     #[test]
-    fn test_find_horizontal_reflection_with_smudge2() {
+    fn test_find_reflection_with_smudge2() {
         let raw_map = "#...##..#
 #....#..#
 ..##..###
@@ -245,7 +178,9 @@ mod tests {
 ..##..###
 #....#..#";
         let map: Map = raw_map.parse().unwrap();
-        let horizontal_reflection = map.find_horizontal_reflection_with_smudge().unwrap();
-        assert_eq!(horizontal_reflection, 0);
+        let horizontal_reflection = map.find_reflection(1);
+        let vertical_reflection = map.transpose().find_reflection(1);
+        assert_eq!(horizontal_reflection.unwrap(), 1);
+        assert!(vertical_reflection.is_none());
     }
 }

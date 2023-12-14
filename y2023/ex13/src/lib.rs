@@ -2,49 +2,25 @@ use models::Map;
 
 mod models;
 
-pub fn part1(input: &str) -> usize {
+fn solve(input: &str, errors: usize) -> usize {
     input
         .split("\n\n")
         .map(|raw_map| {
             let map: Map = raw_map.parse().unwrap();
-            let vertical_reflection = match map.find_vertical_reflection() {
-                Some(col) => col + 1,
-                None => 0,
-            };
-            let horizontal_reflection = match map.find_horizontal_reflection() {
-                Some(row) => row + 1,
-                None => 0,
-            };
+            let horizontal_reflection = map.find_reflection(errors).unwrap_or(0);
+            let vertical_reflection = map.transpose().find_reflection(errors).unwrap_or(0);
 
             vertical_reflection + horizontal_reflection * 100
         })
         .sum()
 }
 
+pub fn part1(input: &str) -> usize {
+    solve(input, 0)
+}
+
 pub fn part2(input: &str) -> usize {
-    input
-        .split("\n\n")
-        .map(|raw_map| {
-            let map: Map = raw_map.parse().unwrap();
-            let vertical_reflection = match map.find_vertical_reflection_with_smudge() {
-                Some(col) => col + 1,
-                None => 0,
-            };
-            let horizontal_reflection = match map.find_horizontal_reflection_with_smudge() {
-                Some(row) => row + 1,
-                None => 0,
-            };
-
-            let result = vertical_reflection + horizontal_reflection * 100;
-
-            println!(
-                "{}\n{} (vert: {}, horiz: {})\n",
-                raw_map, result, vertical_reflection, horizontal_reflection
-            );
-
-            result
-        })
-        .sum()
+    solve(input, 1)
 }
 
 #[cfg(test)]
@@ -84,6 +60,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 0);
+        assert_eq!(part2(INPUT), 37478);
     }
 }
