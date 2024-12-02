@@ -129,4 +129,4 @@ So, for these example lists, the similarity score at the end of this process is
 
 Once again consider your left and right lists. What is their similarity score?
 
-Your puzzle answer was `?`. (TODO: )
+Your puzzle answer was `19097157`.
