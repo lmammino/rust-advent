@@ -1,0 +1,16 @@
+[package]
+name = "y2025ex02"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+winnow = "0.7.14"
+
+[[bench]]
+name = "bench_y2025ex02"
+harness = false
+
+[dev-dependencies]
+criterion = "0.5.1"
